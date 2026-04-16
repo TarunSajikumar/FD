@@ -1,0 +1,17 @@
+[
+  {
+    "id": "owner",
+    "name": "Owner",
+    "email": "owner@foodpoint.local",
+    "password": "1515",
+    "role": "owner"
+  },
+  {
+    "id": "1776336230126",
+    "name": "Test User",
+    "email": "test@example.com",
+    "password": "$2a$12$SeqGekCGG6JEVQb3J1KZmeTR3m.vxgdUp.rBOpBCREMUiPNDU9aGC",
+    "role": "customer",
+    "createdAt": "2026-04-16T10:43:50.126Z"
+  }
+]

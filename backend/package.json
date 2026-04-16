@@ -8,10 +8,11 @@
     "test-db": "node test-db.js"
   },
   "dependencies": {
-    "express": "^4.18.4",
-    "socket.io": "^4.7.2",
-    "mongoose": "^8.0.0",
     "bcryptjs": "^2.4.3",
-    "cors": "^2.8.5"
+    "cors": "^2.8.5",
+    "dotenv": "^17.4.2",
+    "express": "^4.18.4",
+    "mongoose": "^8.0.0",
+    "socket.io": "^4.7.2"
   }
 }

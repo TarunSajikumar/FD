@@ -138,7 +138,7 @@
     }
 
     .page-with-header {
-      margin-top: 100px !important;
+      margin-top: 40px !important;
       padding: 20px;
     }
 
@@ -1383,17 +1383,6 @@
   </style>
 </head>
 <body>
-  <div class="user-bar" aria-hidden="false">
-    <div class="user-info">
-      <div class="user-avatar">FP</div>
-      <div class="user-text">
-        <div class="user-name">Food Point</div>
-        <div class="user-email">Owner Dashboard</div>
-      </div>
-    </div>
-    <button class="logout-btn" onclick="location.href='home.html'">Home</button>
-  </div>
-
   <div class="page-with-header">
     <div class="dashboard-container">
       <!-- Header -->
@@ -1511,9 +1500,6 @@
           <div id="emptyNote" class="empty-note" style="display:none;">
             <i class="fas fa-clipboard"></i>
             <p>No orders yet. When customers place orders, they will appear here.</p>
-            <button class="action-btn primary" onclick="generateDemoOrders()" style="margin-top: 20px;">
-              <i class="fas fa-magic"></i> Generate Demo Orders
-            </button>
           </div>
         </div>
       </div>
@@ -1726,6 +1712,19 @@
       </div>
       <div class="modal-buttons">
         <button class="modal-btn modal-btn-secondary" onclick="closeManageMenuModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="confirmDeleteModal" class="modal-overlay">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3><i class="fas fa-exclamation-triangle"></i> Confirm Delete</h3>
+        <p id="confirmDeleteMessage">Are you sure you want to delete this menu item? This action cannot be undone.</p>
+      </div>
+      <div class="modal-buttons">
+        <button class="modal-btn modal-btn-secondary" onclick="closeConfirmDeleteModal()">Cancel</button>
+        <button class="modal-btn modal-btn-primary" onclick="confirmDeleteMenuItem()">Delete</button>
       </div>
     </div>
   </div>
@@ -3309,11 +3308,38 @@
       openManageMenuModal();
     }
 
-    async function deleteMenuItem(id) {
-      if (!confirm("Are you sure you want to delete this menu item? This action cannot be undone.")) {
-        return;
-      }
+    let pendingDeleteItemId = null;
 
+    function openConfirmDeleteModal(id, name) {
+      pendingDeleteItemId = id;
+      const message = name
+        ? `Delete "${name}" from the menu? This action cannot be undone.`
+        : "Are you sure you want to delete this menu item? This action cannot be undone.";
+      document.getElementById("confirmDeleteMessage").textContent = message;
+      document.getElementById("confirmDeleteModal").classList.add("active");
+    }
+
+    function closeConfirmDeleteModal() {
+      pendingDeleteItemId = null;
+      document.getElementById("confirmDeleteModal").classList.remove("active");
+    }
+
+    function confirmDeleteMenuItem() {
+      if (!pendingDeleteItemId) return;
+      const id = pendingDeleteItemId;
+      closeConfirmDeleteModal();
+      doDeleteMenuItem(id);
+    }
+
+    async function deleteMenuItem(id) {
+      let menuItems = [];
+      try { menuItems = JSON.parse(localStorage.getItem(MENU_ITEMS_KEY) || '[]'); } catch(e) { menuItems = []; }
+      const item = menuItems.find(i => i.id === id);
+      if (!item) { showNotification('Error', 'Item not found', 'error'); return; }
+      openConfirmDeleteModal(id, item.name);
+    }
+
+    async function doDeleteMenuItem(id) {
       let menuItems = [];
       try { menuItems = JSON.parse(localStorage.getItem(MENU_ITEMS_KEY) || '[]'); } catch(e) { menuItems = []; }
       const item = menuItems.find(i => i.id === id);
@@ -3331,7 +3357,6 @@
         }
       }
 
-      // fallback
       menuItems = menuItems.filter(i => i.id !== id);
       localStorage.setItem(MENU_ITEMS_KEY, JSON.stringify(menuItems));
       showNotification('Item Deleted', `${item.name} has been removed from the menu`, 'success');

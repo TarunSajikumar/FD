@@ -128,7 +128,7 @@
       /* Main container */
       .container {
         max-width: 880px;
-        margin: 100px auto 120px;
+        margin: 40px auto 120px;
         padding: 28px 24px;
         background: linear-gradient(135deg, rgba(30,35,50,0.78), rgba(25,30,45,0.73));
         border-radius: 28px;
@@ -138,7 +138,7 @@
       }
 
       .page-with-header {
-        margin-top: 82px !important;
+        margin-top: 0 !important;
       }
 
       /* Brand and header */
@@ -423,24 +423,27 @@
       /* Bottom action bar */
       .bottom-action-bar {
         position: fixed;
-        bottom: 10px;
-        left: 10px;
-        right: 10px;
+        bottom: 12px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: min(880px, calc(100% - 24px));
+        max-width: 880px;
         background: linear-gradient(135deg, rgba(30,35,50,0.85), rgba(25,30,45,0.82));
-        padding: 12px 16px;
+        padding: 14px 18px;
         display: flex;
         align-items: center;
         justify-content: space-between;
+        gap: 16px;
         border-radius: 14px;
         box-shadow: 0 16px 40px rgba(0,0,0,0.5);
         z-index: 999;
         border: 1px solid rgba(255,255,255,0.08);
         backdrop-filter: blur(12px);
-        max-width: calc(100% - 20px);
       }
 
       .selection-info {
         flex: 1;
+        min-width: 0;
       }
 
       .selection-count {
@@ -465,10 +468,11 @@
         font-size: 15px;
         cursor: pointer;
         transition: all 200ms ease;
-        min-width: 130px;
+        min-width: 140px;
         text-transform: uppercase;
         letter-spacing: 0.04em;
         box-shadow: 0 0 16px rgba(255,140,0,0.35);
+        white-space: nowrap;
       }
 
       .add-to-cart-btn:hover {
@@ -541,18 +545,7 @@
 
       /* Reserve space for floating ADD TO CART bar */
       .bottom-bar-spacer {
-        height: 110px;
-      }
-
-      /* Ensure bottom bar truly floats like top bar */
-      .bottom-action-bar {
-        position: fixed !important;
-        bottom: 12px !important;
-        left: 50% !important;
-        transform: translateX(-50%) !important;
-        max-width: 880px !important;
-        width: calc(100% - 24px) !important;
-        z-index: 10000 !important;
+        height: 96px;
       }
 
       @media (max-width: 480px) {
@@ -588,17 +581,6 @@
     </style>
 </head>
 <body>
-  <div class="user-bar">
-    <div class="user-info">
-      <div class="user-avatar">FP</div>
-      <div class="user-text">
-        <div class="user-name">Food Point</div>
-        <div class="user-email">Menu</div>
-      </div>
-    </div>
-    <button class="logout-btn" onclick="location.href='index.html'">Home</button>
-  </div>
-
   <div class="container page-with-header">
     <!-- Brand Header -->
     <div class="brand">FOOD POINT</div>
