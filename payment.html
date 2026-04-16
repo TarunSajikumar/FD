@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Payment — Options & Secure UPI</title>
+
+  <!-- fontawesome (for icons) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="fp-config.js"></script>
+  <script src="fp-fetch-proxy.js"></script>
+  <script src="api.js"></script>
+  <script src="dev-check.js"></script>
+
+  <style>
+    /* --- Reset & base --- */
+    * { margin:0; padding:0; box-sizing:border-box; font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; -webkit-tap-highlight-color:transparent; }
+    html { -webkit-user-select:none; -webkit-text-size-adjust:100%; }
+    body {
+      background: #0a0e1a url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg"/>') repeat;
+      color: #d9e6ff;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+    }
+
+    .container {
+      width:100%;
+      max-width:760px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+      border-radius:18px;
+      padding:26px;
+      box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+      backdrop-filter: blur(6px);
+    }
+
+    header h1 { font-size:22px; color:#fff; letter-spacing:0.4px; margin-bottom:6px;}
+    header p { color:#bfcbe6; font-size:14px; margin-bottom:18px; }
+
+    .steps {
+      display:flex;
+      gap:12px;
+      margin-bottom:18px;
+    }
+    .step {
+      flex:1;
+      background: rgba(255,255,255,0.02);
+      padding:12px;
+      border-radius:12px;
+      text-align:center;
+      cursor:pointer;
+      border:2px solid transparent;
+      transition: all .18s ease;
+      user-select:none;
+    }
+    .step.active { border-color: #ffd79a; transform:translateY(-4px); background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)); }
+    .step h3 { margin-bottom:6px; font-size:16px; color:#fff; }
+    .step p { font-size:13px; color:#bfcbe6; }
+
+    .payment-card {
+      margin-top:10px;
+      padding:18px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,0.03);
+    }
+
+    .amount-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+    .amount-row .label { color:#bfcbe6; font-size:13px; }
+    .amount-row .value { font-weight:700; font-size:20px; color:#fff; }
+
+    .btn {
+      display:inline-block;
+      padding:10px 14px;
+      border-radius:10px;
+      font-weight:700;
+      cursor:pointer;
+      border:0;
+      background: linear-gradient(90deg,#ffb347,#ffcc33);
+      color:#111;
+      box-shadow: 0 6px 16px rgba(255,179,71,0.18);
+    }
+
+    .btn-ghost {
+      background:transparent;
+      border:1px solid rgba(255,255,255,0.06);
+      color:#e6eefc;
+    }
+
+    /* online ui */
+    .online-ui { margin-top:14px; display:none; }
+    .upi-box {
+      display:flex;
+      gap:12px;
+      align-items:center;
+      padding:12px;
+      background:rgba(0,0,0,0.18);
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,0.02);
+    }
+    .upi-qr { width:130px; height:130px; background:#fff; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#222; font-weight:700; }
+    .upi-details { flex:1; }
+    .copy-row { display:flex; gap:8px; margin-top:8px; align-items:center; }
+    .small { font-size:13px; color:#dfe9ff; }
+
+    .hint { margin-top:10px; font-size:13px; color:#c8d6ff; background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00)); padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.02); }
+
+    footer { margin-top:16px; display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; }
+
+    @media (max-width:520px){
+      .steps { flex-direction:column; }
+      .upi-qr { width:100px; height:100px; font-size:14px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container" role="main">
+    <header>
+      <h1>Complete Payment</h1>
+      <p>Choose how you'd like to pay. If you pick Online, follow the UPI instructions on this page and tap <strong>"I have paid"</strong> when done.</p>
+    </header>
+
+    <!-- Step chooser -->
+    <div class="steps" id="paymentSteps">
+      <div class="step" id="stepCash" data-step="cash" aria-pressed="false">
+        <h3>Cash</h3>
+        <p>Pay in cash when your order arrives — fast & easy.</p>
+      </div>
+
+      <div class="step" id="stepOnline" data-step="online" aria-pressed="false">
+        <h3>Online (UPI)</h3>
+        <p>Pay instantly with UPI — scan or copy the UPI ID.</p>
+      </div>
+    </div>
+
+    <div class="payment-card">
+      <div class="amount-row">
+        <div>
+          <div class="label">Amount to pay</div>
+        </div>
+        <div class="value" id="amountValue">₹0.00</div>
+      </div>
+
+      <div id="actionArea">
+        <button class="btn" id="payCashBtn">Pay with Cash</button>
+        <button class="btn btn-ghost" id="chooseOnlineBtn">Proceed to Online Payment</button>
+      </div>
+
+      <!-- Online payment UI (hidden until online chosen) -->
+      <div class="online-ui" id="onlineUI" aria-hidden="true">
+        <div class="upi-box">
+          <div class="upi-qr" id="qrPlaceholder">QR</div>
+          <div class="upi-details">
+            <div class="small">Pay to</div>
+            <div style="font-weight:800; margin-top:4px; font-size:16px;" id="upiId">example@upi</div>
+
+            <div class="copy-row">
+              <input type="text" id="upiInput" value="example@upi" readonly style="flex:1; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,0.04); background:transparent; color:#fff;">
+              <button class="btn btn-ghost" id="copyUpiBtn"><i class="fa-regular fa-copy"></i> Copy</button>
+            </div>
+
+            <div style="margin-top:10px; display:flex; gap:8px;">
+              <button class="btn" id="iPaidBtn">I have paid</button>
+              <button class="btn btn-ghost" id="chooseCashBackBtn">Back to options</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="hint">
+          Tip: Use your UPI app to scan the QR or paste the UPI ID. After completing payment in your app, press “I have paid”.
+        </div>
+      </div>
+
+      <footer>
+        <div class="small">Payment provider: <strong id="providerLabel">UPI</strong></div>
+        <div class="small">Secure · No card details here</div>
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    /* ====== utilities to read/write localStorage and compute fallbacks ====== */
+    function safeGet(key){ try { return localStorage.getItem(key); } catch(e){ return null; } }
+    function safeSet(key,val){ try { localStorage.setItem(key,String(val)); } catch(e){ } }
+
+    function parseAmountRaw(raw){
+      if(!raw) return null;
+      // remove currency symbol and commas
+      const cleaned = String(raw).replace(/[₹, ]+/g,'').trim();
+      const n = parseFloat(cleaned);
+      return Number.isFinite(n) ? n : null;
+    }
+
+    function computeAmountFromCart(){
+      // Attempts to compute amount using available cart items or fallback price-per-item.
+      try {
+        const cartJson = safeGet('cartItems') || safeGet('selectedFoods_v1') || safeGet('selectedFoods');
+        if(cartJson){
+          const parsed = JSON.parse(cartJson);
+          // parsed might be an array or object; try to sum price * qty if available
+          if(Array.isArray(parsed) && parsed.length){
+            let total = 0;
+            parsed.forEach(it=>{
+              const price = (it && (it.price || it.priceNumeric || it.amount)) || 0;
+              const qty = (it && (it.qty || it.quantity || it.qtyOrdered)) || 1;
+              const pnum = parseFloat(String(price).toString().replace(/[₹, ]+/g,'')) || 0;
+              const qnum = parseFloat(qty) || 1;
+              total += pnum * qnum;
+            });
+            if(total>0) return total;
+          }
+        }
+      } catch(e){}
+      // fallback: price per item × count
+      try {
+        const legacy = safeGet('selectedFoods') || safeGet('selectedFoods_v1');
+        if(legacy){
+          const arr = JSON.parse(legacy);
+          if(Array.isArray(arr)){
+            const PRICE_PER_ITEM = 99; // conservative default used by previous pages if missing
+            return arr.length * PRICE_PER_ITEM;
+          }
+        }
+      } catch(e){}
+      return null;
+    }
+
+    /* ====== page state & elements ====== */
+    const amountValueEl = document.getElementById('amountValue');
+    const payCashBtn = document.getElementById('payCashBtn');
+    const chooseOnlineBtn = document.getElementById('chooseOnlineBtn');
+    const onlineUI = document.getElementById('onlineUI');
+    const iPaidBtn = document.getElementById('iPaidBtn');
+    const copyUpiBtn = document.getElementById('copyUpiBtn');
+    const upiInput = document.getElementById('upiInput');
+    const upiIdEl = document.getElementById('upiId');
+    const stepCash = document.getElementById('stepCash');
+    const stepOnline = document.getElementById('stepOnline');
+    const chooseCashBackBtn = document.getElementById('chooseCashBackBtn');
+
+    /* ====== initialize amount & UPI details (try localStorage then fallback) ====== */
+    (function init(){
+      // amount may be set previously by cart page
+      let raw = safeGet('amountPaid') || safeGet('amountValue') || safeGet('cartAmount');
+      let numeric = parseAmountRaw(raw);
+      if(numeric === null){
+        numeric = computeAmountFromCart();
+      }
+      if(numeric === null) numeric = 0;
+      // normalize to two decimals
+      numeric = Math.round(numeric * 100) / 100;
+      amountValueEl.textContent = '₹' + numeric.toFixed(2);
+      // keep canonical numeric field if missing
+      if(!safeGet('amountPaidNumeric')) safeSet('amountPaidNumeric', numeric);
+
+      // load UPI id if stored in settings or fallback to example
+      const settingsUpi = safeGet('upiId') || safeGet('paymentUpi') || null;
+      const upi = settingsUpi || 'example@upi';
+      upiInput.value = upi;
+      upiIdEl.textContent = upi;
+      document.getElementById('providerLabel').textContent = 'UPI';
+    })();
+
+    /* ====== step UI helpers ====== */
+    function setActiveStep(name){
+      stepCash.classList.remove('active');
+      stepOnline.classList.remove('active');
+      if(name === 'cash') stepCash.classList.add('active');
+      if(name === 'online') stepOnline.classList.add('active');
+    }
+
+    /* ====== Cash flow ====== */
+    payCashBtn.addEventListener('click', function(){
+      // store payment info and redirect to thankyou
+      const amtRaw = amountValueEl.textContent || '';
+      safeSet('paymentMethod', 'cash');
+      safeSet('amountPaid', amtRaw);
+      // also store numeric for consistency
+      const numeric = parseAmountRaw(amtRaw) || parseFloat(safeGet('amountPaidNumeric')) || 0;
+      safeSet('amountPaidNumeric', numeric);
+      safeSet('justPaid', '1'); // thankyou page expects this
+      // redirect
+      window.location.href = 'thank-you.html';
+    });
+
+    /* ====== show online UI (step-click and button) ====== */
+    chooseOnlineBtn.addEventListener('click', openOnline);
+    stepOnline.addEventListener('click', openOnline);
+
+    function openOnline(){
+      setActiveStep('online');
+      onlineUI.style.display = 'block';
+      onlineUI.setAttribute('aria-hidden','false');
+      // hide the primary cash button to avoid double actions
+      payCashBtn.style.display = 'none';
+      chooseOnlineBtn.style.display = 'inline-block';
+      // scroll into view for smaller screens
+      onlineUI.scrollIntoView({behavior:'smooth', block:'nearest'});
+    }
+
+    /* allow clicking cash step to select cash without immediately paying (UX) */
+    stepCash.addEventListener('click', function(){
+      setActiveStep('cash');
+      payCashBtn.style.display = 'inline-block';
+      chooseOnlineBtn.style.display = 'inline-block';
+      onlineUI.style.display = 'none';
+      onlineUI.setAttribute('aria-hidden','true');
+    });
+
+    chooseCashBackBtn.addEventListener('click', function(){
+      // go back to options
+      stepCash.click();
+    });
+
+    /* ====== Online "I have paid" flow ====== */
+    iPaidBtn.addEventListener('click', function(){
+      // mark as paid and redirect to thankyou
+      const provider = 'UPI';
+      const amtText = amountValueEl.textContent || '₹0.00';
+      safeSet('paymentMethod', 'online');
+      safeSet('paymentProvider', provider);
+      safeSet('amountPaid', amtText);
+      const numeric = parseAmountRaw(amtText) || parseFloat(safeGet('amountPaidNumeric')) || 0;
+      safeSet('amountPaidNumeric', numeric);
+      safeSet('justPaid', '1');
+      // optional timestamp
+      safeSet('lastPaidAt', (new Date()).toISOString());
+      // redirect
+      window.location.href = 'thank-you.html';
+    });
+
+    /* copy UPI id */
+    copyUpiBtn.addEventListener('click', function(){
+      const txt = upiInput.value || upiIdEl.textContent || '';
+      navigator.clipboard?.writeText(txt).then(()=>{
+        copyUpiBtn.textContent = 'Copied';
+        setTimeout(()=> copyUpiBtn.innerHTML = '<i class="fa-regular fa-copy"></i> Copy', 1400);
+      }).catch(()=>{
+        // fallback - select and exec
+        upiInput.select();
+        try { document.execCommand('copy'); copyUpiBtn.textContent = 'Copied'; setTimeout(()=> copyUpiBtn.innerHTML = '<i class="fa-regular fa-copy"></i> Copy', 1400); } catch(e){ alert('Copy failed — please long-press to copy the UPI ID.'); }
+      });
+    });
+
+    /* Accessibility: allow Enter on steps */
+    [stepCash, stepOnline].forEach(el=>{
+      el.setAttribute('tabindex','0');
+      el.addEventListener('keydown', function(e){ if(e.key === 'Enter' || e.key === ' ') el.click(); });
+    });
+
+    /* Extra: if the page was opened as part of a fallback that already set payment method (e.g., direct link), show appropriate UI */
+    (function syncIfAlreadySet(){
+      const pm = safeGet('paymentMethod');
+      if(pm === 'cash'){
+        setActiveStep('cash');
+      } else if(pm === 'online'){
+        setActiveStep('online');
+        onlineUI.style.display = 'block';
+        onlineUI.setAttribute('aria-hidden','false');
+        payCashBtn.style.display = 'none';
+      }
+    })();
+  </script>
+</body>
+</html>

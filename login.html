@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Food Point | Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  />
+  <script src="fp-config.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      position: relative;
+      overflow: hidden;
+      background: #020617;
+      color: #111827;
+      transition: filter 0.3s ease;
+    }
+
+    /* Foody blurred background */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        linear-gradient(to bottom, rgba(0,0,0,0.55), rgba(0,0,0,0.8)),
+        url("https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?q=80&w=1600&auto=format&fit=crop");
+      background-size: cover;
+      background-position: center;
+      filter: blur(4px);
+      transform: scale(1.05);
+      z-index: -2;
+    }
+
+    /* slight vignette */
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at top, transparent 0, rgba(0,0,0,0.7) 55%, rgba(0,0,0,0.9) 100%);
+      z-index: -1;
+    }
+
+    /* blur body when modal is open */
+    body.modal-open .auth-card {
+      filter: blur(4px);
+    }
+
+    .auth-card {
+      width: 100%;
+      max-width: 380px;
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: 22px;
+      padding: 26px 26px 22px;
+      box-shadow: 0 24px 70px rgba(0,0,0,0.9);
+      position: relative;
+      z-index: 1;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      color: #e5e7eb;
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
+    .auth-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background:
+        radial-gradient(circle at top left, rgba(248, 113, 113, 0.15), transparent 55%),
+        radial-gradient(circle at bottom right, rgba(52, 211, 153, 0.18), transparent 55%);
+      opacity: 0.9;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .brand {
+      text-align: center;
+      font-weight: 800;
+      letter-spacing: 4px;
+      font-size: 20px;
+      color: #fef3c7;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 13px;
+      color: #9ca3af;
+      margin-bottom: 18px;
+    }
+
+    h2 {
+      font-size: 18px;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #f9fafb;
+    }
+
+    .input-group {
+      margin-bottom: 12px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 4px;
+      color: #e5e7eb;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px 11px;
+      border-radius: 10px;
+      border: 1px solid #4b5563;
+      font-size: 14px;
+      background: #020617;
+      outline: none;
+      transition: all 0.2s ease;
+      color: #f9fafb;
+    }
+
+    input::placeholder {
+      color: #6b7280;
+    }
+
+    input:focus {
+      border-color: #4f46e5;
+      background: #020617;
+      box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.35);
+    }
+
+    .btn {
+      width: 100%;
+      margin-top: 10px;
+      border-radius: 999px;
+      border: none;
+      padding: 11px 0;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      background: linear-gradient(135deg, #fb923c, #facc15);
+      color: #111827;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      box-shadow: 0 14px 30px rgba(248, 181, 75, 0.7);
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 18px 38px rgba(248, 181, 75, 0.9);
+    }
+
+    .switch-text {
+      text-align: center;
+      margin-top: 14px;
+      font-size: 13px;
+      color: #9ca3af;
+    }
+
+    .switch-text button {
+      border: none;
+      background: transparent;
+      color: #38bdf8;
+      text-decoration: underline;
+      cursor: pointer;
+      font-size: 13px;
+      padding: 0;
+      margin-left: 4px;
+    }
+
+    .switch-text button:hover {
+      color: #7dd3fc;
+    }
+
+    .error {
+      min-height: 16px;
+      margin-top: 4px;
+      font-size: 12px;
+      color: #fecaca;
+    }
+
+    .success {
+      min-height: 16px;
+      margin-top: 4px;
+      font-size: 12px;
+      color: #bbf7d0;
+    }
+
+    .top-links {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 6px;
+      font-size: 12px;
+      gap: 6px;
+    }
+
+    .top-links button {
+      border: none;
+      background: transparent;
+      color: #e5e7eb;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background-color: rgba(15,23,42,0.6);
+      border: 1px solid rgba(148,163,184,0.6);
+      transition: all 0.2s ease;
+    }
+
+    .top-links button:hover {
+      background-color: rgba(30,64,175,0.8);
+      border-color: rgba(191,219,254,0.9);
+    }
+
+    /* === OWNER PASSWORD MODAL === */
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.25s ease;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .password-modal {
+      background: #f9fafb;
+      border-radius: 18px;
+      padding: 26px 22px 20px;
+      width: 90%;
+      max-width: 360px;
+      box-shadow: 0 24px 50px rgba(0,0,0,0.55);
+      transform: translateY(10px);
+      transition: transform 0.25s ease;
+    }
+
+    .modal-overlay.active .password-modal {
+      transform: translateY(0);
+    }
+
+    .modal-header {
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .modal-header h2 {
+      font-size: 18px;
+      margin-bottom: 4px;
+      color: #111827;
+    }
+
+    .modal-header p {
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    .lock-icon {
+      font-size: 40px;
+      color: #22c55e;
+      margin-bottom: 8px;
+    }
+
+    .password-input {
+      width: 100%;
+      padding: 11px;
+      border-radius: 10px;
+      border: 2px solid #e5e7eb;
+      background: #f9fafb;
+      font-size: 14px;
+      color: #111827; /* ensure masked dots/text are visible on light background */
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .password-input:focus {
+      border-color: #22c55e;
+      background: #ffffff;
+      box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+    }
+
+    .password-input.error {
+      border-color: #ef4444;
+      background: #fee2e2;
+    }
+
+    .error-message {
+      color: #ef4444;
+      font-size: 12px;
+      margin-top: 6px;
+      display: none;
+    }
+
+    .error-message.show {
+      display: block;
+    }
+
+    .attempts-warning {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #b91c1c;
+      text-align: center;
+      display: none;
+    }
+
+    .attempts-warning.show {
+      display: block;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .modal-btn {
+      flex: 1;
+      border-radius: 10px;
+      padding: 11px 0;
+      border: none;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .modal-btn-primary {
+      background: #22c55e;
+      color: #ffffff;
+    }
+
+    .modal-btn-primary:hover {
+      background: #16a34a;
+      transform: translateY(-1px);
+    }
+
+    .modal-btn-secondary {
+      background: #f3f4f6;
+      color: #374151;
+    }
+
+    .modal-btn-secondary:hover {
+      background: #e5e7eb;
+    }
+
+    @media (max-width: 480px) {
+      .auth-card {
+        padding: 22px 20px 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<script src="fp-config.js"></script>
+<script src="fp-fetch-proxy.js"></script>
+<script src="api.js"></script>
+<script src="dev-check.js"></script>
+
+  <div class="auth-card">
+    <div class="top-links">
+      <!-- Owner button with popup -->
+      <button id="ownerBtnTop">
+        <i class="fas fa-lock"></i> Owner
+      </button>
+    </div>
+
+    <div class="brand">FOOD POINT</div>
+    <div class="subtitle">Sign in to continue or create an account</div>
+
+    <h2 id="formTitle">Log in</h2>
+
+    <!-- LOGIN: email or name -->
+    <div class="input-group" id="loginIdGroup">
+      <label for="loginIdInput">Email or name</label>
+      <input type="text" id="loginIdInput" placeholder="you@example.com or your name">
+    </div>
+
+    <!-- SIGNUP ONLY: full name -->
+    <div id="nameGroup" class="input-group" style="display:none;">
+      <label for="nameInput">Full name</label>
+      <input type="text" id="nameInput" placeholder="Your name" autocomplete="name">
+    </div>
+
+    <!-- SIGNUP ONLY: email -->
+    <div id="emailGroup" class="input-group" style="display:none;">
+      <label for="emailInput">Email</label>
+      <input type="email" id="emailInput" placeholder="you@example.com" autocomplete="email">
+    </div>
+
+    <div class="input-group">
+      <label for="passwordInput">Password</label>
+      <input type="password" id="passwordInput" placeholder="••••••••" autocomplete="current-password">
+    </div>
+
+    <div class="input-group" id="confirmGroup" style="display:none;">
+      <label for="confirmInput">Confirm password</label>
+      <input type="password" id="confirmInput" placeholder="Repeat password" autocomplete="new-password">
+    </div>
+
+    <div id="message" class="error"></div>
+    <div id="successMsg" class="success"></div>
+
+    <button class="btn" id="submitBtn">
+      <i class="fas fa-sign-in-alt" id="btnIcon"></i>
+      <span id="btnText">Log in</span>
+    </button>
+
+    <div class="switch-text">
+      <span id="switchLabel">New here?</span>
+      <button id="switchBtn" type="button">Create an account</button>
+    </div>
+  </div>
+
+  <!-- OWNER PASSWORD MODAL -->
+  <div class="modal-overlay" id="ownerPasswordModal">
+    <div class="password-modal">
+      <div class="modal-header">
+        <div class="lock-icon">
+          <i class="fas fa-lock"></i>
+        </div>
+        <h2>Owner Access</h2>
+        <p>Enter the owner password to open the dashboard</p>
+      </div>
+
+      <input
+        type="password"
+        id="ownerPasswordInput"
+        class="password-input"
+        placeholder="Owner password"
+      />
+      <div class="error-message" id="ownerErrorMsg">
+        Incorrect password. Please try again.
+      </div>
+      <div class="attempts-warning" id="ownerAttemptsWarn">
+        Too many failed attempts. Please wait 30 seconds.
+      </div>
+
+      <div class="modal-buttons">
+        <button class="modal-btn modal-btn-secondary" id="ownerCancelBtn">Cancel</button>
+        <button class="modal-btn modal-btn-primary" id="ownerSubmitBtn">Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ---------- USER LOGIN / SIGNUP (same logic) ----------
+    const USERS_KEY = "fp_users";
+    const CURRENT_USER_KEY = "fp_current_user";
+
+    const formTitle     = document.getElementById("formTitle");
+    const loginIdGroup  = document.getElementById("loginIdGroup");
+    const loginIdInput  = document.getElementById("loginIdInput");
+    const nameGroup     = document.getElementById("nameGroup");
+    const emailGroup    = document.getElementById("emailGroup");
+    const confirmGroup  = document.getElementById("confirmGroup");
+    const nameInput     = document.getElementById("nameInput");
+    const emailInput    = document.getElementById("emailInput");
+    const passwordInput = document.getElementById("passwordInput");
+    const confirmInput  = document.getElementById("confirmInput");
+    const submitBtn     = document.getElementById("submitBtn");
+    const btnText       = document.getElementById("btnText");
+    const btnIcon       = document.getElementById("btnIcon");
+    const switchLabel   = document.getElementById("switchLabel");
+    const switchBtn     = document.getElementById("switchBtn");
+    const message       = document.getElementById("message");
+    const successMsg    = document.getElementById("successMsg");
+
+    let mode = "login"; // or "signup"
+
+    function loadUsers() {
+      try {
+        return JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
+      } catch {
+        return [];
+      }
+    }
+
+    function saveUsers(users) {
+      localStorage.setItem(USERS_KEY, JSON.stringify(users));
+    }
+
+    function setCurrentUser(user) {
+      localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
+    }
+
+    function switchMode() {
+      message.textContent = "";
+      successMsg.textContent = "";
+      passwordInput.value = "";
+      confirmInput.value = "";
+
+      if (mode === "login") {
+        mode = "signup";
+        formTitle.textContent = "Create account";
+        loginIdGroup.style.display = "none";
+        nameGroup.style.display = "block";
+        emailGroup.style.display = "block";
+        confirmGroup.style.display = "block";
+        btnText.textContent = "Sign up";
+        btnIcon.className = "fas fa-user-plus";
+        switchLabel.textContent = "Already have an account?";
+        switchBtn.textContent = "Log in";
+      } else {
+        mode = "login";
+        formTitle.textContent = "Log in";
+        loginIdGroup.style.display = "block";
+        nameGroup.style.display = "none";
+        emailGroup.style.display = "none";
+        confirmGroup.style.display = "none";
+        btnText.textContent = "Log in";
+        btnIcon.className = "fas fa-sign-in-alt";
+        switchLabel.textContent = "New here?";
+        switchBtn.textContent = "Create an account";
+      }
+    }
+
+    async function handleSubmit() {
+      message.textContent = "";
+      successMsg.textContent = "";
+
+      const users = loadUsers();
+
+      if (mode === "login") {
+          const identifier = loginIdInput.value.trim().toLowerCase();
+          const password = passwordInput.value.trim();
+
+          if (!identifier || !password) {
+            message.textContent = "Please fill in login and password.";
+            return;
+          }
+
+          // Try backend login first; fallback to local users
+          try {
+            const data = await FPAPI.post('/auth/login', { identifier, password });
+            if (data && data.token) localStorage.setItem('fp_token', data.token);
+            if (data && data.user) setCurrentUser(data.user);
+            successMsg.textContent = 'Logged in successfully. Redirecting…';
+            setTimeout(() => window.location.href = 'home.html', 700);
+            return;
+          } catch (e) {
+            // network error or non-2xx — fall through to local fallback
+          }
+
+          // Fallback: local users
+          const user = users.find(u =>
+            (u.email && u.email.toLowerCase() === identifier) ||
+            (u.name && u.name.toLowerCase() === identifier)
+          );
+
+          if (!user || user.password !== password) {
+            message.textContent = "Invalid details. Try again.";
+            return;
+          }
+
+          setCurrentUser(user);
+          successMsg.textContent = "Logged in successfully. Redirecting…";
+          setTimeout(() => {
+            window.location.href = "home.html";
+          }, 700);
+      } else {
+        const name = nameInput.value.trim();
+        const email = emailInput.value.trim().toLowerCase();
+        const password = passwordInput.value.trim();
+        const confirm = confirmInput.value.trim();
+
+        if (!name || !email || !password || !confirm) {
+          message.textContent = "Please fill all fields.";
+          return;
+        }
+        if (!email.includes("@")) {
+          message.textContent = "Enter a valid email address.";
+          return;
+        }
+        if (password.length < 4) {
+          message.textContent = "Password should be at least 4 characters.";
+          return;
+        }
+        if (password !== confirm) {
+          message.textContent = "Passwords do not match.";
+          return;
+        }
+        if (users.some(u => u.email === email)) {
+          message.textContent = "This email is already registered.";
+          return;
+        }
+
+        // Try to create user on backend first; fallback to local storage
+        try {
+          const data = await FPAPI.post('/auth/signup', { name, email, password });
+          if (data && data.token) localStorage.setItem('fp_token', data.token);
+          if (data && data.user) setCurrentUser(data.user);
+          successMsg.textContent = 'Account created! Redirecting…';
+          setTimeout(() => window.location.href = 'home.html', 800);
+          return;
+        } catch (e) {
+          // network error -> fallback to local storage
+        }
+
+        const newUser = {
+          id: Date.now(),
+          name,
+          email,
+          password
+        };
+        users.push(newUser);
+        saveUsers(users);
+        setCurrentUser(newUser);
+        successMsg.textContent = "Account created! Redirecting…";
+        setTimeout(() => {
+          window.location.href = "home.html";
+        }, 800);
+      }
+    }
+
+    switchBtn.addEventListener("click", switchMode);
+    submitBtn.addEventListener("click", handleSubmit);
+
+    [loginIdInput, nameInput, emailInput, passwordInput, confirmInput].forEach(inp => {
+      inp.addEventListener("keypress", e => {
+        if (e.key === "Enter") handleSubmit();
+      });
+    });
+
+    // If already logged in, send to home directly
+    document.addEventListener("DOMContentLoaded", () => {
+      const current = localStorage.getItem(CURRENT_USER_KEY);
+      if (current) {
+        window.location.href = "home.html";
+      }
+    });
+
+    // ---------- OWNER PASSWORD POPUP (same connection as index) ----------
+    const OWNER_PASSWORD_KEY = "ownerPassword";
+    const ATTEMPTS_KEY = "passwordAttempts";
+    const LOCKOUT_KEY = "passwordLockout";
+
+    function getOwnerPassword() {
+      // default password if not set by owner page
+      try {
+        const p = localStorage.getItem(OWNER_PASSWORD_KEY);
+        if (!p || !p.toString().trim()) return "1515";
+        return p.toString().trim();
+      } catch (e) {
+        return "1515";
+      }
+    }
+
+    function ownerCheckLockout() {
+      const lockoutUntil = localStorage.getItem(LOCKOUT_KEY);
+      const warn = document.getElementById("ownerAttemptsWarn");
+      const submit = document.getElementById("ownerSubmitBtn");
+      if (lockoutUntil && Date.now() < parseInt(lockoutUntil)) {
+        const remaining = Math.ceil((parseInt(lockoutUntil) - Date.now()) / 1000);
+        warn.textContent = `Too many failed attempts. Please wait ${remaining} seconds.`;
+        warn.classList.add("show");
+        submit.disabled = true;
+        return true;
+      } else {
+        localStorage.removeItem(LOCKOUT_KEY);
+        localStorage.removeItem(ATTEMPTS_KEY);
+        warn.classList.remove("show");
+        submit.disabled = false;
+        return false;
+      }
+    }
+
+    function ownerFailedAttempt() {
+      let attempts = parseInt(localStorage.getItem(ATTEMPTS_KEY) || "0");
+      attempts++;
+      localStorage.setItem(ATTEMPTS_KEY, attempts.toString());
+      if (attempts >= 3) {
+        const lockoutTime = Date.now() + 30000; // 30s
+        localStorage.setItem(LOCKOUT_KEY, lockoutTime.toString());
+        document.getElementById("ownerAttemptsWarn").classList.add("show");
+        document.getElementById("ownerSubmitBtn").disabled = true;
+        setTimeout(ownerCheckLockout, 30000);
+      }
+    }
+
+    function verifyOwnerPassword() {
+      if (ownerCheckLockout()) return;
+
+      const input = document.getElementById("ownerPasswordInput");
+      const error = document.getElementById("ownerErrorMsg");
+      const entered = (input.value || '').toString().trim();
+      const correct = (getOwnerPassword() || '1515').toString().trim();
+
+      // Try backend owner login first (graceful fallback to local password)
+      (async () => {
+        try {
+          const data = await FPAPI.post('/auth/login', { identifier: 'Owner', password: entered });
+          if (data && data.token) {
+            localStorage.setItem('fp_owner_token', data.token);
+          }
+          localStorage.removeItem(ATTEMPTS_KEY);
+          localStorage.removeItem(LOCKOUT_KEY);
+          window.location.href = 'owner.html';
+          return;
+        } catch (e) {
+          // network error — ignore and fallback
+        }
+
+        // Fallback: local password check
+        if (entered === correct) {
+          localStorage.removeItem(ATTEMPTS_KEY);
+          localStorage.removeItem(LOCKOUT_KEY);
+          window.location.href = "owner.html";
+        } else {
+          input.classList.add("error");
+          error.classList.add("show");
+          ownerFailedAttempt();
+          ownerCheckLockout();
+        }
+      })();
+    }
+
+    const ownerBtnTop        = document.getElementById("ownerBtnTop");
+    const ownerModal         = document.getElementById("ownerPasswordModal");
+    const ownerCancelBtn     = document.getElementById("ownerCancelBtn");
+    const ownerSubmitBtn     = document.getElementById("ownerSubmitBtn");
+    const ownerPasswordInput = document.getElementById("ownerPasswordInput");
+    const ownerErrorMsg      = document.getElementById("ownerErrorMsg");
+
+    ownerBtnTop.addEventListener("click", () => {
+      ownerModal.classList.add("active");
+      document.body.classList.add("modal-open");
+      ownerPasswordInput.value = "";
+      ownerPasswordInput.classList.remove("error");
+      ownerErrorMsg.classList.remove("show");
+      ownerCheckLockout();
+      setTimeout(() => ownerPasswordInput.focus(), 60);
+    });
+
+    ownerCancelBtn.addEventListener("click", () => {
+      ownerModal.classList.remove("active");
+      document.body.classList.remove("modal-open");
+    });
+
+    ownerSubmitBtn.addEventListener("click", verifyOwnerPassword);
+
+    ownerPasswordInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        verifyOwnerPassword();
+      }
+    });
+
+    ownerPasswordInput.addEventListener("input", () => {
+      ownerPasswordInput.classList.remove("error");
+      ownerErrorMsg.classList.remove("show");
+    });
+
+    ownerModal.addEventListener("click", (e) => {
+      if (e.target === ownerModal) {
+        ownerModal.classList.remove("active");
+        document.body.classList.remove("modal-open");
+      }
+    });
+  </script>
+</body>
+</html>

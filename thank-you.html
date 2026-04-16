@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <title>Payment Successful | Thank You</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      -webkit-user-select: none;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      background: #0a0e1a url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><defs><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" result="noise"/></filter></defs><rect width="100" height="100" fill="%23000" filter="url(%23noise)" opacity="0.03"/></svg>');
+      background-attachment: fixed;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      color: #e8e9ed;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(circle at 20% 50%, rgba(255,140,0,0.15), transparent 50%), radial-gradient(circle at 80% 80%, rgba(0,200,150,0.1), transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body > * { position: relative; z-index: 1; }
+
+    .container {
+      background: linear-gradient(135deg, rgba(30,35,50,0.78), rgba(25,30,45,0.73));
+      border-radius: 28px;
+      padding: 40px 30px;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.08);
+      backdrop-filter: blur(12px) saturate(140%);
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 10px;
+        padding-top: 60px;
+      }
+
+      .container {
+        border-radius: 16px;
+        padding: 24px 16px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      }
+    }
+
+    .success-circle {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #00d9a3, #00c890);
+      margin: 0 auto 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 30px rgba(0,220,170,0.5);
+      border: 2px solid rgba(0,220,170,0.3);
+    }
+
+    @media (max-width: 480px) {
+      .success-circle {
+        width: 90px;
+        height: 90px;
+        margin-bottom: 16px;
+      }
+    }
+
+    .success-circle i {
+      color: #fff;
+      font-size: 52px;
+    }
+
+    @media (max-width: 480px) {
+      .success-circle i {
+        font-size: 42px;
+      }
+    }
+
+    h1 {
+      font-size: 26px;
+      text-align: center;
+      margin-bottom: 8px;
+      color: #f5e6d3;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      text-shadow: 0 0 12px rgba(255,140,0,0.2);
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 22px;
+      }
+    }
+
+    .sub-text {
+      text-align: center;
+      font-size: 16px;
+      color: #aeb5c4;
+      margin-bottom: 18px;
+      letter-spacing: 0.02em;
+    }
+
+    @media (max-width: 480px) {
+      .sub-text {
+        font-size: 14px;
+        margin-bottom: 14px;
+      }
+    }
+
+    .info-box {
+      border-radius: 12px;
+      border: 1px solid rgba(0,220,170,0.3);
+      background: linear-gradient(135deg, rgba(0,200,150,0.15), rgba(0,180,140,0.1));
+      padding: 15px 18px;
+      font-size: 15px;
+      color: #00d9a3;
+      margin-bottom: 25px;
+      text-align: center;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 0 16px rgba(0,220,170,0.15), inset 0 1px 0 rgba(0,220,170,0.1);
+    }
+
+    @media (max-width: 480px) {
+      .info-box {
+        padding: 12px 14px;
+        font-size: 13px;
+        margin-bottom: 20px;
+      }
+    }
+
+    .order-title {
+      font-weight: 700;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      color: #f5e6d3;
+      font-size: 15px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 480px) {
+      .order-title {
+        font-size: 14px;
+        margin-top: 8px;
+        margin-bottom: 8px;
+      }
+    }
+
+    .order-details {
+      border-top: 1px solid rgba(255,255,255,0.08);
+      margin-top: 10px;
+      padding-top: 15px;
+      font-size: 14px;
+    }
+
+    @media (max-width: 480px) {
+      .order-details {
+        padding-top: 12px;
+        font-size: 13px;
+      }
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+    }
+
+    @media (max-width: 480px) {
+      .detail-row {
+        padding: 5px 0;
+      }
+    }
+
+    .detail-label {
+      color: #aeb5c4;
+    }
+
+    .detail-value {
+      color: #f5e6d3;
+      font-weight: 700;
+    }
+
+    .btn-row {
+      display: flex;
+      margin-top: 25px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 480px) {
+      .btn-row {
+        flex-direction: column;
+        margin-top: 20px;
+        gap: 10px;
+      }
+    }
+
+    .btn {
+      flex: 1;
+      border-radius: 12px;
+      border: none;
+      padding: 14px 18px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 200ms ease;
+      min-height: 44px;
+      touch-action: manipulation;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .btn:active:not(:disabled) {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #00d9a3, #00c890);
+      color: #0a0e1a;
+      box-shadow: 0 0 20px rgba(0,220,170,0.4);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 28px rgba(0,220,170,0.6), 0 10px 22px rgba(0,0,0,0.3);
+    }
+
+    .btn-outline {
+      background: linear-gradient(135deg, rgba(40,50,70,0.3), rgba(35,45,65,0.25));
+      color: #00d9a3;
+      border: 1.5px solid rgba(0,220,170,0.4);
+      box-shadow: 0 0 16px rgba(0,220,170,0.2);
+      backdrop-filter: blur(8px);
+    }
+
+    .btn-outline:hover {
+      background: linear-gradient(135deg, rgba(40,50,70,0.4), rgba(35,45,65,0.35));
+      border-color: rgba(0,220,170,0.6);
+      box-shadow: 0 0 24px rgba(0,220,170,0.35);
+      color: #f5e6d3;
+      transform: translateY(-2px);
+    }
+
+    .help-text {
+      text-align: center;
+      margin-top: 18px;
+      font-size: 13px;
+      color: #aeb5c4;
+      letter-spacing: 0.02em;
+    }
+
+    .help-text a {
+      color: #00d9a3;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 200ms ease;
+    }
+
+    .help-text a:hover {
+      text-decoration: underline;
+      text-shadow: 0 0 8px rgba(0,220,170,0.3);
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 30px 20px;
+      }
+
+      h1 {
+        font-size: 22px;
+      }
+
+      .btn-row {
+        flex-direction: column;
+      }
+    }
+
+    /* PREMIUM GLASSMORPHIC USER-BAR */
+    .user-bar {
+      position: fixed !important;
+      top: 14px !important;
+      left: 50% !important;
+      transform: translateX(-50%) !important;
+      max-width: 720px !important;
+      width: calc(100% - 28px) !important;
+      background: linear-gradient(135deg, rgba(30,35,50,0.8), rgba(25,30,45,0.77)) !important;
+      backdrop-filter: blur(16px) saturate(160%) !important;
+      border-radius: 20px !important;
+      padding: 12px 20px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      z-index: 999 !important;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.12) !important;
+      border: 1px solid rgba(255,255,255,0.08) !important;
+    }
+
+    .user-info {
+      display: flex !important;
+      align-items: center !important;
+      gap: 10px !important;
+    }
+
+    .user-avatar {
+      width: 48px !important;
+      height: 48px !important;
+      border-radius: 12px !important;
+      background: linear-gradient(135deg, rgba(255,140,0,0.5), rgba(255,160,20,0.45)) !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      color: #f5e6d3 !important;
+      font-weight: 800 !important;
+      font-size: 18px !important;
+      box-shadow: 0 0 20px rgba(255,160,0,0.4) !important;
+      border: 1px solid rgba(255,255,255,0.1) !important;
+    }
+
+    .user-text {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 2px !important;
+    }
+
+    .user-name {
+      color: #f5e6d3 !important;
+      font-weight: 700 !important;
+      font-size: 13px !important;
+      letter-spacing: 0.04em !important;
+    }
+
+    .user-email {
+      color: #aeb5c4 !important;
+      font-size: 11px !important;
+      letter-spacing: 0.02em !important;
+    }
+
+    .logout-btn {
+      background: linear-gradient(135deg, rgba(0,200,150,0.3), rgba(0,180,140,0.25)) !important;
+      border: 1px solid rgba(0,220,170,0.3) !important;
+      color: #00d9a3 !important;
+      padding: 8px 16px !important;
+      border-radius: 10px !important;
+      font-size: 12px !important;
+      font-weight: 700 !important;
+      cursor: pointer !important;
+      transition: all 200ms ease !important;
+      box-shadow: 0 0 16px rgba(0,220,170,0.35) !important;
+      letter-spacing: 0.04em !important;
+      text-transform: uppercase !important;
+    }
+
+    .logout-btn:hover {
+      background: linear-gradient(135deg, rgba(0,220,170,0.4), rgba(0,200,150,0.35)) !important;
+      box-shadow: 0 0 24px rgba(0,220,170,0.5) !important;
+      transform: translateY(-1px) !important;
+    }
+
+    .logout-btn:active {
+      transform: scale(0.98) !important;
+    }
+
+    /* Adjust container for fixed header */
+    .page-with-header {
+      margin-top: 82px !important;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="user-bar">
+    <div class="user-info">
+      <div class="user-avatar">FP</div>
+      <div class="user-text">
+        <div class="user-name">Food Point</div>
+        <div class="user-email">Thank you</div>
+      </div>
+    </div>
+    <button class="logout-btn" onclick="location.href='home.html'">Home</button>
+  </div>
+
+  <div class="container page-with-header">
+    <div class="success-circle">
+      <i class="fas fa-check"></i>
+    </div>
+
+    <h1>Payment Successful!</h1>
+    <p class="sub-text">Thank you for your purchase.</p>
+
+    <div class="info-box">
+      Your payment has been successfully processed.
+    </div>
+
+    <div class="order-details">
+      <div class="order-title">Order Details</div>
+
+      <div class="detail-row">
+        <span class="detail-label">Order ID:</span>
+        <span class="detail-value" id="orderId">#001</span>
+      </div>
+
+      <div class="detail-row">
+        <span class="detail-label">Date:</span>
+        <span class="detail-value" id="orderDate">1 December 2025</span>
+      </div>
+
+      <div class="detail-row">
+        <span class="detail-label">Amount Paid:</span>
+        <span class="detail-value" id="amountPaid">₹175</span>
+      </div>
+
+      <div class="detail-row">
+        <span class="detail-label">Payment Method:</span>
+        <span class="detail-value" id="paymentMethod">online / cash</span>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="location.href='home.html'">
+        <i class="fas fa-home"></i> GO HOME
+      </button>
+
+      <button class="btn btn-outline" onclick="location.href='orders.html'">
+        <i class="fas fa-lock"></i> VIEW ORDERS
+      </button>
+    </div>
+
+    <p class="help-text">
+      Need help? <a href="tel:+918095248273">Call us </a>
+    </p>
+  </div>
+
+  <script>
+    const COUNTER_KEY = "orderCounterDaily";
+    const ORDERS_KEY  = "ordersHistory";
+
+    function getOrdersStorageKey() {
+      const CURRENT_USER_KEY = "fp_current_user";
+      const userRaw = localStorage.getItem(CURRENT_USER_KEY);
+      if (!userRaw) return ORDERS_KEY;
+      try {
+        const user = JSON.parse(userRaw);
+        if (user && user.id) return ORDERS_KEY + "_" + user.id;
+      } catch (e) {}
+      return ORDERS_KEY;
+    }
+
+    function applyOrderToUI(order) {
+      document.getElementById("orderId").textContent      = order.id || "#001";
+      document.getElementById("orderDate").textContent    = order.date || "";
+      document.getElementById("amountPaid").textContent   = order.amount || "₹0.00";
+      document.getElementById("paymentMethod").textContent = order.method || "";
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      let history = [];
+      try {
+        history = JSON.parse(localStorage.getItem(getOrdersStorageKey()) || "[]");
+      } catch (e) {
+        history = [];
+      }
+
+      const justPaid = localStorage.getItem("justPaid") === "1";
+
+      if (justPaid) {
+        // New payment → create a new order
+        const now = new Date();
+        const todayKey = now.toISOString().slice(0, 10);
+
+        let counterData = { date: todayKey, last: 0 };
+        try {
+          const stored = localStorage.getItem(COUNTER_KEY);
+          if (stored) {
+            const parsed = JSON.parse(stored);
+            if (parsed.date === todayKey) {
+              counterData = parsed;
+            }
+          }
+        } catch (e) {}
+
+        counterData.last = (counterData.last || 0) + 1;
+        localStorage.setItem(COUNTER_KEY, JSON.stringify(counterData));
+
+        const orderNumber = counterData.last;
+        const orderId = "#" + String(orderNumber).padStart(3, "0");
+
+        const dateOptions = { year: "numeric", month: "long", day: "numeric" };
+        const dateText = now.toLocaleDateString("en-IN", dateOptions);
+
+        const amountPaid = localStorage.getItem("amountPaid") || "₹149.99";
+        const method     = localStorage.getItem("paymentMethod") || "online";
+
+        // Build items array by preferring modern keys (cartItems, selectedFoods_v1)
+        let items = [];
+        try {
+          const rawCart = localStorage.getItem('cartItems');
+          if (rawCart) {
+            const parsed = JSON.parse(rawCart);
+            if (Array.isArray(parsed) && parsed.length) {
+              items = parsed.map(it => (typeof it === 'string') ? it : (it.name || it.title || String(it)));
+            }
+          }
+        } catch (e) { items = []; }
+
+        if (!items.length) {
+          try {
+            const v1 = JSON.parse(localStorage.getItem('selectedFoods_v1') || '[]');
+            if (Array.isArray(v1) && v1.length) {
+              items = v1.map(it => (typeof it === 'string') ? it : (it.name || it.title || String(it)));
+            }
+          } catch (e) { /* ignore */ }
+        }
+
+        if (!items.length) {
+          try {
+            const legacy = JSON.parse(localStorage.getItem('selectedFoods') || '[]');
+            if (Array.isArray(legacy) && legacy.length) items = legacy;
+          } catch (e) { /* ignore */ }
+        }
+
+        const parcelSelected = localStorage.getItem("parcelSelected") === "true";
+
+        const newOrder = {
+          id: orderId,
+          date: dateText,
+          amount: amountPaid,
+          method,
+          items,
+          parcelSelected
+        };
+
+        history.push(newOrder);
+        localStorage.setItem(getOrdersStorageKey(), JSON.stringify(history));
+
+        // show this order
+        applyOrderToUI(newOrder);
+
+        // clear cart for next order (clean up both legacy and modern keys)
+        localStorage.removeItem("selectedFoods");
+        localStorage.removeItem("selectedFoods_v1");
+        localStorage.removeItem("cartItems");
+        localStorage.setItem("justPaid", "0");
+      } else {
+        // Not coming directly from payment page → show latest order (if any)
+        if (history.length) {
+          const lastOrder = history[history.length - 1];
+          applyOrderToUI(lastOrder);
+        } else {
+          // nothing in history, best-effort from storage
+          const amountPaid = localStorage.getItem("amountPaid") || "₹149.99";
+          const method     = localStorage.getItem("paymentMethod") || "online";
+          applyOrderToUI({
+            id: "#001",
+            date: new Date().toLocaleDateString("en-IN", { year: "numeric", month: "long", day: "numeric" }),
+            amount: amountPaid,
+            method
+          });
+        }
+      }
+    });
+  </script>
+</body>
+</html>
