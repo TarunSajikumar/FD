@@ -482,9 +482,10 @@
     }
 
     document.addEventListener("DOMContentLoaded", () => {
+      const storageKey = getOrdersStorageKey();
       let history = [];
       try {
-        history = JSON.parse(localStorage.getItem(getOrdersStorageKey()) || "[]");
+        history = JSON.parse(localStorage.getItem(storageKey) || "[]");
       } catch (e) {
         history = [];
       }
@@ -511,7 +512,8 @@
         localStorage.setItem(COUNTER_KEY, JSON.stringify(counterData));
 
         const orderNumber = counterData.last;
-        const orderId = "#" + String(orderNumber).padStart(3, "0");
+        const orderId = "#" + String(orderNumber).padStart(3, "0") + "-" + String(Date.now()).slice(-6);
+        const timeText = now.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
 
         const dateOptions = { year: "numeric", month: "long", day: "numeric" };
         const dateText = now.toLocaleDateString("en-IN", dateOptions);
@@ -564,15 +566,29 @@
         const newOrder = {
           id: orderId,
           date: dateText,
+          time: timeText,
           amount: amountPaid,
           method,
           items,
           parcelSelected,
-          customerName
+          customerName,
+          status: 'new',
+          createdAt: now.toISOString(),
+          updatedAt: now.toISOString()
         };
 
         history.push(newOrder);
-        localStorage.setItem(getOrdersStorageKey(), JSON.stringify(history));
+        localStorage.setItem(storageKey, JSON.stringify(history));
+
+        if (storageKey !== ORDERS_KEY) {
+          try {
+            const globalHistory = JSON.parse(localStorage.getItem(ORDERS_KEY) || "[]");
+            globalHistory.push(newOrder);
+            localStorage.setItem(ORDERS_KEY, JSON.stringify(globalHistory));
+          } catch (e) {
+            // ignore if global history cannot be persisted
+          }
+        }
 
         // show this order
         applyOrderToUI(newOrder);

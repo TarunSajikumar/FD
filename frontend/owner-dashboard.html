@@ -1911,6 +1911,7 @@
       startTimeUpdater();
       startOrderChecker();
       setupEventListeners();
+      setupStorageListener();
       initializeSettings();
       loadMenuItems();
       updateAnalytics();
@@ -2608,12 +2609,7 @@
     }
 
     function updateAnalytics() {
-      let history = [];
-      try {
-        history = JSON.parse(localStorage.getItem(ORDERS_KEY) || "[]");
-      } catch (e) {
-        history = [];
-      }
+      const history = getAllOrders();
 
       const today = new Date().toLocaleDateString("en-IN");
       const yesterday = new Date(Date.now() - 86400000).toLocaleDateString("en-IN");
@@ -2780,7 +2776,7 @@
       const today = new Date().toLocaleDateString("en-IN");
       
       try {
-        const orders = JSON.parse(localStorage.getItem(ORDERS_KEY) || "[]");
+        const orders = getAllOrders();
         newOrdersCount = orders.filter(order => 
           order.status === 'new' || (order.date === today && !order.status)
         ).length;
@@ -2809,20 +2805,36 @@
         const prevCount = newOrdersCount;
         updateNewOrdersBadge();
         
-        // If new orders increased, show notification
-        if (newOrdersCount > prevCount && document.getElementById("autoNotificationsInput")?.checked) {
-          showNotification("New Order Received!", `${newOrdersCount - prevCount} new order(s) waiting.`, "info");
-          
-          // Refresh orders if on orders tab
-          const activeFilter = document.querySelector(".filter-btn.active");
-          if (activeFilter && activeFilter.dataset.filter === 'new') {
-            filterOrders('new');
+        // If new orders increased, show notification and refresh the recent order list
+        if (newOrdersCount > prevCount) {
+          if (document.getElementById("autoNotificationsInput")?.checked) {
+            showNotification("New Order Received!", `${newOrdersCount - prevCount} new order(s) waiting.`, "info");
           }
-          
-          // Update analytics
+          const activeFilter = document.querySelector(".filter-btn.active");
+          if (activeFilter) {
+            filterOrders(activeFilter.dataset.filter);
+          } else {
+            loadOrdersForOwner();
+          }
           updateAnalytics();
         }
       }, 5000);
+    }
+
+    function setupStorageListener() {
+      window.addEventListener('storage', (event) => {
+        if (!event.key) return;
+        if (event.key === ORDERS_KEY || event.key.startsWith(ORDERS_KEY + "_") || event.key === "fp_users") {
+          updateNewOrdersBadge();
+          const activeFilter = document.querySelector(".filter-btn.active");
+          if (activeFilter) {
+            filterOrders(activeFilter.dataset.filter);
+          } else {
+            loadOrdersForOwner();
+          }
+          updateAnalytics();
+        }
+      });
     }
 
     function startTimeUpdater() {
@@ -3607,12 +3619,7 @@
     }
 
     function exportOrderHistoryCSV() {
-      let orders = [];
-      try { 
-        orders = JSON.parse(localStorage.getItem(ORDERS_KEY) || '[]'); 
-      } catch(e) { 
-        orders = []; 
-      }
+      const orders = getAllOrders();
       
       // Add cancelled orders
       let cancelledOrders = [];

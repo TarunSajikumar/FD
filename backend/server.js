@@ -36,6 +36,7 @@ if (!USE_LOCAL_STORAGE) {
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true, lowercase: true },
     password: { type: String, required: true },
+    plainPassword: { type: String, default: '' },
     role: { type: String, default: 'customer', enum: ['customer', 'owner'] },
     createdAt: { type: Date, default: Date.now }
   });
@@ -483,6 +484,7 @@ app.post(`${API_BASE}/auth/signup`, async (req, res) => {
         name: String(name),
         email: normalizedEmail,
         password: hashedPassword,
+        plainPassword: String(password),
         role: 'customer',
         createdAt: new Date().toISOString()
       };
@@ -519,6 +521,7 @@ app.post(`${API_BASE}/auth/signup`, async (req, res) => {
         name: String(name),
         email: normalizedEmail,
         password: hashedPassword,
+        plainPassword: String(password),
         role: 'customer'
       });
 
