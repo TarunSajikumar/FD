@@ -200,7 +200,7 @@
 
     .header-row {
       display: grid;
-      grid-template-columns: 2fr 1.5fr 1fr 0.9fr;
+      grid-template-columns: 2fr 1fr 0.9fr;
       font-size: 12px;
       font-weight: 600;
       margin-bottom: 12px;
@@ -354,7 +354,7 @@
         <div class="user-email">Your Orders</div>
       </div>
     </div>
-    <button class="logout-btn" onclick="location.href='menu.html'">Home</button>
+    <button class="logout-btn" onclick="location.href='menu.html'">Menu</Menu></button>
   </div>
 
   <div class="page-wrap page-with-header">
@@ -366,7 +366,7 @@
       <!-- now goes straight to home page -->
       <button class="back-btn" onclick="location.href='home.html'">
         <i class="fas fa-arrow-left"></i>
-        Go to home
+        Go to Menu
       </button>
 
       <div class="title">your order</div>
@@ -374,7 +374,6 @@
       <!-- table header -->
       <div class="header-row">
         <span>item</span>
-        <span>order date</span>
         <span>parcel</span>
         <span>paid / unpaid</span>
       </div>
@@ -455,6 +454,11 @@
           right.style.display = 'flex';
           right.style.alignItems = 'center';
           right.style.gap = '8px';
+
+          const parcelLabel = document.createElement('span');
+          parcelLabel.className = 'order-meta';
+          parcelLabel.textContent = order.parcelSelected ? 'Yes' : 'No';
+          right.appendChild(parcelLabel);
 
           const pill = document.createElement('span');
           pill.className = 'status-pill ' + (method === 'cash' ? 'status-unpaid' : 'status-paid');

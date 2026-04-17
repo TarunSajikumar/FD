@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Food Menu</title>
+    <title>Food Menu | Food Point</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
       /* Base reset and touch optimizations */
@@ -44,12 +44,10 @@
         z-index: 1;
       }
 
-      /* Premium glasmorphic user-bar header */
+      /* Premium glassmorphic user-bar header with integrated logout */
       .user-bar {
-        position: fixed !important;
-        top: 14px !important;
-        left: 50% !important;
-        transform: translateX(-50%) !important;
+        position: relative !important;
+        margin: 16px auto !important;
         max-width: 720px !important;
         width: calc(100% - 28px) !important;
         background: linear-gradient(135deg, rgba(30,35,50,0.8), rgba(25,30,45,0.77)) !important;
@@ -59,7 +57,7 @@
         display: flex !important;
         align-items: center !important;
         justify-content: space-between !important;
-        z-index: 999 !important;
+        z-index: 1 !important;
         box-shadow: 0 16px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.12) !important;
         border: 1px solid rgba(255,255,255,0.08) !important;
       }
@@ -104,25 +102,58 @@
         letter-spacing: 0.02em !important;
       }
 
-      .logout-btn {
-        background: linear-gradient(135deg, rgba(0,200,150,0.3), rgba(0,180,140,0.25)) !important;
+      /* Button group in user bar */
+      .user-actions {
+        display: flex !important;
+        align-items: center !important;
+        gap: 10px !important;
+      }
+
+      /* Home button */
+      .home-btn {
+        background: linear-gradient(135deg, rgba(0,200,150,0.25), rgba(0,180,140,0.2)) !important;
         border: 1px solid rgba(0,220,170,0.3) !important;
         color: #00d9a3 !important;
-        padding: 8px 16px !important;
-        border-radius: 10px !important;
+        padding: 8px 14px !important;
+        border-radius: 12px !important;
         font-size: 12px !important;
-        font-weight: 700 !important;
+        font-weight: 600 !important;
         cursor: pointer !important;
         transition: all 200ms ease !important;
-        box-shadow: 0 0 16px rgba(0,220,170,0.35) !important;
-        letter-spacing: 0.04em !important;
-        text-transform: uppercase !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+      }
+
+      .home-btn:hover {
+        background: linear-gradient(135deg, rgba(0,220,170,0.4), rgba(0,200,150,0.35)) !important;
+        transform: translateY(-1px) !important;
+      }
+
+      /* Logout button - integrated in user bar */
+      .logout-btn {
+        background: linear-gradient(135deg, rgba(220,70,70,0.25), rgba(200,60,60,0.2)) !important;
+        border: 1px solid rgba(220,70,70,0.3) !important;
+        color: #ff6b6b !important;
+        padding: 8px 14px !important;
+        border-radius: 12px !important;
+        font-size: 12px !important;
+        font-weight: 600 !important;
+        cursor: pointer !important;
+        transition: all 200ms ease !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 6px !important;
       }
 
       .logout-btn:hover {
-        background: linear-gradient(135deg, rgba(0,220,170,0.4), rgba(0,200,150,0.35)) !important;
-        box-shadow: 0 0 24px rgba(0,220,170,0.5) !important;
+        background: linear-gradient(135deg, rgba(220,70,70,0.4), rgba(200,60,60,0.35)) !important;
         transform: translateY(-1px) !important;
+        box-shadow: 0 0 12px rgba(220,70,70,0.3) !important;
+      }
+
+      .logout-btn:active, .home-btn:active {
+        transform: scale(0.96) !important;
       }
 
       /* Main container */
@@ -138,7 +169,7 @@
       }
 
       .page-with-header {
-        margin-top: 82px !important;
+        margin-top: 0 !important;
       }
 
       /* Brand and header */
@@ -372,54 +403,6 @@
         letter-spacing: 0.02em;
       }
 
-      /* Cart FAB */
-      .cart-fab {
-        position: fixed;
-        bottom: 28px;
-        right: 20px;
-        width: 60px;
-        height: 60px;
-        background: linear-gradient(135deg, #ffaa00, #ff8c00);
-        border-radius: 30px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #0a0e1a;
-        font-size: 20px;
-        box-shadow: 0 0 24px rgba(255,140,0,0.4);
-        z-index: 1000;
-        border: none;
-        cursor: pointer;
-        transition: all 200ms ease;
-      }
-
-      .cart-fab:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 0 32px rgba(255,140,0,0.6);
-      }
-
-      .cart-fab:active {
-        transform: scale(0.96);
-      }
-
-      .cart-fab-count {
-        position: absolute;
-        top: -6px;
-        right: -6px;
-        background: #00d9a3;
-        color: #0a0e1a;
-        width: 24px;
-        height: 24px;
-        border-radius: 12px;
-        display: none;
-        align-items: center;
-        justify-content: center;
-        font-size: 12px;
-        font-weight: 700;
-        border: 2px solid rgba(0,220,170,0.3);
-        box-shadow: 0 0 12px rgba(0,220,170,0.3);
-      }
-
       /* Bottom action bar */
       .bottom-action-bar {
         position: fixed;
@@ -478,34 +461,6 @@
 
       .add-to-cart-btn:active {
         transform: scale(0.98);
-      }
-
-      /* Back button - FIXED CSS TYPO */
-      .back-btn {
-        background: linear-gradient(135deg, rgba(40,50,70,0.4), rgba(35,45,65,0.35));
-        border: 1px solid rgba(255,255,255,0.1);
-        color: #aeb5c4;
-        width: 44px;
-        height: 44px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 18px;
-        cursor: pointer;
-        transition: all 200ms ease;
-        -webkit-appearance: none;
-        backdrop-filter: blur(8px);
-      }
-
-      .back-btn:hover {
-        background: linear-gradient(135deg, rgba(40,50,70,0.5), rgba(35,45,65,0.45));
-        border-color: rgba(0,220,170,0.2); /* FIXED: Changed from 'boryyder-color' to 'border-color' */
-        color: #f5e6d3;
-      }
-
-      .back-btn:active {
-        transform: scale(0.96);
       }
 
       /* Empty state */
@@ -584,10 +539,30 @@
           width: 100%;
           text-align: center;
         }
+
+        .user-bar {
+          padding: 10px 16px !important;
+        }
+
+        .user-avatar {
+          width: 40px !important;
+          height: 40px !important;
+          font-size: 14px !important;
+        }
+
+        .home-btn, .logout-btn {
+          padding: 6px 10px !important;
+          font-size: 10px !important;
+        }
+
+        .user-actions {
+          gap: 6px !important;
+        }
       }
     </style>
 </head>
 <body>
+  <!-- Premium User Bar with integrated buttons (no floating elements) -->
   <div class="user-bar">
     <div class="user-info">
       <div class="user-avatar">FP</div>
@@ -596,7 +571,16 @@
         <div class="user-email">Menu</div>
       </div>
     </div>
-    <button class="logout-btn" onclick="location.href='home.html'">Home</button>
+    <div class="user-actions">
+      <!-- Home Button -->
+      <button class="home-btn" id="homeBtn">
+        <i class="fas fa-home"></i> 
+      </button>
+      <!-- Logout Button (integrated, not floating) -->
+      <button class="logout-btn" id="logoutBtn">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </button>
+    </div>
   </div>
 
   <div class="container page-with-header">
@@ -636,12 +620,6 @@
       </span>
     </button>
   </div>
-
-  <!-- Cart FAB (optional, can be added later) -->
-  <!-- <button class="cart-fab" onclick="location.href='cart.html'">
-    <i class="fas fa-shopping-cart"></i>
-    <div class="cart-fab-count" id="cartFabCount">0</div>
-  </button> -->
 
   <script>
     /* ============================
@@ -776,7 +754,6 @@
 
     /* ===== utilities ===== */
     function parsePriceToNumber(price){
-      // price may be number or string like "30 / 50" or "50 / 90"
       if (typeof price === 'number') return price;
       if (!price) return 0;
       const m = String(price).match(/(\d+(\.\d+)?)/);
@@ -808,7 +785,6 @@
           currentCategory = idx;
           document.querySelectorAll(".category-tab").forEach(t => t.classList.remove("active"));
           tab.classList.add("active");
-          // Updated scroll logic
           scrollToSection(idx);
         });
         categoryTabs.appendChild(tab);
@@ -836,18 +812,14 @@
           foodItem.className = "food-item" + (isSelected ? " selected" : "");
           foodItem.dataset.id = id;
           foodItem.dataset.name = item.name;
-          // store numeric price for quick access
           foodItem.dataset.price = numericPrice;
           foodItem.dataset.rawPrice = typeof item.price === 'string' ? item.price : String(item.price);
 
-          // handle multiple-price options like "30 / 50"
-          // prefer previously selected variant (from localStorage) when present
           const savedObj = selectedItems.get(id);
           const savedPriceValue = savedObj ? String(savedObj.price || savedObj.rawPrice || savedObj.numericPrice) : null;
           let chosenPrice = savedPriceValue || (typeof item.price === 'string' && item.price.includes('/') ? item.price.split('/').map(s=>s.trim())[0] : item.price);
           const priceText = `₹${chosenPrice}`;
 
-          // build options HTML if multiple choices present
           let optionsHtml = '';
           let hasOptions = false;
           if (typeof item.price === 'string' && item.price.includes('/')) {
@@ -868,7 +840,6 @@
             ${isSelected ? '<div class="selected-badge"><i class="fas fa-check"></i></div>' : ''}
           `;
 
-          // if there are multiple price options, wire up buttons to update displayed price
           if (hasOptions) {
             const optContainer = foodItem.querySelector('.price-options');
             const priceDisplay = foodItem.querySelector('.food-price');
@@ -876,17 +847,14 @@
             optContainer.addEventListener('click', (ev) => {
               const btn = ev.target.closest('.price-opt');
               if (!btn) return;
-              // mark pressed state
               optContainer.querySelectorAll('.price-opt').forEach(b => b.setAttribute('aria-pressed', 'false'));
               btn.setAttribute('aria-pressed', 'true');
               const val = btn.dataset.price;
               priceDisplay.textContent = '₹' + val;
               if (variantLabel) variantLabel.textContent = '₹' + val;
-              // update dataset to reflect chosen price
               foodItem.dataset.chosenPrice = val;
               foodItem.dataset.price = parsePriceToNumber(val);
               foodItem.dataset.rawPrice = val;
-              // if this item is already selected, update the saved selection to reflect the new variant
               if (selectedItems.has(id)) {
                 const saved = selectedItems.get(id);
                 saved.price = val;
@@ -896,11 +864,8 @@
                 updateUI();
               }
             });
-            // set initial dataset values
-            // if a saved variant exists, ensure that option is active and displayed
             const firstOpt = optContainer.querySelector('.price-opt[aria-pressed="true"]') || optContainer.querySelector('.price-opt');
             if (firstOpt) {
-              // ensure visual pressed attribute and display
               optContainer.querySelectorAll('.price-opt').forEach(b => b.setAttribute('aria-pressed', 'false'));
               firstOpt.setAttribute('aria-pressed', 'true');
               const startVal = firstOpt.dataset.price;
@@ -911,7 +876,6 @@
               foodItem.dataset.rawPrice = startVal;
             }
           } else {
-            // no options - store the price value (if a saved variant exists prefer it)
             const finalPrice = savedPriceValue || String(item.price);
             foodItem.dataset.chosenPrice = finalPrice;
             foodItem.dataset.price = numericPrice;
@@ -920,14 +884,11 @@
             if (variantLabel) variantLabel.textContent = '₹' + finalPrice;
           }
 
-          // click / tap selects — read chosen price from dataset so cart stores the selected variant
           foodItem.addEventListener("click", (e) => {
-            // if user clicked an option button, don't toggle selection on the parent
             if (e.target.closest('.price-opt')) return;
             const chosen = foodItem.dataset.rawPrice || foodItem.dataset.chosenPrice || item.price;
             toggleSelection(id, item.name, chosen, item.description);
           });
-          // keyboard support
           foodItem.tabIndex = 0;
           foodItem.addEventListener("keydown", (e) => { if (e.key === "Enter") toggleSelection(id, item.name, item.price, item.description); });
           section.appendChild(foodItem);
@@ -939,7 +900,6 @@
 
     function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
 
-    /* ===== selection logic ===== */
     function toggleSelection(id, name, price, description){
       const element = document.querySelector(`[data-id="${id}"]`);
       if (!element) return;
@@ -968,26 +928,20 @@
     function pulse(el){
       if (!el) return;
       el.style.animation = "none";
-      // trigger reflow
       void el.offsetWidth;
       el.style.animation = "pulse .28s ease";
       setTimeout(()=> el.style.animation = "", 300);
     }
 
-    /* ===== UI update ===== */
     function updateUI(){
       const totalItems = selectedItems.size;
       const totalPrice = Array.from(selectedItems.values()).reduce((s,it)=> s + (parsePriceToNumber(it.price) * (it.quantity||1)), 0);
-
-      // Cart count in button
       if (totalItems > 0){
         cartFabCount.textContent = totalItems > 99 ? "99+" : String(totalItems);
         cartFabCount.style.display = "flex";
       } else {
         cartFabCount.style.display = "none";
       }
-
-      // bottom bar
       if (totalItems > 0){
         bottomBar.style.display = "flex";
         selectionCount.textContent = `${totalItems} ${totalItems === 1 ? 'item' : 'items'} selected`;
@@ -998,7 +952,6 @@
       }
     }
 
-    /* ===== search & filtering ===== */
     function setupSearch(){
       searchInput.addEventListener("input", (e) => {
         const q = String(e.target.value || "").trim().toLowerCase();
@@ -1007,7 +960,6 @@
     }
 
     function filterBySearch(query){
-      // Show/hide items based on search, hide empty sections
       document.querySelectorAll(".menu-section").forEach(section => {
         let anyVisible = false;
         section.querySelectorAll(".food-item").forEach(itemEl => {
@@ -1020,11 +972,8 @@
             itemEl.style.display = "none";
           }
         });
-        // if none of the children are visible, hide section (and category tab marking remains)
         section.style.display = anyVisible ? "" : "none";
       });
-
-      // show empty state if no items visible anywhere
       const anyItemVisible = Array.from(document.querySelectorAll(".food-item")).some(i => i.style.display !== "none");
       if (!anyItemVisible && query){
         showEmptyState();
@@ -1045,62 +994,65 @@
       if (s) s.remove();
     }
 
-    /* ===== scroll / UX helpers ===== */
     function scrollToSection(index){
       const sec = document.getElementById(`section-${index}`);
       if (!sec) return;
-      // scroll the section header into view (account for fixed header)
       const headerHeight = document.querySelector(".user-bar").getBoundingClientRect().height + 20;
       const top = sec.getBoundingClientRect().top + window.scrollY - headerHeight;
       window.scrollTo({ top, behavior: "smooth" });
     }
 
-    /* ===== cart actions ===== */
     addToCartBtn.addEventListener("click", function(){
       if (selectedItems.size === 0) return;
-      // for now redirect to cart.html and keep selected items in localStorage (persisted)
-      // we show a tiny confirmation
       const originalHTML = addToCartBtn.innerHTML;
       addToCartBtn.innerHTML = '<i class="fas fa-check"></i> ADDED';
       addToCartBtn.disabled = true;
       setTimeout(()=> {
         addToCartBtn.innerHTML = originalHTML;
         addToCartBtn.disabled = false;
-        // keep data and redirect
         window.location.href = "cart.html";
       }, 700);
     });
 
-    /* ===== init ===== */
+    // Integrated Home and Logout functionality (no floating elements)
+    const homeBtn = document.getElementById("homeBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+    
+    if (homeBtn) {
+      homeBtn.addEventListener("click", function() {
+        window.location.href = "home.html";
+      });
+    }
+    
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", function() {
+        localStorage.removeItem("fp_current_user");
+        window.location.href = "login.html";
+      });
+    }
+
     function init(){
       loadSelected();
       renderCategories();
       renderFoodItems();
       setupSearch();
-      // initial search state (none)
       filterBySearch("");
       updateUI();
-
-      // minimize unnecessary reflows on mobile
       document.addEventListener('touchstart', function() {}, { passive: true });
-
-      // iOS double-tap zoom prevention
       let lastTouch = 0;
       document.addEventListener('touchend', function(e){
         const now = Date.now();
         if (now - lastTouch <= 300) e.preventDefault();
         lastTouch = now;
       }, false);
-
-      // handle orientation/viewport issues
       function setVH(){ document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`); }
       window.addEventListener('resize', setVH);
       window.addEventListener('orientationchange', setVH);
       setVH();
     }
 
-    // initialize once DOM ready
     document.addEventListener('DOMContentLoaded', init);
   </script>
 </body>
 </html>
+```
