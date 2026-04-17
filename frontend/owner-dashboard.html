@@ -2269,6 +2269,42 @@
       }
     }
 
+    function getAllOrders() {
+      let allOrders = [];
+      
+      // Load from main ordersHistory (legacy)
+      const legacyOrders = JSON.parse(localStorage.getItem(ORDERS_KEY) || "[]");
+      allOrders.push(...legacyOrders);
+      
+      // Load from all user-specific order histories
+      const users = JSON.parse(localStorage.getItem("fp_users") || "[]");
+      users.forEach(user => {
+        if (user && user.id) {
+          const userOrdersKey = ORDERS_KEY + "_" + user.id;
+          try {
+            const userOrders = JSON.parse(localStorage.getItem(userOrdersKey) || "[]");
+            // Add customerName if not present
+            userOrders.forEach(order => {
+              if (!order.customerName && user.name) {
+                order.customerName = user.name;
+              }
+            });
+            allOrders.push(...userOrders);
+          } catch (e) { /* ignore */ }
+        }
+      });
+      
+      // Remove duplicates based on order id
+      const seen = new Set();
+      allOrders = allOrders.filter(order => {
+        if (!order.id || seen.has(order.id)) return false;
+        seen.add(order.id);
+        return true;
+      });
+      
+      return allOrders;
+    }
+
     function loadOrdersForOwner() {
       const list = document.getElementById("ordersList");
       const empty = document.getElementById("emptyNote");
@@ -2279,7 +2315,7 @@
 
       setTimeout(() => {
         try {
-          currentOrders = JSON.parse(localStorage.getItem(ORDERS_KEY) || "[]");
+          currentOrders = getAllOrders();
         } catch (e) {
           currentOrders = [];
         }
@@ -2384,7 +2420,7 @@
     }
 
     function filterOrders(filter) {
-      const orders = JSON.parse(localStorage.getItem(ORDERS_KEY) || "[]").reverse();
+      const orders = getAllOrders().reverse();
       const today = new Date().toLocaleDateString("en-IN");
       
       let filteredOrders = orders;
@@ -2465,8 +2501,8 @@
     }
 
     function viewOrderDetails(orderId) {
-      let orders = JSON.parse(localStorage.getItem(ORDERS_KEY) || "[]");
-      const order = orders.find(o => o.id === orderId);
+      const allOrders = getAllOrders();
+      const order = allOrders.find(o => o.id === orderId);
       
       if (!order) {
         showNotification("Error", "Order not found!", "error");
@@ -2474,6 +2510,7 @@
       }
       
       const items = Array.isArray(order.items) ? order.items : [];
+      const displayName = order.customerName || 'Walk-in';
       const details = `
         <div style="background: rgba(40,50,70,0.3); padding: 20px; border-radius: 12px; margin-bottom: 20px;">
           <h3 style="color: var(--text); margin-bottom: 15px;">Order #${order.id}</h3>

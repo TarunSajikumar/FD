@@ -652,13 +652,7 @@
       });
     });
 
-    // If already logged in, send to home directly
-    document.addEventListener("DOMContentLoaded", () => {
-      const current = localStorage.getItem(CURRENT_USER_KEY);
-      if (current) {
-        window.location.href = "menu.html";
-      }
-    });
+    // No automatic login redirect. Users must sign in manually.
 
     // ---------- OWNER PASSWORD POPUP (same connection as index) ----------
     const OWNER_PASSWORD_KEY = "ownerPassword";
