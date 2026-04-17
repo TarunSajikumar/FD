@@ -2,447 +2,683 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Payment — Options & Secure UPI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes" />
+  <title>Secure Payment — UPI & Cash Options</title>
 
-  <!-- fontawesome (for icons) -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- QR Code Library (async) -->
-  <script async src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
-  <script src="fp-config.js"></script>
-  <script src="fp-fetch-proxy.js"></script>
-  <script src="api.js"></script>
-  <script src="dev-check.js"></script>
+  <!-- Font Awesome 6 (icons) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <!-- QRCode.js from CDN (fast, reliable) -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 
   <style>
-    /* --- Reset & base --- */
-    * { margin:0; padding:0; box-sizing:border-box; font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; -webkit-tap-highlight-color:transparent; }
-    html { -webkit-user-select:none; -webkit-text-size-adjust:100%; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    }
+
     body {
-      background: #0a0e1a url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg"/>') repeat;
-      color: #d9e6ff;
-      min-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:20px;
+      background: radial-gradient(circle at 10% 20%, #0a0f1f, #03060c);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
     }
 
-    .container {
-      width:100%;
-      max-width:760px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
-      border-radius:18px;
-      padding:26px;
-      box-shadow: 0 8px 30px rgba(2,6,23,0.6);
-      backdrop-filter: blur(6px);
+    /* glassmorphic card */
+    .payment-container {
+      max-width: 780px;
+      width: 100%;
+      background: rgba(12, 18, 32, 0.75);
+      backdrop-filter: blur(14px);
+      border-radius: 2rem;
+      border: 1px solid rgba(255, 215, 150, 0.2);
+      box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.6);
+      padding: 1.8rem;
+      transition: all 0.2s ease;
     }
 
-    header h1 { font-size:22px; color:#fff; letter-spacing:0.4px; margin-bottom:6px;}
-    header p { color:#bfcbe6; font-size:14px; margin-bottom:18px; }
-
-    .steps {
-      display:flex;
-      gap:12px;
-      margin-bottom:18px;
-    }
-    .step {
-      flex:1;
-      background: rgba(255,255,255,0.02);
-      padding:12px;
-      border-radius:12px;
-      text-align:center;
-      cursor:pointer;
-      border:2px solid transparent;
-      transition: all .18s ease;
-      user-select:none;
-    }
-    .step.active { border-color: #ffd79a; transform:translateY(-4px); background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)); }
-    .step h3 { margin-bottom:6px; font-size:16px; color:#fff; }
-    .step p { font-size:13px; color:#bfcbe6; }
-
-    .payment-card {
-      margin-top:10px;
-      padding:18px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,0.03);
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      background: linear-gradient(135deg, #fff5e0, #ffd89a);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      letter-spacing: -0.2px;
     }
 
-    .amount-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
-    .amount-row .label { color:#bfcbe6; font-size:13px; }
-    .amount-row .value { font-weight:700; font-size:20px; color:#fff; }
+    .subhead {
+      color: #a3b3df;
+      font-size: 0.9rem;
+      margin-top: 6px;
+      border-left: 3px solid #ffb347;
+      padding-left: 12px;
+    }
 
+    /* step selector */
+    .step-row {
+      display: flex;
+      gap: 1rem;
+      margin: 1.8rem 0 1.2rem;
+      flex-wrap: wrap;
+    }
+
+    .step-card {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 1.2rem;
+      padding: 1rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      text-align: center;
+    }
+
+    .step-card.active {
+      background: linear-gradient(135deg, rgba(255, 180, 71, 0.18), rgba(255, 210, 110, 0.05));
+      border-color: #ffcd7e;
+      box-shadow: 0 6px 14px rgba(255, 180, 70, 0.12);
+      transform: translateY(-2px);
+    }
+
+    .step-card i {
+      font-size: 1.8rem;
+      color: #ffcd7e;
+      margin-bottom: 8px;
+      display: inline-block;
+    }
+
+    .step-card h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #f0f3ff;
+    }
+
+    .step-card p {
+      font-size: 0.75rem;
+      color: #9aaed6;
+      margin-top: 6px;
+    }
+
+    /* amount panel */
+    .amount-panel {
+      background: rgba(0, 0, 0, 0.35);
+      border-radius: 1.2rem;
+      padding: 1.2rem;
+      margin: 1rem 0 1.2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      flex-wrap: wrap;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .amount-label {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 500;
+      color: #b7c5f0;
+    }
+
+    .amount-value {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #ffe6b3;
+      letter-spacing: 1px;
+    }
+
+    /* buttons */
     .btn {
-      display:inline-block;
-      padding:10px 14px;
-      border-radius:10px;
-      font-weight:700;
-      cursor:pointer;
-      border:0;
-      background: linear-gradient(90deg,#ffb347,#ffcc33);
-      color:#111;
-      box-shadow: 0 6px 16px rgba(255,179,71,0.18);
+      border: none;
+      padding: 12px 24px;
+      border-radius: 60px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: center;
     }
 
-    .btn-ghost {
-      background:transparent;
-      border:1px solid rgba(255,255,255,0.06);
-      color:#e6eefc;
+    .btn-primary {
+      background: linear-gradient(95deg, #ffb347, #ff8c1a);
+      color: #0f0f1c;
+      box-shadow: 0 8px 18px rgba(255, 140, 26, 0.3);
     }
 
-    /* online ui */
-    .online-ui { margin-top:14px; display:none; }
-    .upi-box {
-      display:flex;
-      gap:12px;
-      align-items:center;
-      padding:12px;
-      background:rgba(0,0,0,0.18);
-      border-radius:10px;
-      border:1px solid rgba(255,255,255,0.02);
+    .btn-primary:hover {
+      transform: scale(0.98);
+      background: linear-gradient(95deg, #ffa32e, #ff7a00);
     }
-    .upi-qr { width:130px; height:130px; background:#fff; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#222; font-weight:700; }
-    .upi-details { flex:1; }
-    .copy-row { display:flex; gap:8px; margin-top:8px; align-items:center; }
-    .small { font-size:13px; color:#dfe9ff; }
 
-    .hint { margin-top:10px; font-size:13px; color:#c8d6ff; background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00)); padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.02); }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid rgba(255, 200, 120, 0.6);
+      color: #ffddb0;
+    }
 
-    footer { margin-top:16px; display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; }
+    .btn-outline:hover {
+      background: rgba(255, 200, 120, 0.12);
+      border-color: #ffc97a;
+    }
 
-    @media (max-width:520px){
-      .steps { flex-direction:column; }
-      .upi-qr { width:100px; height:100px; font-size:14px; }
+    .action-group {
+      display: flex;
+      gap: 14px;
+      margin: 8px 0 0;
+      flex-wrap: wrap;
+    }
+
+    /* Online UPI panel */
+    .upi-panel {
+      margin-top: 1.5rem;
+      background: rgba(10, 14, 27, 0.7);
+      border-radius: 1.5rem;
+      padding: 1.3rem;
+      border: 1px solid rgba(255, 220, 140, 0.25);
+      transition: all 0.2s;
+    }
+
+    .qr-section {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .qr-box {
+      background: white;
+      padding: 12px;
+      border-radius: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+      min-width: 150px;
+      min-height: 150px;
+    }
+
+    #qrcodeCanvas {
+      width: 130px;
+      height: 130px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .upi-details {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .upi-id-group {
+      background: #0b0f1c;
+      border-radius: 14px;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 12px 0;
+      border: 1px solid #2a314a;
+    }
+
+    .upi-id-text {
+      font-family: monospace;
+      font-size: 1rem;
+      font-weight: 500;
+      color: #ffde9c;
+      word-break: break-all;
+    }
+
+    .copy-btn {
+      background: #2e3a5c;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 40px;
+      color: white;
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+
+    .paid-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 18px;
+      flex-wrap: wrap;
+    }
+
+    .hint-text {
+      font-size: 0.75rem;
+      background: rgba(255, 215, 140, 0.08);
+      padding: 10px;
+      border-radius: 12px;
+      margin-top: 14px;
+      color: #c7d2f0;
+    }
+
+    footer {
+      margin-top: 1.8rem;
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.7rem;
+      color: #6a7bb5;
+    }
+
+    @media (max-width: 580px) {
+      .payment-container {
+        padding: 1rem;
+      }
+      .qr-section {
+        flex-direction: column;
+      }
+      .amount-value {
+        font-size: 1.6rem;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="container" role="main">
-    <header>
-      <h1>Complete Payment</h1>
-      <p>Choose how you'd like to pay. If you pick Online, follow the UPI instructions on this page and tap <strong>"I have paid"</strong> when done.</p>
-    </header>
 
-    <!-- Step chooser -->
-    <div class="steps" id="paymentSteps">
-      <div class="step" id="stepCash" data-step="cash" aria-pressed="false">
-        <h3>Cash</h3>
-        <p>Pay in cash when your order arrives — fast & easy.</p>
-      </div>
+<div class="payment-container" id="app">
+  <div>
+    <h1><i class="fa-regular fa-credit-card"></i> Secure payment</h1>
+    <div class="subhead">Fast checkout · UPI or cash on delivery</div>
+  </div>
 
-      <div class="step" id="stepOnline" data-step="online" aria-pressed="false">
-        <h3>Online (UPI)</h3>
-        <p>Pay instantly with UPI — scan or copy the UPI ID.</p>
-      </div>
+  <!-- Step toggle -->
+  <div class="step-row">
+    <div class="step-card" id="cashStepBtn">
+      <i class="fa-solid fa-hand-holding-dollar"></i>
+      <h3>Cash</h3>
+      <p>Pay when order arrives</p>
     </div>
-
-    <div class="payment-card">
-      <div class="amount-row">
-        <div>
-          <div class="label">Amount to pay</div>
-        </div>
-        <div class="value" id="amountValue">₹0.00</div>
-      </div>
-
-      <div id="actionArea">
-        <button class="btn" id="payCashBtn">Pay with Cash</button>
-        <button class="btn btn-ghost" id="chooseOnlineBtn">Proceed to Online Payment</button>
-      </div>
-
-      <!-- Online payment UI (hidden until online chosen) -->
-      <div class="online-ui" id="onlineUI" aria-hidden="true">
-        <div class="upi-box">
-          <div class="upi-qr" id="qrPlaceholder">QR</div>
-          <div class="upi-details">
-            <div class="small">Pay to</div>
-            <div style="font-weight:800; margin-top:4px; font-size:16px;" id="upiId">example@upi</div>
-
-            <div class="copy-row">
-              <input type="text" id="upiInput" value="example@upi" readonly style="flex:1; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,0.04); background:transparent; color:#fff;">
-              <button class="btn btn-ghost" id="copyUpiBtn"><i class="fa-regular fa-copy"></i> Copy</button>
-            </div>
-
-            <div style="margin-top:10px; display:flex; gap:8px;">
-              <button class="btn" id="iPaidBtn">I have paid</button>
-              <button class="btn btn-ghost" id="chooseCashBackBtn">Back to options</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="hint">
-          Tip: Use your UPI app to scan the QR or paste the UPI ID. After completing payment in your app, press “I have paid”.
-        </div>
-      </div>
-
-      <footer>
-        <div class="small">Payment provider: <strong id="providerLabel">UPI</strong></div>
-        <div class="small">Secure · No card details here</div>
-      </footer>
+    <div class="step-card" id="onlineStepBtn">
+      <i class="fa-brands fa-google-pay"></i>
+      <h3>Online (UPI)</h3>
+      <p>Scan & pay instantly</p>
     </div>
   </div>
 
-  <script>
-    /* ====== utilities to read/write localStorage and compute fallbacks ====== */
-    function safeGet(key){ try { return localStorage.getItem(key); } catch(e){ return null; } }
-    function safeSet(key,val){ try { localStorage.setItem(key,String(val)); } catch(e){ } }
+  <!-- Amount display -->
+  <div class="amount-panel">
+    <span class="amount-label"><i class="fa-regular fa-indian-rupee-sign"></i> Total amount</span>
+    <span class="amount-value" id="totalAmountDisplay">₹0.00</span>
+  </div>
 
-    function parseAmountRaw(raw){
-      if(!raw) return null;
-      // remove currency symbol and commas
-      const cleaned = String(raw).replace(/[₹, ]+/g,'').trim();
-      const n = parseFloat(cleaned);
-      return Number.isFinite(n) ? n : null;
-    }
+  <!-- Dynamic action area (changes based on step) -->
+  <div id="actionZone">
+    <!-- Cash mode content (default visible) -->
+    <div id="cashModePanel">
+      <button class="btn btn-primary" id="cashPayNowBtn"><i class="fa-regular fa-circle-check"></i> Confirm Cash Payment</button>
+      <div class="hint-text" style="margin-top:12px;">
+        <i class="fa-regular fa-bell"></i> No advance needed. Pay cash to delivery partner.
+      </div>
+    </div>
 
-    function computeAmountFromCart(){
-      // Attempts to compute amount using available cart items or fallback price-per-item.
+    <!-- Online mode panel (hidden at start) -->
+    <div id="onlineModePanel" style="display: none;">
+      <div class="upi-panel">
+        <div class="qr-section">
+          <div class="qr-box">
+            <div id="qrcodeCanvas"></div>
+          </div>
+          <div class="upi-details">
+            <div style="font-size:0.8rem; opacity:0.8;">🔐 Pay using any UPI app</div>
+            <div class="upi-id-group">
+              <span class="upi-id-text" id="upiIdText">fetching@upi</span>
+              <button class="copy-btn" id="copyUpiButton"><i class="fa-regular fa-copy"></i> Copy ID</button>
+            </div>
+            <div class="paid-actions">
+              <button class="btn btn-primary" id="iPaidConfirmBtn"><i class="fa-regular fa-thumbs-up"></i> I have paid</button>
+              <button class="btn btn-outline" id="backToCashBtn"><i class="fa-regular fa-arrow-left"></i> Back to cash</button>
+            </div>
+          </div>
+        </div>
+        <div class="hint-text">
+          <i class="fa-regular fa-qrcode"></i> Scan QR code with PhonePe, Google Pay, Paytm, or any UPI app. After payment, click "I have paid" to confirm.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <span><i class="fa-regular fa-shield-haltered"></i> PCI compliant · no card storage</span>
+    <span id="providerBadge">UPI powered</span>
+  </footer>
+</div>
+
+<script>
+  // ----------------------------------------------
+  // 1. Secure localStorage helpers + amount resolver
+  // ----------------------------------------------
+  const storage = {
+    get: (key) => {
       try {
-        const cartJson = safeGet('cartItems') || safeGet('selectedFoods_v1') || safeGet('selectedFoods');
-        if(cartJson){
-          const parsed = JSON.parse(cartJson);
-          // parsed might be an array or object; try to sum price * qty if available
-          if(Array.isArray(parsed) && parsed.length){
-            let total = 0;
-            parsed.forEach(it=>{
-              const price = (it && (it.price || it.priceNumeric || it.amount)) || 0;
-              const qty = (it && (it.qty || it.quantity || it.qtyOrdered)) || 1;
-              const pnum = parseFloat(String(price).toString().replace(/[₹, ]+/g,'')) || 0;
-              const qnum = parseFloat(qty) || 1;
-              total += pnum * qnum;
-            });
-            if(total>0) return total;
-          }
-        }
-      } catch(e){}
-      // fallback: price per item × count
+        return localStorage.getItem(key);
+      } catch(e) { return null; }
+    },
+    set: (key, val) => {
       try {
-        const legacy = safeGet('selectedFoods') || safeGet('selectedFoods_v1');
-        if(legacy){
-          const arr = JSON.parse(legacy);
-          if(Array.isArray(arr)){
-            const PRICE_PER_ITEM = 99; // conservative default used by previous pages if missing
-            return arr.length * PRICE_PER_ITEM;
-          }
-        }
-      } catch(e){}
-      return null;
+        localStorage.setItem(key, String(val));
+        return true;
+      } catch(e) { return false; }
     }
+  };
 
-    /* ====== page state & elements ====== */
-    const amountValueEl = document.getElementById('amountValue');
-    const payCashBtn = document.getElementById('payCashBtn');
-    const chooseOnlineBtn = document.getElementById('chooseOnlineBtn');
-    const onlineUI = document.getElementById('onlineUI');
-    const iPaidBtn = document.getElementById('iPaidBtn');
-    const copyUpiBtn = document.getElementById('copyUpiBtn');
-    const upiInput = document.getElementById('upiInput');
-    const upiIdEl = document.getElementById('upiId');
-    const stepCash = document.getElementById('stepCash');
-    const stepOnline = document.getElementById('stepOnline');
-    const chooseCashBackBtn = document.getElementById('chooseCashBackBtn');
-
-    /* ====== QR Code generation helper ====== */
-    function generateUPIQRCode(upiId, restaurantName, amount) {
-      const qrPlaceholder = document.getElementById('qrPlaceholder');
-      if (!qrPlaceholder) {
-        console.error('QR placeholder not found');
-        return;
+  // Parse amount from various possible fields
+  function resolvePaymentAmount() {
+    // priority: explicit amount fields from cart flow
+    let rawAmount = storage.get('amountPaid') || storage.get('cartAmount') || storage.get('totalOrderValue') || storage.get('amountPaidNumeric');
+    if (rawAmount) {
+      let cleaned = String(rawAmount).replace(/[₹,]/g, '').trim();
+      let numeric = parseFloat(cleaned);
+      if (!isNaN(numeric) && numeric > 0) return numeric;
+    }
+    
+    // fallback: compute from cartItems array (supports food order structure)
+    try {
+      let cartRaw = storage.get('cartItems') || storage.get('selectedFoods_v1') || storage.get('selectedFoods');
+      if (cartRaw) {
+        let cart = JSON.parse(cartRaw);
+        if (Array.isArray(cart) && cart.length) {
+          let total = 0;
+          for (let item of cart) {
+            let price = 0;
+            let qty = 1;
+            if (item.price) price = parseFloat(String(item.price).replace(/[^0-9.-]/g, ''));
+            else if (item.priceNumeric) price = parseFloat(item.priceNumeric);
+            else if (item.amount) price = parseFloat(item.amount);
+            if (item.qty) qty = parseFloat(item.qty);
+            else if (item.quantity) qty = parseFloat(item.quantity);
+            if (isNaN(price)) price = 0;
+            if (isNaN(qty)) qty = 1;
+            total += price * qty;
+          }
+          if (total > 0) return total;
+        }
       }
-      
-      qrPlaceholder.innerHTML = ''; // clear previous QR
-      
-      // Build UPI URL: upi://pay?pa=<UPI_ID>&pn=<NAME>&am=<AMOUNT>&cu=INR
-      const numericAmount = parseAmountRaw(String(amount).replace(/₹/g, '')) || 0;
-      const upiUrl = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(restaurantName)}&am=${numericAmount.toFixed(2)}&cu=INR`;
-      
-      console.log('Generating QR for:', upiUrl);
-      
-      // Wait for QRCode library to be available
+    } catch(e) { /* silent fallback */ }
+    
+    // final generic fallback: if nothing, use demo amount 249.00
+    return 249.00;
+  }
+
+  // get restaurant UPI settings or fallback
+  function getUpiDetails() {
+    let upiId = 'foodiepay@okhdfcbank';
+    let restaurantName = 'Tasty Bites';
+    try {
+      const settingsRaw = storage.get('RESTAURANT_SETTINGS') || storage.get('fp_settings');
+      if (settingsRaw) {
+        const settings = JSON.parse(settingsRaw);
+        upiId = settings.upiId || upiId;
+        restaurantName = settings.restaurantName || restaurantName;
+      }
+      // also check legacy direct upiId storage
+      const directUpi = storage.get('upiId') || storage.get('paymentUpi');
+      if (directUpi) upiId = directUpi;
+    } catch(e) { console.warn("settings parse error"); }
+    return { upiId, restaurantName };
+  }
+
+  // -------------------------------
+  // 2. QR CODE generation using QRCode.js (reliable auto-generation)
+  // -------------------------------
+  let currentQR = null;  // reference to QRCode object if needed
+
+  function regenerateQRCode(upiId, amount, restaurantName) {
+    const qrContainer = document.getElementById('qrcodeCanvas');
+    if (!qrContainer) return;
+    // clear container
+    qrContainer.innerHTML = '';
+    
+    // build upi intent URI as per NPCI standard
+    const amtVal = typeof amount === 'number' ? amount.toFixed(2) : parseFloat(amount).toFixed(2);
+    const upiUrl = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(restaurantName)}&am=${amtVal}&cu=INR&mc=0000`;
+    
+    console.log(`[QR] Generating with amount: ₹${amtVal}, UPI: ${upiId}`);
+    
+    try {
+      // Using QRCode.js library (global QRCode constructor)
       if (typeof QRCode === 'undefined') {
-        console.warn('QRCode library not loaded yet, retrying...');
-        setTimeout(() => generateUPIQRCode(upiId, restaurantName, amount), 500);
+        console.error("QRCode library not loaded yet — retrying in 300ms");
+        setTimeout(() => regenerateQRCode(upiId, amount, restaurantName), 300);
         return;
       }
-
-      // Generate QR code using qrcode.js
-      try {
-        QRCode.toCanvas(qrPlaceholder, upiUrl, {
-          width: 130,
-          margin: 2,
-          color: {
-            dark: '#000000',
-            light: '#ffffff'
-          }
-        }, function(error) {
-          if (error) {
-            console.error('QR Code generation failed:', error);
-            qrPlaceholder.textContent = 'QR';
-          } else {
-            console.log('QR Code generated successfully');
-          }
-        });
-      } catch (e) {
-        console.error('QR Code error:', e);
-        qrPlaceholder.textContent = 'QR';
-      }
-    }
-
-    /* ====== initialize amount & UPI details (try localStorage then fallback) ====== */
-    (function init(){
-      // amount may be set previously by cart page
-      let raw = safeGet('amountPaid') || safeGet('amountValue') || safeGet('cartAmount');
-      let numeric = parseAmountRaw(raw);
-      if(numeric === null){
-        numeric = computeAmountFromCart();
-      }
-      if(numeric === null) numeric = 0;
-      // normalize to two decimals
-      numeric = Math.round(numeric * 100) / 100;
-      amountValueEl.textContent = '₹' + numeric.toFixed(2);
-      // keep canonical numeric field if missing
-      if(!safeGet('amountPaidNumeric')) safeSet('amountPaidNumeric', numeric);
-
-      // load owner settings for UPI
-      let restaurantName = 'Food Point';
-      let upi = 'example@upi';
-      try {
-        const settingsRaw = safeGet('RESTAURANT_SETTINGS') || safeGet('fp_settings');
-        if (settingsRaw) {
-          const settings = JSON.parse(settingsRaw);
-          upi = settings.upiId || upi;
-          restaurantName = settings.restaurantName || restaurantName;
-        }
-      } catch (e) {
-        console.warn('Settings parse failed, using defaults');
-      }
-      
-      // Fallback to direct localStorage keys if settings object not found
-      const settingsUpi = safeGet('upiId') || safeGet('paymentUpi') || null;
-      if (settingsUpi) upi = settingsUpi;
-
-      upiInput.value = upi;
-      upiIdEl.textContent = upi;
-      document.getElementById('providerLabel').textContent = 'UPI';
-
-      // Generate initial QR code
-      generateUPIQRCode(upi, restaurantName, numeric.toFixed(2));
-    })();
-
-    /* ====== step UI helpers ====== */
-    function setActiveStep(name){
-      stepCash.classList.remove('active');
-      stepOnline.classList.remove('active');
-      if(name === 'cash') stepCash.classList.add('active');
-      if(name === 'online') stepOnline.classList.add('active');
-    }
-
-    /* ====== Cash flow ====== */
-    payCashBtn.addEventListener('click', function(){
-      // store payment info and redirect to thankyou
-      const amtRaw = amountValueEl.textContent || '';
-      safeSet('paymentMethod', 'cash');
-      safeSet('amountPaid', amtRaw);
-      // also store numeric for consistency
-      const numeric = parseAmountRaw(amtRaw) || parseFloat(safeGet('amountPaidNumeric')) || 0;
-      safeSet('amountPaidNumeric', numeric);
-      safeSet('justPaid', '1'); // thankyou page expects this
-      // redirect
-      window.location.href = 'thank-you.html';
-    });
-
-    /* ====== show online UI (step-click and button) ====== */
-    chooseOnlineBtn.addEventListener('click', openOnline);
-    stepOnline.addEventListener('click', openOnline);
-
-    function openOnline(){
-      setActiveStep('online');
-      onlineUI.style.display = 'block';
-      onlineUI.setAttribute('aria-hidden','false');
-      // hide the primary cash button to avoid double actions
-      payCashBtn.style.display = 'none';
-      chooseOnlineBtn.style.display = 'inline-block';
-      
-      // Regenerate QR code with current amount in case it changed
-      const amountText = amountValueEl.textContent || '₹0.00';
-      let restaurantName = 'Food Point';
-      let upi = upiIdEl.textContent || 'example@upi';
-      try {
-        const settingsRaw = safeGet('RESTAURANT_SETTINGS') || safeGet('fp_settings');
-        if (settingsRaw) {
-          const settings = JSON.parse(settingsRaw);
-          upi = settings.upiId || upi;
-          restaurantName = settings.restaurantName || restaurantName;
-        }
-      } catch (e) {}
-      generateUPIQRCode(upi, restaurantName, amountText);
-      
-      // scroll into view for smaller screens
-      onlineUI.scrollIntoView({behavior:'smooth', block:'nearest'});
-    }
-
-    /* allow clicking cash step to select cash without immediately paying (UX) */
-    stepCash.addEventListener('click', function(){
-      setActiveStep('cash');
-      payCashBtn.style.display = 'inline-block';
-      chooseOnlineBtn.style.display = 'inline-block';
-      onlineUI.style.display = 'none';
-      onlineUI.setAttribute('aria-hidden','true');
-    });
-
-    chooseCashBackBtn.addEventListener('click', function(){
-      // go back to options
-      stepCash.click();
-    });
-
-    /* ====== Online "I have paid" flow ====== */
-    iPaidBtn.addEventListener('click', function(){
-      // mark as paid and redirect to thankyou
-      const provider = 'UPI';
-      const amtText = amountValueEl.textContent || '₹0.00';
-      safeSet('paymentMethod', 'online');
-      safeSet('paymentProvider', provider);
-      safeSet('amountPaid', amtText);
-      const numeric = parseAmountRaw(amtText) || parseFloat(safeGet('amountPaidNumeric')) || 0;
-      safeSet('amountPaidNumeric', numeric);
-      safeSet('justPaid', '1');
-      // optional timestamp
-      safeSet('lastPaidAt', (new Date()).toISOString());
-      // redirect
-      window.location.href = 'thank-you.html';
-    });
-
-    /* copy UPI id */
-    copyUpiBtn.addEventListener('click', function(){
-      const txt = upiInput.value || upiIdEl.textContent || '';
-      navigator.clipboard?.writeText(txt).then(()=>{
-        copyUpiBtn.textContent = 'Copied';
-        setTimeout(()=> copyUpiBtn.innerHTML = '<i class="fa-regular fa-copy"></i> Copy', 1400);
-      }).catch(()=>{
-        // fallback - select and exec
-        upiInput.select();
-        try { document.execCommand('copy'); copyUpiBtn.textContent = 'Copied'; setTimeout(()=> copyUpiBtn.innerHTML = '<i class="fa-regular fa-copy"></i> Copy', 1400); } catch(e){ alert('Copy failed — please long-press to copy the UPI ID.'); }
+      // generate QR code inside div container
+      new QRCode(qrContainer, {
+        text: upiUrl,
+        width: 130,
+        height: 130,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.M
       });
-    });
+    } catch (err) {
+      console.error("QR generation error:", err);
+      qrContainer.innerHTML = '<div style="font-size:12px; color:red;">QR failed, use UPI ID</div>';
+    }
+  }
 
-    /* Accessibility: allow Enter on steps */
-    [stepCash, stepOnline].forEach(el=>{
-      el.setAttribute('tabindex','0');
-      el.addEventListener('keydown', function(e){ if(e.key === 'Enter' || e.key === ' ') el.click(); });
-    });
+  // -------------------------------
+  // 3. Global state & DOM elements
+  // -------------------------------
+  let currentStep = 'cash';   // 'cash' or 'online'
+  let currentAmount = 0;
+  
+  // dom elements
+  const totalAmountSpan = document.getElementById('totalAmountDisplay');
+  const cashModeDiv = document.getElementById('cashModePanel');
+  const onlineModeDiv = document.getElementById('onlineModePanel');
+  const cashStepBtn = document.getElementById('cashStepBtn');
+  const onlineStepBtn = document.getElementById('onlineStepBtn');
+  const cashPayNow = document.getElementById('cashPayNowBtn');
+  const iPaidBtn = document.getElementById('iPaidConfirmBtn');
+  const backToCashBtn = document.getElementById('backToCashBtn');
+  const copyUpiButton = document.getElementById('copyUpiButton');
+  const upiIdSpan = document.getElementById('upiIdText');
+  
+  // helper: update UI based on step
+  function setActiveStepUI(step) {
+    if (step === 'cash') {
+      cashStepBtn.classList.add('active');
+      onlineStepBtn.classList.remove('active');
+      cashModeDiv.style.display = 'block';
+      onlineModeDiv.style.display = 'none';
+    } else {
+      onlineStepBtn.classList.add('active');
+      cashStepBtn.classList.remove('active');
+      cashModeDiv.style.display = 'none';
+      onlineModeDiv.style.display = 'block';
+      // whenever we show online panel, ensure QR is up-to-date with latest amount & UPI
+      const { upiId, restaurantName } = getUpiDetails();
+      upiIdSpan.innerText = upiId;
+      regenerateQRCode(upiId, currentAmount, restaurantName);
+    }
+    currentStep = step;
+    // persist current step in storage optionally
+    storage.set('lastPaymentStep', step);
+  }
 
-    /* Extra: if the page was opened as part of a fallback that already set payment method (e.g., direct link), show appropriate UI */
-    (function syncIfAlreadySet(){
-      const pm = safeGet('paymentMethod');
-      if(pm === 'cash'){
-        setActiveStep('cash');
-      } else if(pm === 'online'){
-        setActiveStep('online');
-        onlineUI.style.display = 'block';
-        onlineUI.setAttribute('aria-hidden','false');
-        payCashBtn.style.display = 'none';
+  // load amount and update display
+  function updateAmountAndRefresh() {
+    currentAmount = resolvePaymentAmount();
+    // ensure two decimal
+    currentAmount = Math.round(currentAmount * 100) / 100;
+    totalAmountSpan.innerText = `₹${currentAmount.toFixed(2)}`;
+    storage.set('amountPaidNumeric', currentAmount);
+    storage.set('amountPaid', `₹${currentAmount.toFixed(2)}`);
+    
+    // if online panel is visible, refresh QR with new amount
+    if (currentStep === 'online') {
+      const { upiId, restaurantName } = getUpiDetails();
+      upiIdSpan.innerText = upiId;
+      regenerateQRCode(upiId, currentAmount, restaurantName);
+    }
+  }
+
+  // -------------------------------
+  // 4. Payment completion & redirect
+  // -------------------------------
+  function finalizePayment(method, provider = 'UPI') {
+    // store payment info in localStorage for thank-you page
+    storage.set('paymentMethod', method);
+    storage.set('paymentProvider', provider);
+    storage.set('amountPaid', `₹${currentAmount.toFixed(2)}`);
+    storage.set('amountPaidNumeric', currentAmount);
+    storage.set('justPaid', '1');
+    storage.set('lastPaidAt', new Date().toISOString());
+    // optional cart cleared flag can be added
+    // redirect to thank you page
+    window.location.href = 'thank-you.html';
+  }
+
+  // cash flow
+  cashPayNow.addEventListener('click', () => {
+    finalizePayment('cash', 'Cash on Delivery');
+  });
+  
+  // online "I have paid"
+  iPaidBtn.addEventListener('click', () => {
+    finalizePayment('online', 'UPI');
+  });
+  
+  // back to cash from online panel
+  backToCashBtn.addEventListener('click', () => {
+    setActiveStepUI('cash');
+  });
+  
+  // step clicks
+  cashStepBtn.addEventListener('click', () => {
+    setActiveStepUI('cash');
+  });
+  
+  onlineStepBtn.addEventListener('click', () => {
+    setActiveStepUI('online');
+  });
+  
+  // copy UPI functionality
+  copyUpiButton.addEventListener('click', async () => {
+    const upiText = upiIdSpan.innerText;
+    if (!upiText) return;
+    try {
+      await navigator.clipboard.writeText(upiText);
+      const originalText = copyUpiButton.innerHTML;
+      copyUpiButton.innerHTML = '<i class="fa-regular fa-check"></i> Copied!';
+      setTimeout(() => {
+        copyUpiButton.innerHTML = '<i class="fa-regular fa-copy"></i> Copy ID';
+      }, 1800);
+    } catch (err) {
+      // fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = upiText;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      copyUpiButton.innerHTML = '<i class="fa-regular fa-check"></i> Copied!';
+      setTimeout(() => {
+        copyUpiButton.innerHTML = '<i class="fa-regular fa-copy"></i> Copy ID';
+      }, 1800);
+    }
+  });
+  
+  // additional event: ensure if online step becomes active after amount change (like dynamic amount change from storage event)
+  window.addEventListener('storage', (event) => {
+    if (event.key && (event.key === 'cartItems' || event.key === 'amountPaid' || event.key === 'cartAmount' || event.key === 'selectedFoods')) {
+      updateAmountAndRefresh();
+    }
+  });
+  
+  // keyboard accessibility for steps
+  [cashStepBtn, onlineStepBtn].forEach(btn => {
+    btn.setAttribute('tabindex', '0');
+    btn.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        btn.click();
       }
-    })();
-  </script>
+    });
+  });
+  
+  // initialization: read previously selected step if exists
+  function init() {
+    updateAmountAndRefresh();
+    const lastStep = storage.get('lastPaymentStep');
+    if (lastStep === 'online') {
+      setActiveStepUI('online');
+    } else {
+      setActiveStepUI('cash');
+    }
+    // also ensure UPI display and QR if online mode initially from persistent storage
+    if (currentStep === 'online') {
+      const { upiId, restaurantName } = getUpiDetails();
+      upiIdSpan.innerText = upiId;
+      regenerateQRCode(upiId, currentAmount, restaurantName);
+    }
+    // set provider label
+    document.getElementById('providerBadge').innerHTML = '<i class="fa-brands fa-google-pay"></i> UPI Secure';
+  }
+  
+  // final protection: if there's an online mode and amount is zero, maybe force recalc
+  // also if QR code fails to load due to library race condition, we retry after DOM ready
+  window.addEventListener('load', () => {
+    init();
+    // double-check QR in case library was async but now ready
+    if (currentStep === 'online') {
+      const { upiId, restaurantName } = getUpiDetails();
+      setTimeout(() => {
+        regenerateQRCode(upiId, currentAmount, restaurantName);
+      }, 100);
+    }
+  });
+  
+  // if any manual amount change via other page scripts, we can expose global method for consistency
+  window.refreshPaymentAmount = function() {
+    updateAmountAndRefresh();
+    if (currentStep === 'online') {
+      const { upiId, restaurantName } = getUpiDetails();
+      regenerateQRCode(upiId, currentAmount, restaurantName);
+    }
+  };
+  
+  // ensure that when online panel is opened, QR regenerates every single time to avoid stale data
+  const originalSetActive = setActiveStepUI;
+  window.setActiveStepUI = setActiveStepUI;
+  // override to add extra regeneration guarantee
+  setActiveStepUI = function(step) {
+    originalSetActive(step);
+    if (step === 'online') {
+      const { upiId, restaurantName } = getUpiDetails();
+      upiIdSpan.innerText = upiId;
+      // small delay to ensure DOM ready for qr container
+      setTimeout(() => {
+        regenerateQRCode(upiId, currentAmount, restaurantName);
+      }, 20);
+    }
+  }.bind(this);
+  
+  // rebind step functions after overriding
+  cashStepBtn.onclick = () => setActiveStepUI('cash');
+  onlineStepBtn.onclick = () => setActiveStepUI('online');
+  backToCashBtn.onclick = () => setActiveStepUI('cash');
+  
+  // re-evaluate initial again
+  setTimeout(() => {
+    if (currentStep === 'online') {
+      const { upiId, restaurantName } = getUpiDetails();
+      regenerateQRCode(upiId, currentAmount, restaurantName);
+    }
+  }, 200);
+</script>
 </body>
 </html>
