@@ -21,8 +21,7 @@ This repository is a small static web project with only HTML pages. There is no 
 - `menu.html`
 - `orders.html`
 - `owner-dashboard.html`
-- `payment-options.html`
-- `payment-upi.html`
+- `payment-way.html`
 - `payment.html`
 - `store.html`
 - `thank-you.html`

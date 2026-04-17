@@ -7,6 +7,8 @@
 
   <!-- fontawesome (for icons) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- QR Code Library (async) -->
+  <script async src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
   <script src="fp-config.js"></script>
   <script src="fp-fetch-proxy.js"></script>
   <script src="api.js"></script>
@@ -240,6 +242,52 @@
     const stepOnline = document.getElementById('stepOnline');
     const chooseCashBackBtn = document.getElementById('chooseCashBackBtn');
 
+    /* ====== QR Code generation helper ====== */
+    function generateUPIQRCode(upiId, restaurantName, amount) {
+      const qrPlaceholder = document.getElementById('qrPlaceholder');
+      if (!qrPlaceholder) {
+        console.error('QR placeholder not found');
+        return;
+      }
+      
+      qrPlaceholder.innerHTML = ''; // clear previous QR
+      
+      // Build UPI URL: upi://pay?pa=<UPI_ID>&pn=<NAME>&am=<AMOUNT>&cu=INR
+      const numericAmount = parseAmountRaw(String(amount).replace(/₹/g, '')) || 0;
+      const upiUrl = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(restaurantName)}&am=${numericAmount.toFixed(2)}&cu=INR`;
+      
+      console.log('Generating QR for:', upiUrl);
+      
+      // Wait for QRCode library to be available
+      if (typeof QRCode === 'undefined') {
+        console.warn('QRCode library not loaded yet, retrying...');
+        setTimeout(() => generateUPIQRCode(upiId, restaurantName, amount), 500);
+        return;
+      }
+
+      // Generate QR code using qrcode.js
+      try {
+        QRCode.toCanvas(qrPlaceholder, upiUrl, {
+          width: 130,
+          margin: 2,
+          color: {
+            dark: '#000000',
+            light: '#ffffff'
+          }
+        }, function(error) {
+          if (error) {
+            console.error('QR Code generation failed:', error);
+            qrPlaceholder.textContent = 'QR';
+          } else {
+            console.log('QR Code generated successfully');
+          }
+        });
+      } catch (e) {
+        console.error('QR Code error:', e);
+        qrPlaceholder.textContent = 'QR';
+      }
+    }
+
     /* ====== initialize amount & UPI details (try localStorage then fallback) ====== */
     (function init(){
       // amount may be set previously by cart page
@@ -255,12 +303,30 @@
       // keep canonical numeric field if missing
       if(!safeGet('amountPaidNumeric')) safeSet('amountPaidNumeric', numeric);
 
-      // load UPI id if stored in settings or fallback to example
+      // load owner settings for UPI
+      let restaurantName = 'Food Point';
+      let upi = 'example@upi';
+      try {
+        const settingsRaw = safeGet('RESTAURANT_SETTINGS') || safeGet('fp_settings');
+        if (settingsRaw) {
+          const settings = JSON.parse(settingsRaw);
+          upi = settings.upiId || upi;
+          restaurantName = settings.restaurantName || restaurantName;
+        }
+      } catch (e) {
+        console.warn('Settings parse failed, using defaults');
+      }
+      
+      // Fallback to direct localStorage keys if settings object not found
       const settingsUpi = safeGet('upiId') || safeGet('paymentUpi') || null;
-      const upi = settingsUpi || 'example@upi';
+      if (settingsUpi) upi = settingsUpi;
+
       upiInput.value = upi;
       upiIdEl.textContent = upi;
       document.getElementById('providerLabel').textContent = 'UPI';
+
+      // Generate initial QR code
+      generateUPIQRCode(upi, restaurantName, numeric.toFixed(2));
     })();
 
     /* ====== step UI helpers ====== */
@@ -296,6 +362,21 @@
       // hide the primary cash button to avoid double actions
       payCashBtn.style.display = 'none';
       chooseOnlineBtn.style.display = 'inline-block';
+      
+      // Regenerate QR code with current amount in case it changed
+      const amountText = amountValueEl.textContent || '₹0.00';
+      let restaurantName = 'Food Point';
+      let upi = upiIdEl.textContent || 'example@upi';
+      try {
+        const settingsRaw = safeGet('RESTAURANT_SETTINGS') || safeGet('fp_settings');
+        if (settingsRaw) {
+          const settings = JSON.parse(settingsRaw);
+          upi = settings.upiId || upi;
+          restaurantName = settings.restaurantName || restaurantName;
+        }
+      } catch (e) {}
+      generateUPIQRCode(upi, restaurantName, amountText);
+      
       // scroll into view for smaller screens
       onlineUI.scrollIntoView({behavior:'smooth', block:'nearest'});
     }

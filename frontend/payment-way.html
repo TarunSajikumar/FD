@@ -346,8 +346,8 @@
     function getAmount() { return localStorage.getItem('amountPaid') || '₹149.99'; }
     function setPayment(m) { localStorage.setItem('paymentMethod', m); localStorage.setItem('amountPaid', getAmount()); }
     function selectCash() { setPayment('cash'); localStorage.setItem('justPaid','1'); location.href='thank-you.html'; }
-    function selectOnline() { setPayment('online'); location.href='payment-upi.html'; }
-    function goToPayment() { try { localStorage.setItem('amountPaid', getAmount()); } catch(e){}; location.href='payment-upi.html'; }
+    function selectOnline() { setPayment('online'); location.href='payment.html'; }
+    function goToPayment() { try { localStorage.setItem('amountPaid', getAmount()); } catch(e){}; location.href='payment.html'; }
     document.addEventListener('DOMContentLoaded', () => { document.getElementById('amountValue').textContent = getAmount(); });
     // Defensive cleanup in case of stray 'uud' or tiny text nodes
     document.addEventListener('DOMContentLoaded', () => {
