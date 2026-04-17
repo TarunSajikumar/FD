@@ -1,5 +1,4 @@
-Here is an HTML document that implements a payment page with a dynamically generated UPI QR code that updates based on the merchant's settings.
-```html
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,8 +8,8 @@ Here is an HTML document that implements a payment page with a dynamically gener
 
   <!-- Font Awesome 6 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <!-- QRCode Library (stable) -->
-  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <!-- QRCode Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
   <style>
     * {
@@ -22,22 +21,23 @@ Here is an HTML document that implements a payment page with a dynamically gener
     }
 
     body {
-      background: radial-gradient(circle at 10% 20%, #0b0f1c, #030617);
+      background: #020617;
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 1.5rem;
+      color: #f8fafc;
     }
 
     /* main card container */
     .payment-container {
       max-width: 800px;
       width: 100%;
-      background: rgba(12, 18, 32, 0.75);
+      background: rgba(15, 23, 42, 0.95);
       backdrop-filter: blur(14px);
       border-radius: 2rem;
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(251, 191, 36, 0.18);
       box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.6);
       padding: 1.8rem;
       transition: all 0.2s;
@@ -46,19 +46,16 @@ Here is an HTML document that implements a payment page with a dynamically gener
     h1 {
       font-size: 1.75rem;
       font-weight: 600;
-      background: linear-gradient(135deg, #FFFFFF 0%, #C0D4FF 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
+      color: #fbbf24;
       letter-spacing: -0.3px;
     }
 
     .subhead {
-      color: #9aa9c7;
+      color: #cbd5e1;
       font-size: 0.85rem;
       margin-top: 0.3rem;
       margin-bottom: 1.5rem;
-      border-left: 3px solid #ffb347;
+      border-left: 3px solid #fbbf24;
       padding-left: 0.75rem;
     }
 
@@ -124,7 +121,7 @@ Here is an HTML document that implements a payment page with a dynamically gener
     .amount-value {
       font-size: 2rem;
       font-weight: 800;
-      color: #ffde9c;
+      color: #fbbf24;
       letter-spacing: 1px;
     }
 
@@ -150,19 +147,25 @@ Here is an HTML document that implements a payment page with a dynamically gener
     }
 
     .btn-primary {
-      background: linear-gradient(95deg, #f5b042, #ff9f2c);
-      color: #0e0f1a;
-      box-shadow: 0 5px 12px rgba(255, 160, 0, 0.25);
+      background: #f59e0b;
+      color: #111827;
+      box-shadow: 0 5px 12px rgba(245, 158, 11, 0.25);
     }
 
     .btn-primary:hover {
       transform: scale(0.97);
-      background: linear-gradient(95deg, #ffa82e, #ff8c00);
+      background: #d97706;
     }
 
     .btn-outline {
-      border: 1px solid rgba(255, 215, 150, 0.6);
+      border: 1px solid rgba(251, 191, 36, 0.6);
       background: transparent;
+      color: #fbbf24;
+    }
+
+    .btn-outline:hover {
+      background: rgba(251, 191, 36, 0.12);
+      border-color: #fbbf24;
     }
 
     /* online UPI section */
@@ -330,6 +333,7 @@ Here is an HTML document that implements a payment page with a dynamically gener
           <button class="btn small-btn" id="copyUpiBtn"><i class="fa-regular fa-copy"></i> Copy</button>
         </div>
         <div class="paid-actions">
+          <button class="btn btn-primary" id="payWithUpiBtn"><i class="fa-brands fa-google-pay"></i> Pay with UPI</button>
           <button class="btn btn-primary" id="iHavePaidBtn"><i class="fa-regular fa-check-circle"></i> I have paid</button>
           <button class="btn btn-outline" id="backToCashBtn"><i class="fa-regular fa-arrow-left"></i> Back to cash</button>
         </div>
@@ -419,48 +423,37 @@ Here is an HTML document that implements a payment page with a dynamically gener
 
   // ---------- DYNAMIC QR GENERATION (upi://pay format) ----------
   // This function generates QR with full UPI intent string
-  async function generateDynamicQR(upiId, payeeName, amountValue) {
+  function generateDynamicQR(upiId, payeeName, amountValue) {
     const qrContainer = document.getElementById('qrCodeTarget');
     if (!qrContainer) return;
-    
-    // clear previous content
+
     qrContainer.innerHTML = '';
-    
     let numericAmount = 0;
     if (typeof amountValue === 'number') numericAmount = amountValue;
     else if (typeof amountValue === 'string') {
       let cleaned = amountValue.replace(/[₹,]/g, '').trim();
       numericAmount = parseFloat(cleaned) || 0;
     }
-    // ensure two decimals
     numericAmount = Math.round(numericAmount * 100) / 100;
-    
-    // Build UPI string exactly as required: upi://pay?pa=UPI_ID&pn=NAME&am=AMOUNT&cu=INR
+
     const upiIntent = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${numericAmount.toFixed(2)}&cu=INR`;
     console.log("Generating QR with UPI intent:", upiIntent);
-    
-    // QRCode library: create canvas element inside container
+
+    if (typeof QRCode === 'undefined') {
+      console.warn("QRCode lib not ready, retry after 300ms");
+      setTimeout(() => generateDynamicQR(upiId, payeeName, amountValue), 300);
+      return;
+    }
+
     try {
-      // Ensure QRCode library loaded
-      if (typeof QRCode === 'undefined') {
-        console.warn("QRCode lib not ready, retry after 300ms");
-        setTimeout(() => generateDynamicQR(upiId, payeeName, amountValue), 300);
-        return;
-      }
-      // Create canvas element
-      const canvas = document.createElement('canvas');
-      canvas.width = 120;
-      canvas.height = 120;
-      canvas.style.width = '120px';
-      canvas.style.height = '120px';
-      canvas.style.borderRadius = '12px';
-      
-      await QRCode.toCanvas(canvas, upiIntent, {
+      new QRCode(qrContainer, {
+        text: upiIntent,
         width: 120,
-        margin: 1,
-        color: { dark: '#000000', light: '#ffffff' }
+        height: 120,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.M
       });
-      qrContainer.appendChild(canvas);
     } catch (err) {
       console.error("QR generation error:", err);
       qrContainer.innerHTML = `<div style="background:#fff; color:#000; width:120px; height:120px; display:flex; align-items:center; justify-content:center; border-radius:12px; font-size:12px;">QR error</div>`;
@@ -507,6 +500,7 @@ Here is an HTML document that implements a payment page with a dynamically gener
   const backToCashBtn = document.getElementById('backToCashBtn');
   const totalAmountSpan = document.getElementById('totalAmountDisplay');
   const copyBtn = document.getElementById('copyUpiBtn');
+  const payWithUpiBtn = document.getElementById('payWithUpiBtn');
 
   // Set total amount from cart
   function setTotalAmount() {
@@ -578,6 +572,19 @@ Here is an HTML document that implements a payment page with a dynamically gener
     });
   }
 
+  // Open UPI payment intent (opens UPI app chooser)
+  function openUPIPaymentIntent() {
+    const { upiId, restaurantName } = getMerchantUPISettings();
+    let amountDisplay = document.getElementById('totalAmountDisplay').innerText;
+    let numericAmt = parseFloat(amountDisplay.replace(/[₹,]/g, '')) || 0;
+    if (numericAmt === 0) numericAmt = extractNumericAmount();
+    numericAmt = Math.round(numericAmt * 100) / 100;
+
+    const upiIntent = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(restaurantName)}&am=${numericAmt.toFixed(2)}&cu=INR`;
+    console.log("Opening UPI intent:", upiIntent);
+    window.location.href = upiIntent;
+  }
+
   // also force regeneration when amount might change via any event (if cart updates)
   function bindRefreshOnAmountChange() {
     // if any external script modifies amountPaid, we can listen storage event for amount keys
@@ -603,13 +610,14 @@ Here is an HTML document that implements a payment page with a dynamically gener
     // Pre-generate QR hidden but for first online open it's fine
     // but we generate a dummy QR for initial background
     let amountVal = extractNumericAmount();
-    generateDynamicQR(upiId, restaurantName, amountVal).catch(e=>console.log);
+    generateDynamicQR(upiId, restaurantName, amountVal);
     
     // Event listeners
     stepCashCard.addEventListener('click', () => setActiveMethodUI('cash'));
     stepOnlineCard.addEventListener('click', () => setActiveMethodUI('online'));
     payWithCashBtn.addEventListener('click', handleCashPayment);
     switchToOnlineBtn.addEventListener('click', () => setActiveMethodUI('online'));
+    payWithUpiBtn.addEventListener('click', openUPIPaymentIntent);
     iHavePaidBtn.addEventListener('click', handleOnlinePaid);
     backToCashBtn.addEventListener('click', () => setActiveMethodUI('cash'));
     copyBtn.addEventListener('click', copyUPI);

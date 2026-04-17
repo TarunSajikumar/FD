@@ -9,7 +9,26 @@
   <main style="text-align:center;padding:24px;max-width:420px;">
     <h1 style="font-size:2rem;margin-bottom:1rem;color:#fbbf24;">Food Point</h1>
     <p style="margin-bottom:1.5rem;color:#cbd5e1;">Welcome to Food Point. Use the button below to sign in or create an account.</p>
-    <a href="login.html" style="display:inline-block;padding:12px 24px;border-radius:999px;background:#f59e0b;color:#111827;text-decoration:none;font-weight:700;">Go to Login</a>
+    <a id="goToLoginBtn" href="login.html" style="display:inline-block;padding:12px 24px;border-radius:999px;background:#f59e0b;color:#111827;text-decoration:none;font-weight:700;">Go to Login</a>
+    <p id="shopStatusMessage" style="margin-top:1rem;color:#fca5a5;font-size:0.95rem;min-height:1.2rem;"></p>
   </main>
+  <script>
+    const SHOP_STATUS_KEY = 'shopStatus';
+    const goToLoginBtn = document.getElementById('goToLoginBtn');
+    const shopStatusMessage = document.getElementById('shopStatusMessage');
+    const shopStatus = localStorage.getItem(SHOP_STATUS_KEY) || 'open';
+
+    if (shopStatus === 'closed') {
+      goToLoginBtn.style.pointerEvents = 'none';
+      goToLoginBtn.style.opacity = '0.55';
+      goToLoginBtn.style.cursor = 'not-allowed';
+      goToLoginBtn.style.background = '#a855f7';
+      goToLoginBtn.href = '#';
+      shopStatusMessage.textContent = 'Shop is currently closed. Customer login is disabled until the owner opens it again.';
+      goToLoginBtn.addEventListener('click', function(event) {
+        event.preventDefault();
+      });
+    }
+  </script>
 </body>
 </html>

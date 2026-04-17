@@ -477,6 +477,7 @@
     // ---------- USER LOGIN / SIGNUP (same logic) ----------
     const USERS_KEY = "fp_users";
     const CURRENT_USER_KEY = "fp_current_user";
+    const SHOP_STATUS_KEY = "shopStatus";
 
     const formTitle     = document.getElementById("formTitle");
     const loginIdGroup  = document.getElementById("loginIdGroup");
@@ -545,7 +546,36 @@
       }
     }
 
+    function getShopStatus() {
+      return localStorage.getItem(SHOP_STATUS_KEY) || "open";
+    }
+
+    function refreshShopStatusUI() {
+      const isClosed = getShopStatus() === "closed";
+      if (isClosed) {
+        message.textContent = "Shop is currently closed. Customer login is disabled until the owner opens it again.";
+        submitBtn.disabled = true;
+        submitBtn.style.opacity = "0.6";
+        submitBtn.style.cursor = "not-allowed";
+      } else {
+        if (message.textContent.startsWith("Shop is currently closed")) {
+          message.textContent = "";
+        }
+        submitBtn.disabled = false;
+        submitBtn.style.opacity = "1";
+        submitBtn.style.cursor = "pointer";
+      }
+    }
+
     async function handleSubmit() {
+      message.textContent = "";
+      successMsg.textContent = "";
+
+      const shopStatus = getShopStatus();
+      if (shopStatus === "closed") {
+        message.textContent = "Shop is currently closed. Customer login/signup is disabled until the owner reopens it.";
+        return;
+      }
       message.textContent = "";
       successMsg.textContent = "";
 
@@ -651,6 +681,8 @@
         if (e.key === "Enter") handleSubmit();
       });
     });
+
+    refreshShopStatusUI();
 
     // No automatic login redirect. Users must sign in manually.
 
