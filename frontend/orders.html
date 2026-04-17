@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-  <title>Your Orders</title>
+  <title>Food Point • Your Orders</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     * {
@@ -59,7 +59,6 @@
         padding: 10px;
         padding-top: 70px;
       }
-
       .page-wrap {
         margin-bottom: 20px;
       }
@@ -200,8 +199,9 @@
 
     .header-row {
       display: grid;
-      grid-template-columns: 2fr 1fr 0.9fr;
+      grid-template-columns: 2fr 1fr 1.3fr;
       font-size: 12px;
+      margin-left: 20px;
       font-weight: 600;
       margin-bottom: 12px;
       color: #aeb5c4;
@@ -226,6 +226,7 @@
       border: 1px solid rgba(255,255,255,0.05);
       background: rgba(40,50,70,0.3);
       backdrop-filter: blur(8px);
+      cursor: pointer;
     }
     .order-block:hover { background: rgba(50,65,90,0.4); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
 
@@ -234,85 +235,83 @@
         margin-top: 10px;
       }
     }
-    
 
     .order-id-label {
       font-size: 12px;
       font-weight: 700;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
       color: #f5e6d3;
       letter-spacing: 0.04em;
+      border-left: 3px solid #ffaa00;
+      padding-left: 10px;
     }
 
+    /* 3-COLUMN LAYOUT: item (food) | parcel (yes/no) | payment + details in ONE ROW */
     .order-header {
       display: grid;
-      grid-template-columns: 1fr auto;
+      grid-template-columns: 2fr 1fr 1.3fr;
       gap: 12px;
       align-items: center;
+      margin-bottom: 8px;
     }
 
     .order-summary {
       display: flex;
-      gap: 12px;
-      align-items: center;
-      flex-wrap:wrap;
+      flex-direction: column;
+      gap: 4px;
     }
 
-    .order-meta { color: #aeb5c4; font-size: 12px; letter-spacing: 0.02em; }
+    .order-summary strong {
+      font-size: 14px;
+      letter-spacing: 0.03em;
+      color: #fff1e0;
+    }
+
+    .order-meta {
+      color: #aeb5c4;
+      font-size: 12px;
+      letter-spacing: 0.02em;
+    }
+
+    .order-parcel {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+    }
+
+    /* payment + details row: both in same line, horizontally */
+    .payment-details-row {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
 
     .order-toggle {
       background: linear-gradient(135deg, rgba(0,200,150,0.2), rgba(0,180,140,0.15));
-      border: 1px solid rgba(0,200,150,0.4);
-      padding: 6px 12px;
+      border: 1px solid rgba(0,200,150,0.45);
+      padding: 5px 12px;
       border-radius: 8px;
       cursor: pointer;
       font-weight: 700;
-      font-size: 12px;
+      font-size: 11px;
       color: #00d9a3;
       transition: all 160ms ease;
-    }
-    .order-toggle:hover { background: linear-gradient(135deg, rgba(0,200,150,0.3), rgba(0,180,140,0.25)); box-shadow: 0 0 12px rgba(0,220,160,0.3); }
-
-    .order-details-list { margin-top:10px; display:none; list-style:none; padding:0; }
-    .order-block.expanded .order-details-list { display:block; }
-
-    .order-item-line { padding: 8px 0; border-bottom: 1px dashed rgba(255,255,255,0.05); color: #c9d0dd; }
-
-    .empty-cta { margin-top:12px; display:inline-block; background:#111827; color:#fff; padding:10px 14px; border-radius:999px; font-weight:700; text-decoration:none }
-
-    .order-inner {
-      border-radius: 14px;
-      background: linear-gradient(180deg, #ffffff, #fbfdff);
-      border: 1px solid rgba(15,23,42,0.06);
-      padding: 12px 12px;
-      box-shadow: 0 8px 22px rgba(11,18,32,0.06);
-    }
-
-    .order-row {
-      display: grid;
-      grid-template-columns: 2fr 1.5fr 1fr 0.9fr;
-      font-size: 14px;
-      align-items: center;
-      padding: 8px 6px;
-    }
-
-    .order-row:not(:last-child) {
-      border-bottom: 1px dashed rgba(15,23,42,0.04);
-    }
-
-    .item-name {
-      text-transform: lowercase;
-    }
-
-    .order-date {
-      font-size: 12px;
       text-align: center;
-      color: #475569;
+      white-space: nowrap;
+      letter-spacing: 0.03em;
+    }
+    .order-toggle:hover { 
+      background: linear-gradient(135deg, rgba(0,200,150,0.3), rgba(0,180,140,0.25)); 
+      box-shadow: 0 0 12px rgba(0,220,160,0.3); 
+      transform: translateY(-1px);
     }
 
     .status-pill {
       display: inline-block;
-      padding: 6px 12px;
+      padding: 5px 12px;
       border-radius: 999px;
       font-size: 11px;
       text-transform: lowercase;
@@ -320,6 +319,7 @@
       min-width: 64px;
       font-weight: 700;
       letter-spacing: 0.03em;
+      white-space: nowrap;
     }
 
     .status-paid {
@@ -336,12 +336,82 @@
       box-shadow: 0 0 10px rgba(255,160,0,0.25);
     }
 
+    .order-details-list {
+      margin-top: 12px;
+      display: none;
+      list-style: none;
+      padding: 12px 8px 8px 12px;
+      background: rgba(20, 25, 40, 0.5);
+      border-radius: 14px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .order-block.expanded .order-details-list {
+      display: block;
+    }
+
+    .order-item-line {
+      padding: 8px 0;
+      border-bottom: 1px dashed rgba(255,255,255,0.08);
+      color: #c9d0dd;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .order-item-line::before {
+      content: "🍽️";
+      font-size: 12px;
+      opacity: 0.7;
+    }
+    .order-item-line:last-child {
+      border-bottom: none;
+    }
+
     .empty-text {
       margin-top: 20px;
       font-size: 14px;
       text-align: center;
       color: #aeb5c4;
       letter-spacing: 0.02em;
+      padding: 28px 0;
+    }
+
+    /* responsive: on narrow screens, keep row but allow wrap */
+    @media (max-width: 550px) {
+      .order-header {
+        gap: 8px;
+      }
+      .payment-details-row {
+        gap: 8px;
+      }
+      .status-pill {
+        padding: 4px 8px;
+        font-size: 10px;
+        min-width: 56px;
+      }
+      .order-toggle {
+        padding: 4px 10px;
+        font-size: 10px;
+      }
+      .order-summary strong {
+        font-size: 13px;
+      }
+      .order-meta {
+        font-size: 10px;
+      }
+    }
+
+    @media (max-width: 450px) {
+      .payment-details-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+      }
+      /* keep vertical stacking only for extremely small devices but still in same column area */
+      .order-header {
+        align-items: start;
+      }
     }
   </style>
 </head>
@@ -354,7 +424,7 @@
         <div class="user-email">Your Orders</div>
       </div>
     </div>
-    <button class="logout-btn" onclick="location.href='menu.html'">Menu</Menu></button>
+    <button class="logout-btn" onclick="location.href='menu.html'">Menu</button>
   </div>
 
   <div class="page-wrap page-with-header">
@@ -363,19 +433,19 @@
         <div class="brand">FOOD POINT</div>
         <div class="tagline">Fresh, fast & tasty bites for you</div>
       </div>
-      <!-- now goes straight to home page -->
-      <button class="back-btn" onclick="location.href='home.html'">
+      <!-- go to menu button -->
+      <button class="back-btn" onclick="location.href='menu.html'">
         <i class="fas fa-arrow-left"></i>
         Go to Menu
       </button>
 
       <div class="title">your order</div>
 
-      <!-- table header -->
+      <!-- table header: item | parcel | payment (with details inline) -->
       <div class="header-row">
         <span>item</span>
         <span>parcel</span>
-        <span>paid / unpaid</span>
+        <span>payment </span>
       </div>
 
       <div id="ordersContainer"></div>
@@ -400,13 +470,26 @@
       return ORDERS_KEY;
     }
 
+    function formatItemName(item) {
+      try {
+        if (typeof item === 'string') return item;
+        if (item && typeof item === 'object') {
+          return item.name || item.title || item.itemName || JSON.stringify(item);
+        }
+        return String(item);
+      } catch(e) {
+        return String(item);
+      }
+    }
+
     function renderOrders() {
       const container = document.getElementById("ordersContainer");
       const emptyState = document.getElementById("emptyState");
 
       let orders = [];
       try {
-        orders = JSON.parse(localStorage.getItem(getOrdersStorageKey()) || "[]");
+        const raw = localStorage.getItem(getOrdersStorageKey());
+        orders = raw ? JSON.parse(raw) : [];
       } catch (e) {
         orders = [];
       }
@@ -420,117 +503,189 @@
       emptyState.style.display = "none";
       container.innerHTML = "";
 
-      // show in reverse order: most recent first
+      // most recent first
       const reversedOrders = [...orders].reverse();
+      
       reversedOrders.forEach(order => {
           const block = document.createElement("div");
           block.className = "order-block";
-
-          const idText = order.id || "#---";
-          const dateText = order.date || "--";
-          const method = order.method || "online";
+          
+          const orderId = order.id || "###";
+          const dateText = order.date || new Date().toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+          const method = order.method || "online";   // 'cash' or 'online' (UPI)
+          const parcelSelected = order.parcelSelected === true;
           const items = Array.isArray(order.items) ? order.items : [];
 
+          // order id label
           const label = document.createElement("div");
           label.className = "order-id-label";
-          label.textContent = "order id " + idText;
+          label.textContent = `order id #${orderId} • ${dateText}`;
           block.appendChild(label);
-
-          // header: summary + status/toggle
+          
+          // header row (3 columns)
           const header = document.createElement('div');
           header.className = 'order-header';
-
-          const summary = document.createElement('div');
-          summary.className = 'order-summary';
-          const summaryLeft = document.createElement('div');
-          summaryLeft.innerHTML = '<strong>FOOD</strong>';
-          const meta = document.createElement('div');
-          meta.className = 'order-meta';
-          meta.textContent = dateText + ' • ' + (order.parcelSelected ? 'Takeaway' : 'Dine in');
-          summary.appendChild(summaryLeft);
-          summary.appendChild(meta);
-
-          const right = document.createElement('div');
-          right.style.display = 'flex';
-          right.style.alignItems = 'center';
-          right.style.gap = '8px';
-
-          const parcelLabel = document.createElement('span');
-          parcelLabel.className = 'order-meta';
-          parcelLabel.textContent = order.parcelSelected ? 'Yes' : 'No';
-          right.appendChild(parcelLabel);
-
-          const pill = document.createElement('span');
-          pill.className = 'status-pill ' + (method === 'cash' ? 'status-unpaid' : 'status-paid');
-          pill.textContent = method;
-          right.appendChild(pill);
-
-          const toggle = document.createElement('button');
-          toggle.className = 'order-toggle';
-          toggle.setAttribute('aria-expanded', 'false');
-          toggle.textContent = 'details';
-          right.appendChild(toggle);
-
-          header.appendChild(summary);
-          header.appendChild(right);
+          
+          // --- COLUMN 1: ITEM (FOOD + dine-in/takeaway) ---
+          const summaryCol = document.createElement('div');
+          summaryCol.className = 'order-summary';
+          const foodStrong = document.createElement('strong');
+          foodStrong.textContent = 'FOOD';
+          const metaSpan = document.createElement('div');
+          metaSpan.className = 'order-meta';
+          metaSpan.textContent = parcelSelected ? 'Takeaway' : 'Dine in';
+          summaryCol.appendChild(foodStrong);
+          summaryCol.appendChild(metaSpan);
+          
+          // --- COLUMN 2: PARCEL (Yes/No) ---
+          const parcelCol = document.createElement('div');
+          parcelCol.className = 'order-parcel';
+          const parcelPill = document.createElement('span');
+          parcelPill.className = `status-pill ${parcelSelected ? 'status-paid' : 'status-unpaid'}`;
+          parcelPill.textContent = parcelSelected ? 'Yes' : 'No';
+          parcelCol.appendChild(parcelPill);
+          
+          // --- COLUMN 3: PAYMENT PILL + DETAILS BUTTON (in same row) ---
+          const paymentCol = document.createElement('div');
+          paymentCol.className = 'order-payment';
+          
+          // Create a flex row container that holds both the payment pill and the details button
+          const rowContainer = document.createElement('div');
+          rowContainer.className = 'payment-details-row';
+          
+          // payment pill
+          let paymentMethodDisplay = '';
+          if (method === 'online') paymentMethodDisplay = 'UPI';
+          else if (method === 'cash') paymentMethodDisplay = 'Cash';
+          else paymentMethodDisplay = method.charAt(0).toUpperCase() + method.slice(1);
+          
+          const paymentPill = document.createElement('span');
+          paymentPill.className = `status-pill ${method === 'online' ? 'status-paid' : 'status-unpaid'}`;
+          paymentPill.textContent = paymentMethodDisplay;
+          
+          // details toggle button
+          const toggleBtn = document.createElement('button');
+          toggleBtn.className = 'order-toggle';
+          toggleBtn.setAttribute('aria-expanded', 'false');
+          toggleBtn.textContent = 'details';
+          
+          // Append both to the row container
+          rowContainer.appendChild(paymentPill);
+          rowContainer.appendChild(toggleBtn);
+          paymentCol.appendChild(rowContainer);
+          
+          header.appendChild(summaryCol);
+          header.appendChild(parcelCol);
+          header.appendChild(paymentCol);
           block.appendChild(header);
-
-          // details container (hidden by default)
+          
+          // --- DETAILS SECTION (hidden by default, shows ordered items) ---
           const detailsList = document.createElement('ul');
           detailsList.className = 'order-details-list';
-
+          
           if (!items.length) {
-            const li = document.createElement('li');
-            li.className = 'order-item-line';
-            li.textContent = 'No items in this order.';
-            detailsList.appendChild(li);
+            const emptyItem = document.createElement('li');
+            emptyItem.className = 'order-item-line';
+            emptyItem.textContent = 'No items listed for this order.';
+            detailsList.appendChild(emptyItem);
           } else {
-            items.forEach((it) => {
+            items.forEach(it => {
               const li = document.createElement('li');
               li.className = 'order-item-line';
-              let itemName = '';
-              try {
-                if (typeof it === 'string') itemName = it;
-                else if (it && typeof it === 'object') itemName = it.name || it.title || JSON.stringify(it);
-                else itemName = String(it);
-              } catch (e) { itemName = String(it); }
-              li.textContent = itemName.toString();
+              li.textContent = formatItemName(it);
               detailsList.appendChild(li);
             });
           }
-
           block.appendChild(detailsList);
-
-          // toggle action
-          toggle.addEventListener('click', function (e) {
+          
+          // Toggle logic: expand/collapse on button click or block click (except button)
+          const toggleExpanded = (expandedState) => {
+            if (expandedState) {
+              block.classList.add('expanded');
+              toggleBtn.setAttribute('aria-expanded', 'true');
+              toggleBtn.textContent = 'hide';
+            } else {
+              block.classList.remove('expanded');
+              toggleBtn.setAttribute('aria-expanded', 'false');
+              toggleBtn.textContent = 'details';
+            }
+          };
+          
+          // button click handler
+          const onToggleClick = (e) => {
             e.stopPropagation();
-            const expanded = block.classList.toggle('expanded');
-            toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
-            toggle.textContent = expanded ? 'hide' : 'details';
+            const isExpanded = block.classList.contains('expanded');
+            toggleExpanded(!isExpanded);
+          };
+          toggleBtn.addEventListener('click', onToggleClick);
+          
+          // block click (anywhere except toggle button) expands/collapses
+          block.addEventListener('click', (e) => {
+            if (e.target === toggleBtn || toggleBtn.contains(e.target)) return;
+            const isExpanded = block.classList.contains('expanded');
+            toggleExpanded(!isExpanded);
           });
-
-          // also allow clicking the block to expand/collapse
-          block.addEventListener('click', function (e) {
-            if (e.target === toggle) return;
-            const expanded = block.classList.toggle('expanded');
-            toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
-            toggle.textContent = expanded ? 'hide' : 'details';
-          });
-
+          
           container.appendChild(block);
       });
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
-      // set header name from localStorage if available
+    // update user display name from localStorage
+    function updateUserDisplay() {
       try {
-        const raw = localStorage.getItem('fp_current_user');
-        if (raw) {
-          let name = raw;
-          try { const parsed = JSON.parse(raw); if (parsed) name = parsed.name || parsed.email || parsed.username || JSON.stringify(parsed); } catch(e){}
-          const el = document.querySelector('.user-name'); if (el) el.textContent = String(name).split('@')[0];
+        const rawUser = localStorage.getItem('fp_current_user');
+        if (rawUser) {
+          let displayName = "Food Point";
+          try {
+            const parsed = JSON.parse(rawUser);
+            if (parsed && parsed.name) displayName = parsed.name;
+            else if (parsed && parsed.email) displayName = parsed.email.split('@')[0];
+            else if (parsed && parsed.username) displayName = parsed.username;
+            else if (typeof parsed === 'string') displayName = parsed.split('@')[0];
+          } catch(e) {
+            displayName = rawUser.split('@')[0] || "Food Point";
+          }
+          const userNameSpan = document.querySelector('.user-name');
+          if (userNameSpan) userNameSpan.textContent = displayName;
         }
-      } catch (e) { /* ignore */ }
+      } catch(e) { /* ignore */ }
+    }
+    
+    // populate sample orders for demo if empty, so UI is not blank
+    function populateSampleOrdersIfEmpty() {
+      const storageKey = getOrdersStorageKey();
+      const existing = localStorage.getItem(storageKey);
+      if (!existing || JSON.parse(existing).length === 0) {
+        const demoOrders = [
+          {
+            id: "001",
+            date: "16 April 2026",
+            method: "cash",
+            parcelSelected: false,
+            items: ["Grilled Chicken Burger", "French Fries", "Coca-Cola"]
+          },
+          {
+            id: "002",
+            date: "15 April 2026",
+            method: "online",
+            parcelSelected: true,
+            items: ["Margherita Pizza", "Garlic Bread", "Lemon Iced Tea"]
+          },
+          {
+            id: "003",
+            date: "14 April 2026",
+            method: "online",
+            parcelSelected: false,
+            items: ["Vegan Bowl", "Avocado Smoothie"]
+          }
+        ];
+        localStorage.setItem(storageKey, JSON.stringify(demoOrders));
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      populateSampleOrdersIfEmpty();
+      updateUserDisplay();
       renderOrders();
     });
   </script>

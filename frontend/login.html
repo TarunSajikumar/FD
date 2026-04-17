@@ -566,7 +566,7 @@
             if (data && data.token) localStorage.setItem('fp_token', data.token);
             if (data && data.user) setCurrentUser(data.user);
             successMsg.textContent = 'Logged in successfully. Redirecting…';
-            setTimeout(() => window.location.href = 'home.html', 700);
+            setTimeout(() => window.location.href = 'menu.html', 700);
             return;
           } catch (e) {
             // network error or non-2xx — fall through to local fallback
@@ -586,7 +586,7 @@
           setCurrentUser(user);
           successMsg.textContent = "Logged in successfully. Redirecting…";
           setTimeout(() => {
-            window.location.href = "home.html";
+            window.location.href = "menu.html";
           }, 700);
       } else {
         const name = nameInput.value.trim();
@@ -621,7 +621,7 @@
           if (data && data.token) localStorage.setItem('fp_token', data.token);
           if (data && data.user) setCurrentUser(data.user);
           successMsg.textContent = 'Account created! Redirecting…';
-          setTimeout(() => window.location.href = 'home.html', 800);
+          setTimeout(() => window.location.href = 'menu.html', 800);
           return;
         } catch (e) {
           // network error -> fallback to local storage
@@ -638,7 +638,7 @@
         setCurrentUser(newUser);
         successMsg.textContent = "Account created! Redirecting…";
         setTimeout(() => {
-          window.location.href = "home.html";
+          window.location.href = "menu.html";
         }, 800);
       }
     }
@@ -656,7 +656,7 @@
     document.addEventListener("DOMContentLoaded", () => {
       const current = localStorage.getItem(CURRENT_USER_KEY);
       if (current) {
-        window.location.href = "home.html";
+        window.location.href = "menu.html";
       }
     });
 

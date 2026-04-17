@@ -11,12 +11,12 @@
   <style>
     /* User-bar styling from menu page */
     .user-bar {
-      position: fixed !important;
-      top: 14px !important;
-      left: 50% !important;
-      transform: translateX(-50%) !important;
-      max-width: 720px !important;
+      position: relative !important;
+      margin: 0 auto 20px !important;
       width: calc(100% - 28px) !important;
+      max-width: 720px !important;
+      left: auto !important;
+      transform: none !important;
       background: linear-gradient(135deg, rgba(30,35,50,0.8), rgba(25,30,45,0.77)) !important;
       backdrop-filter: blur(16px) saturate(160%) !important;
       border-radius: 20px !important;
@@ -24,7 +24,7 @@
       display: flex !important;
       align-items: center !important;
       justify-content: space-between !important;
-      z-index: 999 !important;
+      z-index: 1 !important;
       box-shadow: 0 16px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.12) !important;
       border: 1px solid rgba(255,255,255,0.08) !important;
     }
@@ -91,7 +91,7 @@
     }
 
     .page-with-header {
-      margin-top: 100px !important;
+      margin-top: 0 !important;
     }
 
     /* Cart page styling */
@@ -406,7 +406,7 @@
         <div class="user-email">Cart</div>
       </div>
     </div>
-    <button class="logout-btn" onclick="location.href='home.html'">Home</button>
+    <button class="logout-btn" onclick="location.href='menu.html'">Menu</button>
   </div>
 
   <div class="page page-with-header">
@@ -443,7 +443,7 @@
       <button id="payBtn" class="pay-btn" disabled>PROCEED TO PAY</button>
       
       <div style="text-align:center; margin-top:16px;">
-        <button onclick="location.href='store.html'" style="background:transparent; border:1px solid rgba(255,255,255,0.1); color:#aeb5c4; padding:10px 20px; border-radius:10px; cursor:pointer; transition:all 200ms ease;">
+        <button onclick="location.href='menu.html'" style="background:transparent; border:1px solid rgba(255,255,255,0.1); color:#aeb5c4; padding:10px 20px; border-radius:10px; cursor:pointer; transition:all 200ms ease;">
           ← Back to Menu
         </button>
       </div>

@@ -109,27 +109,6 @@
         gap: 10px !important;
       }
 
-      /* Home button */
-      .home-btn {
-        background: linear-gradient(135deg, rgba(0,200,150,0.25), rgba(0,180,140,0.2)) !important;
-        border: 1px solid rgba(0,220,170,0.3) !important;
-        color: #00d9a3 !important;
-        padding: 8px 14px !important;
-        border-radius: 12px !important;
-        font-size: 12px !important;
-        font-weight: 600 !important;
-        cursor: pointer !important;
-        transition: all 200ms ease !important;
-        display: flex !important;
-        align-items: center !important;
-        gap: 6px !important;
-      }
-
-      .home-btn:hover {
-        background: linear-gradient(135deg, rgba(0,220,170,0.4), rgba(0,200,150,0.35)) !important;
-        transform: translateY(-1px) !important;
-      }
-
       /* Logout button - integrated in user bar */
       .logout-btn {
         background: linear-gradient(135deg, rgba(220,70,70,0.25), rgba(200,60,60,0.2)) !important;
@@ -152,7 +131,7 @@
         box-shadow: 0 0 12px rgba(220,70,70,0.3) !important;
       }
 
-      .logout-btn:active, .home-btn:active {
+      .logout-btn:active {
         transform: scale(0.96) !important;
       }
 
@@ -572,10 +551,6 @@
       </div>
     </div>
     <div class="user-actions">
-      <!-- Home Button -->
-      <button class="home-btn" id="homeBtn">
-        <i class="fas fa-home"></i> 
-      </button>
       <!-- Logout Button (integrated, not floating) -->
       <button class="logout-btn" id="logoutBtn">
         <i class="fas fa-sign-out-alt"></i> Logout
@@ -1014,15 +989,8 @@
       }, 700);
     });
 
-    // Integrated Home and Logout functionality (no floating elements)
-    const homeBtn = document.getElementById("homeBtn");
+    // Integrated Logout functionality (no floating elements)
     const logoutBtn = document.getElementById("logoutBtn");
-    
-    if (homeBtn) {
-      homeBtn.addEventListener("click", function() {
-        window.location.href = "home.html";
-      });
-    }
     
     if (logoutBtn) {
       logoutBtn.addEventListener("click", function() {
