@@ -1,666 +1,572 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>SecurePay — UPI & Cash Options</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes" />
+  <title>Payment — Secure UPI & Cash</title>
 
-  <!-- Font Awesome 6 -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <!-- QRCode Library -->
+  <!-- fontawesome (for icons) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- QR Code Library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <!-- external config/proxy scripts (kept for compatibility but not mandatory) -->
+  <script src="fp-config.js"></script>
+  <script src="fp-fetch-proxy.js"></script>
+  <script src="api.js"></script>
+  <script src="dev-check.js"></script>
 
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
-      -webkit-tap-highlight-color: transparent;
-    }
-
+    /* --- Reset & base --- */
+    * { margin:0; padding:0; box-sizing:border-box; font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; -webkit-tap-highlight-color:transparent; }
+    html { -webkit-user-select:none; -webkit-text-size-adjust:100%; }
     body {
-      background: #020617;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 1.5rem;
-      color: #f8fafc;
+      background: #0a0e1a;
+      color: #d9e6ff;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+      position: relative;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      top:0; left:0; width:100%; height:100%;
+      background: radial-gradient(circle at 20% 30%, rgba(255,180,70,0.08), transparent 70%);
+      pointer-events: none;
     }
 
-    /* main card container */
-    .payment-container {
-      max-width: 800px;
-      width: 100%;
-      background: rgba(15, 23, 42, 0.95);
-      backdrop-filter: blur(14px);
-      border-radius: 2rem;
-      border: 1px solid rgba(251, 191, 36, 0.18);
-      box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.6);
-      padding: 1.8rem;
+    .container {
+      width:100%;
+      max-width:760px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+      border-radius:28px;
+      padding:26px;
+      box-shadow: 0 20px 40px rgba(2,6,23,0.8), 0 0 0 1px rgba(255,255,255,0.02);
+      backdrop-filter: blur(8px);
       transition: all 0.2s;
     }
 
-    h1 {
-      font-size: 1.75rem;
-      font-weight: 600;
-      color: #fbbf24;
-      letter-spacing: -0.3px;
-    }
+    header h1 { font-size:24px; font-weight:600; color:#fff; letter-spacing:-0.2px; margin-bottom:6px; background: linear-gradient(135deg, #FFFFFF, #FFE4B5); -webkit-background-clip:text; background-clip:text; color:transparent; display:inline-block; }
+    header p { color:#bfcbe6; font-size:14px; margin-bottom:22px; border-left: 2px solid #ffb347; padding-left:12px; opacity:0.9; }
 
-    .subhead {
-      color: #cbd5e1;
-      font-size: 0.85rem;
-      margin-top: 0.3rem;
-      margin-bottom: 1.5rem;
-      border-left: 3px solid #fbbf24;
-      padding-left: 0.75rem;
+    .steps {
+      display:flex;
+      gap:14px;
+      margin-bottom:24px;
     }
-
-    /* step selector */
-    .step-selector {
-      display: flex;
-      gap: 1rem;
-      margin-bottom: 1.6rem;
-      flex-wrap: wrap;
+    .step {
+      flex:1;
+      background: rgba(20, 28, 40, 0.6);
+      padding:14px 8px;
+      border-radius:20px;
+      text-align:center;
+      cursor:pointer;
+      border:1px solid rgba(255,255,255,0.02);
+      transition: all 0.2s cubic-bezier(0.2,0.9,0.4,1.1);
+      user-select:none;
+      backdrop-filter: blur(4px);
     }
-
-    .step-card {
-      flex: 1;
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      border-radius: 1.2rem;
-      padding: 0.9rem;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      text-align: center;
+    .step.active { 
+      border-color: #ffcc66; 
+      transform: translateY(-3px); 
+      background: linear-gradient(145deg, rgba(255,200,100,0.12), rgba(255,180,70,0.05));
+      box-shadow: 0 8px 18px rgba(0,0,0,0.2);
     }
+    .step h3 { margin-bottom:6px; font-size:17px; color:#fff; font-weight:600; }
+    .step p { font-size:12px; color:#b7c2e0; }
 
-    .step-card.active {
-      background: linear-gradient(145deg, rgba(255, 200, 100, 0.12), rgba(255, 180, 70, 0.05));
-      border-color: #ffcd7e;
-      box-shadow: 0 6px 14px rgba(255, 180, 60, 0.12);
-      transform: translateY(-2px);
-    }
-
-    .step-card h3 {
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: #f2f6ff;
-    }
-
-    .step-card p {
-      font-size: 0.75rem;
-      color: #a6b5da;
-      margin-top: 0.2rem;
-    }
-
-    /* amount panel */
-    .amount-panel {
-      background: rgba(0, 0, 0, 0.35);
-      border-radius: 1.2rem;
-      padding: 1.2rem;
-      margin-bottom: 1.2rem;
-      border: 1px solid rgba(255, 255, 255, 0.03);
-    }
-
-    .amount-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      flex-wrap: wrap;
-    }
-
-    .amount-label {
-      font-size: 0.85rem;
-      color: #b7c3e2;
-    }
-
-    .amount-value {
-      font-size: 2rem;
-      font-weight: 800;
-      color: #fbbf24;
-      letter-spacing: 1px;
-    }
-
-    /* action buttons */
-    .action-buttons {
-      display: flex;
-      gap: 1rem;
-      margin-top: 0.5rem;
-      flex-wrap: wrap;
-    }
-
-    .btn {
-      border: none;
-      padding: 0.75rem 1.4rem;
-      border-radius: 2rem;
-      font-weight: 700;
-      font-size: 0.9rem;
-      cursor: pointer;
-      transition: all 0.2s;
-      background: rgba(255, 255, 255, 0.05);
-      color: #eef3ff;
+    .payment-card {
+      margin-top:6px;
+      padding:20px;
+      background: rgba(8, 12, 22, 0.55);
+      border-radius:24px;
+      border:1px solid rgba(255,255,255,0.04);
       backdrop-filter: blur(4px);
     }
 
-    .btn-primary {
-      background: #f59e0b;
-      color: #111827;
-      box-shadow: 0 5px 12px rgba(245, 158, 11, 0.25);
-    }
+    .amount-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; padding-bottom:8px; border-bottom:1px dashed rgba(255,255,255,0.08);}
+    .amount-row .label { color:#bfcbe6; font-size:14px; letter-spacing:0.3px; }
+    .amount-row .value { font-weight:800; font-size:28px; color:#ffdd99; text-shadow:0 0 6px rgba(255,180,0,0.2); }
 
-    .btn-primary:hover {
-      transform: scale(0.97);
-      background: #d97706;
+    .btn {
+      display:inline-block;
+      padding:12px 20px;
+      border-radius:60px;
+      font-weight:700;
+      cursor:pointer;
+      border:0;
+      background: linear-gradient(95deg, #ffb347, #ff9f2c);
+      color:#111;
+      box-shadow: 0 8px 20px rgba(255,160,50,0.25);
+      transition: transform 0.1s ease, box-shadow 0.2s;
+      font-size:14px;
     }
+    .btn:active { transform: scale(0.97); }
 
-    .btn-outline {
-      border: 1px solid rgba(251, 191, 36, 0.6);
-      background: transparent;
-      color: #fbbf24;
+    .btn-ghost {
+      background:transparent;
+      border:1px solid rgba(255,215,140,0.5);
+      color:#ffe2b5;
+      box-shadow: none;
     }
+    .btn-ghost:hover { background: rgba(255,180,70,0.1); }
 
-    .btn-outline:hover {
-      background: rgba(251, 191, 36, 0.12);
-      border-color: #fbbf24;
+    /* online ui */
+    .online-ui { margin-top:20px; display:none; animation: fadeSlide 0.25s ease; }
+    @keyframes fadeSlide { from { opacity:0; transform: translateY(10px); } to { opacity:1; transform: translateY(0); } }
+    
+    .upi-box {
+      display:flex;
+      gap:18px;
+      align-items:center;
+      flex-wrap:wrap;
+      padding:16px;
+      background:rgba(0,0,0,0.28);
+      border-radius:28px;
+      border:1px solid rgba(255,215,150,0.15);
     }
-
-    /* online UPI section */
-    .upi-section {
-      margin-top: 1.3rem;
-      display: none;
-      animation: fadeSlide 0.25s ease-out;
+    .upi-qr { 
+      width:140px; 
+      height:140px; 
+      background:#ffffff; 
+      border-radius:10px; 
+      border: 1px solid rgba(255,255,255,0.22);
+      display:flex; 
+      align-items:center; 
+      justify-content:center; 
+      color:#222; 
+      font-weight:700;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      overflow: hidden;
     }
+    .upi-qr canvas { width:100% !important; height:100% !important; border-radius:26px; }
+    .upi-details { flex:1; min-width:180px; }
+    .copy-row { display:flex; gap:10px; margin-top:12px; align-items:center; }
+    .small { font-size:13px; color:#cbd8ff; letter-spacing:0.2px; }
 
-    @keyframes fadeSlide {
-      from { opacity: 0; transform: translateY(12px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    .hint { margin-top:16px; font-size:13px; color:#cfddff; background: linear-gradient(120deg, rgba(255,215,140,0.08), rgba(0,0,0,0.2)); padding:12px 16px; border-radius:20px; border-left: 3px solid #ffb347; }
 
-    .qr-upi-card {
-      background: rgba(0, 0, 0, 0.4);
-      border-radius: 1.5rem;
-      padding: 1rem;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1.2rem;
-      align-items: center;
-      border: 1px solid rgba(255, 215, 140, 0.2);
-    }
+    footer { margin-top:20px; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; font-size:12px; opacity:0.8; }
 
-    .qr-wrapper {
-      background: white;
-      border-radius: 1rem;
-      padding: 10px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 140px;
-      height: 140px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-    }
-
-    .qr-wrapper canvas, .qr-placeholder {
-      width: 120px !important;
-      height: 120px !important;
-      display: block;
-    }
-
-    .upi-info {
-      flex: 1;
-      min-width: 180px;
-    }
-
-    .upi-id-label {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: #b9c6ec;
-    }
-
-    .upi-id-value {
-      font-size: 1.2rem;
-      font-weight: 700;
-      word-break: break-all;
-      color: #ffeaC0;
-      background: rgba(0,0,0,0.3);
-      padding: 0.3rem 0.6rem;
-      border-radius: 1rem;
-      display: inline-block;
-      margin: 6px 0;
-    }
-
-    .copy-group {
-      display: flex;
-      gap: 0.6rem;
-      align-items: center;
-      margin: 12px 0;
-    }
-
-    .copy-group input {
-      background: #10131f;
-      border: 1px solid #2a2f44;
-      border-radius: 2rem;
-      padding: 0.55rem 1rem;
-      color: #ffefcf;
-      font-size: 0.85rem;
+    .pay-intent-btn {
+      margin-top: 18px;
+      background: linear-gradient(95deg, #1e2a3a, #0f1722);
+      border: 1px solid #ffb347;
+      color: #ffdd99;
       width: 100%;
-      outline: none;
-    }
-
-    .small-btn {
-      padding: 0.5rem 1rem;
-      font-size: 0.8rem;
-    }
-
-    .paid-actions {
+      text-align: center;
+      justify-content: center;
       display: flex;
-      gap: 0.8rem;
-      margin-top: 0.8rem;
-      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      backdrop-filter: blur(12px);
     }
+    .pay-intent-btn i { font-size: 18px; }
 
-    .hint-text {
-      font-size: 0.75rem;
-      background: rgba(255, 215, 130, 0.08);
-      border-radius: 1rem;
-      padding: 0.6rem 1rem;
-      margin-top: 0.9rem;
-      color: #c9d6ff;
-      border-left: 3px solid #ffbc5e;
-    }
-
-    footer {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 1.2rem;
-      font-size: 0.7rem;
-      color: #6b7aa0;
-    }
-
-    @media (max-width: 550px) {
-      .payment-container { padding: 1.2rem; }
-      .qr-upi-card { flex-direction: column; align-items: center; text-align: center; }
-      .qr-wrapper { width: 130px; height: 130px; }
+    @media (max-width:560px){
+      .container { padding: 18px; }
+      .upi-qr { width: 110px; height: 110px; }
+      .upi-box { flex-direction: column; align-items: center; text-align: center; }
+      .copy-row { justify-content: center; }
+      .amount-row .value { font-size: 24px; }
     }
   </style>
 </head>
 <body>
+<div class="container" role="main">
+  <header>
+    <h1>✨ Complete Payment</h1>
+    <p>Choose cash or UPI. For online, scan QR or click "Pay via UPI App" to pay instantly.</p>
+  </header>
 
-<div class="payment-container" id="paymentApp">
-  <h1><i class="fa-regular fa-credit-card"></i> Secure Payment</h1>
-  <div class="subhead">Choose method • UPI QR auto-updates with merchant ID</div>
-
-  <!-- Steps: Cash / Online -->
-  <div class="step-selector">
-    <div class="step-card" data-method="cash" id="stepCashCard">
-      <h3><i class="fa-regular fa-money-bill-1"></i> Cash</h3>
-      <p>Pay on delivery</p>
+  <!-- Step selector -->
+  <div class="steps" id="paymentSteps">
+    <div class="step" id="stepCash" data-step="cash" tabindex="0" role="button" aria-pressed="false">
+      <h3>💵 Cash</h3>
+      <p>Pay on delivery — simple & secure.</p>
     </div>
-    <div class="step-card" data-method="online" id="stepOnlineCard">
-      <h3><i class="fa-regular fa-qrcode"></i> Online (UPI)</h3>
-      <p>Instant QR payment</p>
+    <div class="step" id="stepOnline" data-step="online" tabindex="0" role="button" aria-pressed="false">
+      <h3>📱 Online (UPI)</h3>
+      <p>Scan QR or click to pay via any UPI app.</p>
     </div>
   </div>
 
-  <!-- Amount & actions -->
-  <div class="amount-panel">
+  <div class="payment-card">
     <div class="amount-row">
-      <span class="amount-label"><i class="fa-regular fa-indian-rupee-sign"></i> Total amount</span>
-      <span class="amount-value" id="totalAmountDisplay">₹0.00</span>
-    </div>
-    <div class="action-buttons" id="cashActionArea">
-      <button class="btn btn-primary" id="payWithCashBtn"><i class="fa-regular fa-hand-holding-usd"></i> Confirm Cash Payment</button>
-      <button class="btn btn-outline" id="switchToOnlineBtn"><i class="fa-regular fa-mobile-alt"></i> Switch to UPI</button>
-    </div>
-  </div>
-
-  <!-- DYNAMIC UPI SECTION (QR + DETAILS) -->
-  <div class="upi-section" id="upiSection">
-    <div class="qr-upi-card">
-      <div class="qr-wrapper" id="qrCanvasContainer">
-        <!-- dynamic QR canvas will appear here -->
-        <div id="qrCodeTarget" style="width:120px;height:120px; display:flex; align-items:center; justify-content:center; background:#fff; border-radius:12px;">QR</div>
+      <div>
+        <div class="label">💰 Total Amount</div>
       </div>
-      <div class="upi-info">
-        <div class="upi-id-label"><i class="fa-regular fa-circle-up"></i> UPI ID (Merchant)</div>
-        <div class="upi-id-value" id="upiIdText">loading...</div>
-        <div class="copy-group">
-          <input type="text" id="upiCopyField" readonly value="example@upi" />
-          <button class="btn small-btn" id="copyUpiBtn"><i class="fa-regular fa-copy"></i> Copy</button>
+      <div class="value" id="amountValue">₹0.00</div>
+    </div>
+
+    <div id="actionArea">
+      <button class="btn" id="payCashBtn">✅ Pay with Cash</button>
+      <button class="btn btn-ghost" id="chooseOnlineBtn">🪙 Proceed to UPI Payment</button>
+    </div>
+
+    <!-- Online Payment Interface (hidden by default) -->
+    <div class="online-ui" id="onlineUI" aria-hidden="true">
+      <div class="upi-box">
+        <div class="upi-qr" id="qrPlaceholder">
+          <i class="fa-solid fa-qrcode" style="font-size:32px; color:#333;"></i>
         </div>
-        <div class="paid-actions">
-          <button class="btn btn-primary" id="payWithUpiBtn"><i class="fa-brands fa-google-pay"></i> Pay with UPI</button>
-          <button class="btn btn-primary" id="iHavePaidBtn"><i class="fa-regular fa-check-circle"></i> I have paid</button>
-          <button class="btn btn-outline" id="backToCashBtn"><i class="fa-regular fa-arrow-left"></i> Back to cash</button>
+        <div class="upi-details">
+          <div class="small"><i class="fa-regular fa-credit-card"></i> Payee UPI ID</div>
+          <div style="font-weight:800; margin-top:6px; font-size:18px; letter-spacing:0.3px; word-break:break-all;" id="upiId">example@upi</div>
+          <div class="copy-row">
+            <input type="text" id="upiInput" readonly style="flex:1; padding:10px; border-radius:40px; border:1px solid rgba(255,215,140,0.3); background:rgba(0,0,0,0.4); color:#ffefcf; font-weight:500; font-size:13px;">
+            <button class="btn btn-ghost" id="copyUpiBtn" style="padding:8px 14px;"><i class="fa-regular fa-copy"></i> Copy</button>
+          </div>
+          <div style="margin-top:14px; display:flex; gap:12px; flex-wrap:wrap;">
+            <button class="btn" id="iPaidBtn"><i class="fa-regular fa-circle-check"></i> I have paid</button>
+            <button class="btn btn-ghost" id="chooseCashBackBtn"><i class="fa-solid fa-arrow-left"></i> Back to options</button>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="hint-text">
-      <i class="fa-regular fa-circle-info"></i> Scan QR with any UPI app (Google Pay, PhonePe, Paytm) or copy ID. After payment, tap <strong>"I have paid"</strong>.
-    </div>
-  </div>
 
-  <footer>
-    <span><i class="fa-regular fa-lock"></i> Secure gateway • UPI verified</span>
-    <span id="merchantHint">Powered by Merchant QR</span>
-  </footer>
+      <!-- NEW: Payment Intent Button: opens UPI chooser popup / redirect -->
+      <button class="btn pay-intent-btn" id="payIntentBtn">
+        <i class="fa-brands fa-google-pay"></i> Pay via UPI App (Intent)
+        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+      </button>
+
+      <div class="hint">
+        <i class="fa-solid fa-lightbulb"></i> Tip: Use any UPI app (Google Pay, PhonePe, Paytm). Click "Pay via UPI App" to open payment intent, or scan QR code.
+      </div>
+    </div>
+
+    <footer>
+      <div class="small"><i class="fa-regular fa-shield"></i> Provider: <strong id="providerLabel">UPI</strong></div>
+      <div class="small"><i class="fa-regular fa-clock"></i> Instant confirmation</div>
+    </footer>
+  </div>
 </div>
 
 <script>
-  // --------------------------------------------------------------
-  //  HELPER: localStorage with fallback
-  // --------------------------------------------------------------
-  function storageGet(key) {
-    try { return localStorage.getItem(key); } catch(e) { return null; }
-  }
-  function storageSet(key, val) {
-    try { localStorage.setItem(key, String(val)); } catch(e) {}
+  /* ---------- secure localStorage helpers ---------- */
+  function safeGet(key) { try { return localStorage.getItem(key); } catch(e) { return null; } }
+  function safeSet(key, val) { try { localStorage.setItem(key, String(val)); } catch(e) {} }
+
+  /* parse amount from different possible formats */
+  function parseAmountRaw(raw) {
+    if (!raw) return null;
+    const cleaned = String(raw).replace(/[₹, ]+/g, '').trim();
+    const n = parseFloat(cleaned);
+    return Number.isFinite(n) ? n : null;
   }
 
-  // parse amount from different sources (cart, amountPaid, etc.)
-  function extractNumericAmount() {
-    // 1) try amountPaid / cartAmount from localStorage
-    let raw = storageGet('amountPaid') || storageGet('amountValue') || storageGet('cartAmount');
-    if (raw) {
-      let cleaned = String(raw).replace(/[₹,]/g, '').trim();
-      let num = parseFloat(cleaned);
-      if (!isNaN(num) && num > 0) return num;
-    }
-    // 2) try cartItems or selectedFoods array
+  function computeAmountFromCart() {
     try {
-      let cart = storageGet('cartItems') || storageGet('selectedFoods_v1') || storageGet('selectedFoods');
-      if (cart) {
-        let items = JSON.parse(cart);
-        if (Array.isArray(items) && items.length) {
+      const cartJson = safeGet('cartItems') || safeGet('selectedFoods_v1') || safeGet('selectedFoods');
+      if (cartJson) {
+        const parsed = JSON.parse(cartJson);
+        if (Array.isArray(parsed) && parsed.length) {
           let total = 0;
-          for (let it of items) {
-            let priceVal = 0;
-            if (it.price) priceVal = parseFloat(String(it.price).replace(/[₹,]/g, '')) || 0;
-            else if (it.priceNumeric) priceVal = parseFloat(it.priceNumeric) || 0;
-            else if (it.amount) priceVal = parseFloat(it.amount) || 0;
-            let qty = (it.qty || it.quantity || 1);
-            qty = parseFloat(qty) || 1;
-            total += priceVal * qty;
-          }
-          if (total > 0) return Math.round(total * 100) / 100;
+          parsed.forEach(it => {
+            const price = (it && (it.price || it.priceNumeric || it.amount)) || 0;
+            const qty = (it && (it.qty || it.quantity || it.qtyOrdered)) || 1;
+            const pnum = parseFloat(String(price).replace(/[₹, ]+/g, '')) || 0;
+            const qnum = parseFloat(qty) || 1;
+            total += pnum * qnum;
+          });
+          if (total > 0) return total;
         }
       }
     } catch(e) {}
-    // 3) fallback default (sample demo amount)
-    return 149.00;  // default demo amount, but will be overwritten if any dynamic
-  }
-
-  // ---------- GET UPI & RESTAURANT SETTINGS (owner-dashboard sync) ----------
-  function getMerchantUPISettings() {
-    let upiId = '9656971579@slc';       // default example as per requirement
-    let restaurantName = 'Tarun Kitchen'; 
     try {
-      // try RESTAURANT_SETTINGS (from owner-dashboard)
-      let settingsRaw = storageGet('RESTAURANT_SETTINGS') || storageGet('fp_settings');
-      if (settingsRaw) {
-        let settings = JSON.parse(settingsRaw);
-        if (settings.upiId && typeof settings.upiId === 'string' && settings.upiId.trim().length > 0) {
-          upiId = settings.upiId.trim();
-        }
-        if (settings.restaurantName && settings.restaurantName.trim().length > 0) {
-          restaurantName = settings.restaurantName.trim();
+      const legacy = safeGet('selectedFoods') || safeGet('selectedFoods_v1');
+      if (legacy) {
+        const arr = JSON.parse(legacy);
+        if (Array.isArray(arr)) {
+          const DEFAULT_PRICE = 99;
+          return arr.length * DEFAULT_PRICE;
         }
       }
-      // also check direct upiId keys (some dashboards store separate)
-      let directUpi = storageGet('upiId') || storageGet('paymentUpi');
-      if (directUpi && directUpi.trim().length > 0) {
-        upiId = directUpi.trim();
-      }
-    } catch(e) {
-      console.warn("settings parse error", e);
-    }
-    return { upiId, restaurantName };
+    } catch(e) {}
+    return null;
   }
 
-  // ---------- DYNAMIC QR GENERATION (upi://pay format) ----------
-  // This function generates QR with full UPI intent string
-  function generateDynamicQR(upiId, payeeName, amountValue) {
-    const qrContainer = document.getElementById('qrCodeTarget');
+  /* ---------- get restaurant settings & UPI ID from owner-dashboard simulation ---------- */
+  let currentUpiId = '9656971579@slc';      // fallback default as per sample format
+  let restaurantName = 'Tarun Kitchen';      // fallback name
+
+  function fetchUpiSettings() {
+    try {
+      // 1. check RESTAURANT_SETTINGS (owner dashboard saves here)
+      const settingsRaw = safeGet('RESTAURANT_SETTINGS') || safeGet('fp_settings');
+      if (settingsRaw) {
+        const settings = JSON.parse(settingsRaw);
+        if (settings.upiId && typeof settings.upiId === 'string' && settings.upiId.trim() !== '') {
+          currentUpiId = settings.upiId.trim();
+        }
+        if (settings.restaurantName) restaurantName = settings.restaurantName.trim();
+      }
+      // 2. also direct fallback keys (legacy compatibility)
+      const directUpi = safeGet('upiId') || safeGet('paymentUpi');
+      if (directUpi && directUpi.trim() !== '') currentUpiId = directUpi.trim();
+      
+      // ensure upi id contains @ or looks like valid upi
+      if (!currentUpiId.includes('@') && !currentUpiId.includes('okhdfcbank') && !currentUpiId.includes('oksbi')) {
+        // if somehow missing @ but still treat as literal, but keep valid. for demo we keep.
+      }
+    } catch(e) { console.warn("settings parse", e); }
+  }
+
+  /* -------- generate QR using correct upi://pay format with live amount & upi id -------- */
+  let currentAmountNumber = 0;
+  let qrGenerationTimeout = null;
+
+  function generateDynamicQR() {
+    const qrContainer = document.getElementById('qrPlaceholder');
     if (!qrContainer) return;
-
-    qrContainer.innerHTML = '';
-    let numericAmount = 0;
-    if (typeof amountValue === 'number') numericAmount = amountValue;
-    else if (typeof amountValue === 'string') {
-      let cleaned = amountValue.replace(/[₹,]/g, '').trim();
-      numericAmount = parseFloat(cleaned) || 0;
-    }
-    numericAmount = Math.round(numericAmount * 100) / 100;
-
-    const upiIntent = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${numericAmount.toFixed(2)}&cu=INR`;
-    console.log("Generating QR with UPI intent:", upiIntent);
-
+    const upiIdForQR = currentUpiId;
+    const nameForQR = restaurantName || 'Store';
+    const amountVal = currentAmountNumber > 0 ? currentAmountNumber : 0;
+    
+    // Format: upi://pay?pa=UPI_ID&pn=NAME&am=AMOUNT&cu=INR
+    const upiIntentUrl = `upi://pay?pa=${encodeURIComponent(upiIdForQR)}&pn=${encodeURIComponent(nameForQR)}&am=${amountVal.toFixed(2)}&cu=INR`;
+    
+    console.log("🔁 Generating QR with URL:", upiIntentUrl);
+    qrContainer.innerHTML = ''; // clear old content
+    
     if (typeof QRCode === 'undefined') {
-      console.warn("QRCode lib not ready, retry after 300ms");
-      setTimeout(() => generateDynamicQR(upiId, payeeName, amountValue), 300);
+      console.warn("QRCode lib not ready, retry soon");
+      qrContainer.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> loading QR...';
+      setTimeout(generateDynamicQR, 300);
       return;
     }
-
+    
     try {
       new QRCode(qrContainer, {
-        text: upiIntent,
-        width: 120,
-        height: 120,
+        text: upiIntentUrl,
+        width: 130,
+        height: 130,
         colorDark: "#000000",
         colorLight: "#ffffff",
         correctLevel: QRCode.CorrectLevel.M
       });
-    } catch (err) {
-      console.error("QR generation error:", err);
-      qrContainer.innerHTML = `<div style="background:#fff; color:#000; width:120px; height:120px; display:flex; align-items:center; justify-content:center; border-radius:12px; font-size:12px;">QR error</div>`;
+    } catch(e) {
+      console.error("QR Generation exception:", e);
+      qrContainer.innerHTML = '<i class="fa-regular fa-rectangle-xmark"></i> QR failed';
     }
   }
 
-  // Full refresh of UPI area (when amount changes, or when settings change)
-  function refreshUPIComponents() {
-    const { upiId, restaurantName } = getMerchantUPISettings();
-    // Update DOM fields
-    const upiIdSpan = document.getElementById('upiIdText');
-    const upiInputField = document.getElementById('upiCopyField');
-    if (upiIdSpan) upiIdSpan.innerText = upiId;
-    if (upiInputField) upiInputField.value = upiId;
-    
-    // get current displayed amount (numeric)
-    let amountDisplay = document.getElementById('totalAmountDisplay').innerText;
-    let numericAmt = parseFloat(amountDisplay.replace(/[₹,]/g, '')) || 0;
-    if (numericAmt === 0) numericAmt = extractNumericAmount();
-    
-    // Generate fresh QR with latest UPI id, name and amount
-    generateDynamicQR(upiId, restaurantName, numericAmt);
+  // update UPI fields in UI and regenerate QR
+  function updateUpiDisplayAndQR() {
+    const upiIdEl = document.getElementById('upiId');
+    const upiInputField = document.getElementById('upiInput');
+    if (upiIdEl) upiIdEl.innerText = currentUpiId;
+    if (upiInputField) upiInputField.value = currentUpiId;
+    generateDynamicQR();
+    // also update the payment intent button's data-url
+    updatePaymentIntentLink();
   }
 
-  // Watch for storage changes (when owner updates UPI from other tab)
-  function listenToSettingsChange() {
-    window.addEventListener('storage', (event) => {
-      if (event.key === 'RESTAURANT_SETTINGS' || event.key === 'fp_settings' || event.key === 'upiId') {
-        console.log("Settings changed externally, refreshing QR...");
-        refreshUPIComponents();
+  function updatePaymentIntentLink() {
+    const intentBtn = document.getElementById('payIntentBtn');
+    if (!intentBtn) return;
+    const amount = currentAmountNumber;
+    const upiLink = `upi://pay?pa=${encodeURIComponent(currentUpiId)}&pn=${encodeURIComponent(restaurantName)}&am=${amount.toFixed(2)}&cu=INR`;
+    // remove any existing data attribute and set new
+    intentBtn.setAttribute('data-upi-link', upiLink);
+  }
+
+  // handle payment intent click: opens UPI app chooser popup (intent)
+  function setupPaymentIntent() {
+    const intentBtn = document.getElementById('payIntentBtn');
+    if (!intentBtn) return;
+    intentBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const amountVal = currentAmountNumber;
+      if (amountVal <= 0) {
+        alert("⚠️ Please check the amount. It seems ₹0. Please ensure cart has items.");
+        return;
       }
-    });
-  }
-
-  // ---------- MAIN UI STATE MANAGEMENT ----------
-  let currentMethod = 'cash';   // 'cash' or 'online'
-  const upiSection = document.getElementById('upiSection');
-  const cashActionArea = document.getElementById('cashActionArea');
-  const stepCashCard = document.getElementById('stepCashCard');
-  const stepOnlineCard = document.getElementById('stepOnlineCard');
-  const payWithCashBtn = document.getElementById('payWithCashBtn');
-  const switchToOnlineBtn = document.getElementById('switchToOnlineBtn');
-  const iHavePaidBtn = document.getElementById('iHavePaidBtn');
-  const backToCashBtn = document.getElementById('backToCashBtn');
-  const totalAmountSpan = document.getElementById('totalAmountDisplay');
-  const copyBtn = document.getElementById('copyUpiBtn');
-  const payWithUpiBtn = document.getElementById('payWithUpiBtn');
-
-  // Set total amount from cart
-  function setTotalAmount() {
-    let amount = extractNumericAmount();
-    if (amount === 0) amount = 149.00;   // demo fallback
-    totalAmountSpan.innerText = `₹${amount.toFixed(2)}`;
-    storageSet('amountPaidNumeric', amount);
-    storageSet('amountPaid', `₹${amount.toFixed(2)}`);
-    return amount;
-  }
-
-  // Update UI based on method
-  function setActiveMethodUI(method) {
-    currentMethod = method;
-    if (method === 'cash') {
-      stepCashCard.classList.add('active');
-      stepOnlineCard.classList.remove('active');
-      upiSection.style.display = 'none';
-      cashActionArea.style.display = 'flex';
-    } else {
-      stepOnlineCard.classList.add('active');
-      stepCashCard.classList.remove('active');
-      upiSection.style.display = 'block';
-      cashActionArea.style.display = 'none';
-      // refresh QR every time we open online (ensures up-to-date UPI & amount)
-      refreshUPIComponents();
-    }
-  }
-
-  // cash payment flow
-  function handleCashPayment() {
-    const amountText = totalAmountSpan.innerText;
-    const numeric = parseFloat(amountText.replace(/[₹,]/g, '')) || 0;
-    storageSet('paymentMethod', 'cash');
-    storageSet('amountPaid', amountText);
-    storageSet('amountPaidNumeric', numeric);
-    storageSet('justPaid', '1');
-    // Redirect to thank-you page (simulate)
-    window.location.href = 'thank-you.html';
-  }
-
-  // online "I have paid" flow
-  function handleOnlinePaid() {
-    const amountText = totalAmountSpan.innerText;
-    const numeric = parseFloat(amountText.replace(/[₹,]/g, '')) || 0;
-    const { upiId } = getMerchantUPISettings();
-    storageSet('paymentMethod', 'online');
-    storageSet('paymentProvider', 'UPI');
-    storageSet('amountPaid', amountText);
-    storageSet('amountPaidNumeric', numeric);
-    storageSet('justPaid', '1');
-    storageSet('lastPaidAt', new Date().toISOString());
-    storageSet('usedUpiId', upiId);
-    // redirect
-    window.location.href = 'thank-you.html';
-  }
-
-  // Copy UPI ID to clipboard
-  function copyUPI() {
-    const upiValue = document.getElementById('upiCopyField').value;
-    if (!upiValue) return;
-    navigator.clipboard.writeText(upiValue).then(() => {
-      copyBtn.innerHTML = '<i class="fa-regular fa-check"></i> Copied!';
+      const upiLink = `upi://pay?pa=${encodeURIComponent(currentUpiId)}&pn=${encodeURIComponent(restaurantName)}&am=${amountVal.toFixed(2)}&cu=INR`;
+      console.log("Intent UPI Link:", upiLink);
+      // open the UPI link (mobile: opens app chooser, desktop may show error but user friendly)
+      window.location.href = upiLink;
+      // fallback for web: show instruction
       setTimeout(() => {
-        copyBtn.innerHTML = '<i class="fa-regular fa-copy"></i> Copy';
-      }, 1500);
-    }).catch(() => {
-      alert('Press long tap to copy UPI ID manually');
+        // optional hint if no app detected
+      }, 200);
     });
   }
 
-  // Open UPI payment intent (opens UPI app chooser)
-  function openUPIPaymentIntent() {
-    const { upiId, restaurantName } = getMerchantUPISettings();
-    let amountDisplay = document.getElementById('totalAmountDisplay').innerText;
-    let numericAmt = parseFloat(amountDisplay.replace(/[₹,]/g, '')) || 0;
-    if (numericAmt === 0) numericAmt = extractNumericAmount();
-    numericAmt = Math.round(numericAmt * 100) / 100;
-
-    const upiIntent = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(restaurantName)}&am=${numericAmt.toFixed(2)}&cu=INR`;
-    console.log("Opening UPI intent:", upiIntent);
-    window.location.href = upiIntent;
+  /* ---------- amount initialization (cart/localStorage) ---------- */
+  function initAmount() {
+    let raw = safeGet('amountPaid') || safeGet('amountValue') || safeGet('cartAmount');
+    let numeric = parseAmountRaw(raw);
+    if (numeric === null) numeric = computeAmountFromCart();
+    if (numeric === null || isNaN(numeric)) numeric = 0;
+    numeric = Math.round(numeric * 100) / 100;
+    currentAmountNumber = numeric;
+    const amountValueEl = document.getElementById('amountValue');
+    if (amountValueEl) amountValueEl.textContent = '₹' + numeric.toFixed(2);
+    if (!safeGet('amountPaidNumeric')) safeSet('amountPaidNumeric', numeric);
+    return numeric;
   }
 
-  // also force regeneration when amount might change via any event (if cart updates)
-  function bindRefreshOnAmountChange() {
-    // if any external script modifies amountPaid, we can listen storage event for amount keys
-    window.addEventListener('storage', (e) => {
-      if (e.key === 'amountPaid' || e.key === 'cartAmount' || e.key === 'cartItems') {
-        setTotalAmount();
-        if (currentMethod === 'online') {
-          refreshUPIComponents();
-        }
+  /* update amount and regenerate QR when needed (if amount changes dynamically) */
+  function refreshAmountAndQR() {
+    let numeric = currentAmountNumber;
+    const amountEl = document.getElementById('amountValue');
+    if (amountEl) {
+      let newRaw = amountEl.innerText.replace('₹', '');
+      let fresh = parseFloat(newRaw);
+      if (!isNaN(fresh) && fresh !== numeric) {
+        numeric = fresh;
+        currentAmountNumber = numeric;
+        safeSet('amountPaidNumeric', numeric);
       }
-    });
-  }
-
-  // ---------- initial load: sync amount, listen, reflect settings, QR ----------
-  function init() {
-    setTotalAmount();
-    // initial set active step: cash by default
-    setActiveMethodUI('cash');
-    // fetch upi settings and preload for later usage (just in case)
-    const { upiId, restaurantName } = getMerchantUPISettings();
-    document.getElementById('upiIdText').innerText = upiId;
-    document.getElementById('upiCopyField').value = upiId;
-    // Pre-generate QR hidden but for first online open it's fine
-    // but we generate a dummy QR for initial background
-    let amountVal = extractNumericAmount();
-    generateDynamicQR(upiId, restaurantName, amountVal);
-    
-    // Event listeners
-    stepCashCard.addEventListener('click', () => setActiveMethodUI('cash'));
-    stepOnlineCard.addEventListener('click', () => setActiveMethodUI('online'));
-    payWithCashBtn.addEventListener('click', handleCashPayment);
-    switchToOnlineBtn.addEventListener('click', () => setActiveMethodUI('online'));
-    payWithUpiBtn.addEventListener('click', openUPIPaymentIntent);
-    iHavePaidBtn.addEventListener('click', handleOnlinePaid);
-    backToCashBtn.addEventListener('click', () => setActiveMethodUI('cash'));
-    copyBtn.addEventListener('click', copyUPI);
-    
-    // When any settings updated from owner-dashboard (real time), refresh QR in online mode
-    listenToSettingsChange();
-    bindRefreshOnAmountChange();
-    
-    // If page is revisited with paymentMethod already stored, sync UI but don't override safety
-    const savedMethod = storageGet('paymentMethod');
-    if (savedMethod === 'online') {
-      setActiveMethodUI('online');
-    } else if (savedMethod === 'cash') {
-      setActiveMethodUI('cash');
     }
-    
-    // Extra: manual refresh for UPI ID if "owner-dashboard" updates & we are currently in online view
-    // periodically check? not needed, storage event handles cross-tab.
-    // Also ensure that if user edits UPI from same page (theoretically same tab dashboard will call storage)
-    setInterval(() => {
-      // optional: re-check settings each 3 sec only if online mode active to ensure QR updated
-      if (currentMethod === 'online') {
-        const oldUpi = document.getElementById('upiIdText').innerText;
-        const { upiId } = getMerchantUPISettings();
-        if (oldUpi !== upiId) {
-          refreshUPIComponents();
-        } else {
-          // also ensure amount consistency if amount changed silently
-          let currentDisplayAmount = totalAmountSpan.innerText;
-          let numericDisplay = parseFloat(currentDisplayAmount.replace(/[₹,]/g,'')) || 0;
-          let storedAmount = parseFloat(storageGet('amountPaidNumeric')) || 0;
-          if (numericDisplay !== storedAmount && storedAmount > 0) {
-            totalAmountSpan.innerText = `₹${storedAmount.toFixed(2)}`;
-            refreshUPIComponents();
-          }
-        }
-      }
-    }, 2000);
+    generateDynamicQR();
+    updatePaymentIntentLink();
   }
-  
-  // start everything
-  init();
+
+  /* -------- UI state machine (cash / online) -------- */
+  const stepCash = document.getElementById('stepCash');
+  const stepOnline = document.getElementById('stepOnline');
+  const onlineUI = document.getElementById('onlineUI');
+  const payCashBtn = document.getElementById('payCashBtn');
+  const chooseOnlineBtn = document.getElementById('chooseOnlineBtn');
+  const chooseCashBackBtn = document.getElementById('chooseCashBackBtn');
+  const iPaidBtn = document.getElementById('iPaidBtn');
+  const copyUpiBtn = document.getElementById('copyUpiBtn');
+  const upiInputField = document.getElementById('upiInput');
+
+  function setActiveStepUI(stepName) {
+    stepCash.classList.remove('active');
+    stepOnline.classList.remove('active');
+    if (stepName === 'cash') stepCash.classList.add('active');
+    if (stepName === 'online') stepOnline.classList.add('active');
+  }
+
+  function showOnlineUI() {
+    setActiveStepUI('online');
+    onlineUI.style.display = 'block';
+    onlineUI.setAttribute('aria-hidden', 'false');
+    payCashBtn.style.display = 'none';
+    chooseOnlineBtn.style.display = 'inline-block';
+    // ensure latest upi details are shown, regen qr
+    fetchUpiSettings();      // re-fetch from localStorage in case owner changed upi
+    updateUpiDisplayAndQR();
+    refreshAmountAndQR();
+    onlineUI.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function hideOnlineUI() {
+    setActiveStepUI('cash');
+    onlineUI.style.display = 'none';
+    onlineUI.setAttribute('aria-hidden', 'true');
+    payCashBtn.style.display = 'inline-block';
+    chooseOnlineBtn.style.display = 'inline-block';
+  }
+
+  // Event listeners
+  stepOnline.addEventListener('click', showOnlineUI);
+  chooseOnlineBtn.addEventListener('click', showOnlineUI);
+  stepCash.addEventListener('click', () => {
+    hideOnlineUI();
+  });
+  chooseCashBackBtn.addEventListener('click', hideOnlineUI);
+
+  // Cash payment
+  payCashBtn.addEventListener('click', () => {
+    const amtText = document.getElementById('amountValue')?.innerText || '₹0.00';
+    safeSet('paymentMethod', 'cash');
+    safeSet('amountPaid', amtText);
+    safeSet('amountPaidNumeric', currentAmountNumber);
+    safeSet('justPaid', '1');
+    window.location.href = 'thank-you.html';
+  });
+
+  // "I have paid" online flow
+  iPaidBtn.addEventListener('click', () => {
+    const amtText = document.getElementById('amountValue')?.innerText || '₹0.00';
+    safeSet('paymentMethod', 'online');
+    safeSet('paymentProvider', 'UPI');
+    safeSet('amountPaid', amtText);
+    safeSet('amountPaidNumeric', currentAmountNumber);
+    safeSet('justPaid', '1');
+    safeSet('lastPaidAt', new Date().toISOString());
+    window.location.href = 'thank-you.html';
+  });
+
+  // copy UPI ID
+  copyUpiBtn.addEventListener('click', async () => {
+    const textToCopy = currentUpiId;
+    try {
+      await navigator.clipboard.writeText(textToCopy);
+      copyUpiBtn.innerHTML = '<i class="fa-regular fa-check-circle"></i> Copied!';
+      setTimeout(() => copyUpiBtn.innerHTML = '<i class="fa-regular fa-copy"></i> Copy', 1500);
+    } catch (err) {
+      if (upiInputField) {
+        upiInputField.select();
+        document.execCommand('copy');
+        copyUpiBtn.innerHTML = '<i class="fa-regular fa-check-circle"></i> Copied!';
+        setTimeout(() => copyUpiBtn.innerHTML = '<i class="fa-regular fa-copy"></i> Copy', 1500);
+      }
+    }
+  });
+
+  // Add event listener for settings changes (owner dashboard might update, we listen to storage event)
+  window.addEventListener('storage', (event) => {
+    if (event.key === 'RESTAURANT_SETTINGS' || event.key === 'fp_settings' || event.key === 'upiId') {
+      fetchUpiSettings();
+      updateUpiDisplayAndQR();
+      refreshAmountAndQR();
+    }
+  });
+
+  // also watch for amount changes if any other tab updates amountPaidNumeric
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'amountPaidNumeric' || e.key === 'cartAmount' || e.key === 'cartItems') {
+      let newAmt = parseAmountRaw(e.newValue);
+      if (newAmt !== null && !isNaN(newAmt) && newAmt !== currentAmountNumber) {
+        currentAmountNumber = newAmt;
+        document.getElementById('amountValue').innerText = '₹' + currentAmountNumber.toFixed(2);
+        refreshAmountAndQR();
+      }
+    }
+  });
+
+  /* periodic check for upi change from dashboard (on same page) not necessary but we add polling? no, storage event enough */
+  // initial setup
+  (function mainInit() {
+    fetchUpiSettings();
+    initAmount();
+    updateUpiDisplayAndQR();
+    setupPaymentIntent();
+    // ensure online UI hidden by default but sync if previously selected method in storage
+    const prevMethod = safeGet('paymentMethod');
+    if (prevMethod === 'online') {
+      showOnlineUI();
+    } else {
+      hideOnlineUI();
+    }
+    // add listener to recalc if any global variable updates amount
+    const amountObserver = setInterval(() => {
+      let newAmount = computeAmountFromCart();
+      if (newAmount !== null && newAmount !== currentAmountNumber && newAmount > 0) {
+        currentAmountNumber = newAmount;
+        document.getElementById('amountValue').innerText = '₹' + currentAmountNumber.toFixed(2);
+        safeSet('amountPaidNumeric', newAmount);
+        generateDynamicQR();
+        updatePaymentIntentLink();
+      }
+    }, 1000);
+    // optional cleanup not needed
+  })();
+
+  // expose function for dynamic updates if dashboard calls
+  window.refreshPaymentQR = function() {
+    fetchUpiSettings();
+    updateUpiDisplayAndQR();
+    refreshAmountAndQR();
+  };
 </script>
 </body>
 </html>
-```
