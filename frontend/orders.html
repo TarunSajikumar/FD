@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
   <title>Food Point • Your Orders</title>
+  <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     * {
@@ -19,27 +20,6 @@
       -webkit-text-size-adjust: 100%;
     }
 
-    body {
-      background: #0a0e1a url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><defs><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" result="noise"/></filter></defs><rect width="100" height="100" fill="%23000" filter="url(%23noise)" opacity="0.03"/></svg>');
-      background-attachment: fixed;
-      min-height: 100vh;
-      min-height: 100dvh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px 10px;
-      color: #e8e9ed;
-      overflow-x: hidden;
-      position: relative;
-    }
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: radial-gradient(circle at 20% 50%, rgba(255,140,0,0.15), transparent 50%), radial-gradient(circle at 80% 80%, rgba(0,200,150,0.1), transparent 50%);
-      pointer-events: none;
-      z-index: 0;
-    }
     body > * { position: relative; z-index: 1; }
 
     .page-wrap {

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,6 +7,7 @@
 
   <!-- fontawesome (for icons) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
   <!-- QR Code Library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <!-- external scripts for compatibility -->
@@ -17,7 +17,7 @@
   <script src="dev-check.js"></script>
 
   <style>
-    /* ----- RESET & BASE (Dark Glassmorphism + Food BG) ----- */
+    /* ----- RESET & BASE (Login-style Dark Glassmorphism + Food BG) ----- */
     * {
       margin: 0;
       padding: 0;
@@ -30,40 +30,28 @@
       min-height: 100%;
     }
 
-    body {
-      background: #020617;
-      color: #e5e7eb;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-      position: relative;
-      overflow-x: hidden;
-    }
-
+    /* Foody blurred background (exactly like login image) */
     body::before {
       content: "";
       position: fixed;
       inset: 0;
-      background: linear-gradient(to bottom, rgba(0,0,0,0.55), rgba(0,0,0,0.8)),
-                  radial-gradient(circle at 12% 18%, rgba(251,146,60,0.14), transparent 18%),
-                  radial-gradient(circle at 82% 12%, rgba(56,189,248,0.12), transparent 20%),
-                  radial-gradient(circle at 50% 82%, rgba(34,197,94,0.10), transparent 22%),
-                  url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat fixed;
+      background:
+        linear-gradient(to bottom, rgba(0,0,0,0.55), rgba(0,0,0,0.8)),
+        url("https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?q=80&w=1600&auto=format&fit=crop");
+      background-size: cover;
+      background-position: center;
       filter: blur(4px);
-      opacity: 0.95;
+      transform: scale(1.05);
       z-index: -2;
-      pointer-events: none;
     }
 
+    /* vignette overlay matching login screenshot */
     body::after {
       content: "";
       position: fixed;
       inset: 0;
-      background: radial-gradient(circle at 10% 20%, rgba(255,243,205,0.08), transparent 22%),
-                  radial-gradient(circle at 90% 12%, rgba(251,146,60,0.08), transparent 22%);
+      background: radial-gradient(circle at top, transparent 0, rgba(0,0,0,0.7) 55%, rgba(0,0,0,0.9) 100%);
       z-index: -1;
-      pointer-events: none;
     }
 
     .container {
@@ -71,10 +59,11 @@
       max-width: 780px;
       padding: 32px 30px;
       border-radius: 28px;
-      background: rgba(15, 23, 42, 0.94);
-      border: 1px solid rgba(148, 163, 184, 0.22);
-      box-shadow: 0 30px 70px rgba(0, 0, 0, 0.85);
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.9);
       backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
       overflow: hidden;
       position: relative;
     }
@@ -82,11 +71,12 @@
     .container::before {
       content: "";
       position: absolute;
-      inset: -20% 0 0 -20%;
-      width: 140%;
-      height: 140%;
-      background: radial-gradient(circle at top left, rgba(248,113,113,0.12), transparent 60%),
-                  radial-gradient(circle at bottom right, rgba(52,211,153,0.12), transparent 60%);
+      inset: 0;
+      border-radius: inherit;
+      background:
+        radial-gradient(circle at top left, rgba(248, 113, 113, 0.15), transparent 55%),
+        radial-gradient(circle at bottom right, rgba(52, 211, 153, 0.18), transparent 55%);
+      opacity: 0.9;
       pointer-events: none;
       z-index: 0;
     }
@@ -98,24 +88,25 @@
     }
     header h1 {
       font-size: 2rem;
-      font-weight: 700;
+      font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.18em;
-      background: linear-gradient(135deg, #fb923c, #facc15);
+      letter-spacing: 4px;
+      background: linear-gradient(135deg, #facc15, #fb923c);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      line-height: 1.1;
-      margin-bottom: 12px;
+      line-height: 1.2;
+      margin-bottom: 8px;
+      text-shadow: 0 0 12px rgba(251,146,60,0.3);
     }
     header p {
       color: #cbd5e1;
-      font-size: 0.96rem;
-      line-height: 1.7;
+      font-size: 0.9rem;
+      line-height: 1.5;
       border-left: 3px solid #fb923c;
       padding-left: 14px;
       margin: 0;
-      opacity: 0.92;
+      opacity: 0.9;
     }
 
     .steps {
@@ -127,7 +118,7 @@
       flex: 1;
       padding: 18px 14px;
       background: rgba(2, 6, 23, 0.7);
-      border: 1px solid rgba(148, 163, 184, 0.18);
+      border: 1px solid rgba(148, 163, 184, 0.25);
       border-radius: 26px;
       text-align: center;
       cursor: pointer;
@@ -135,13 +126,14 @@
       backdrop-filter: blur(12px);
     }
     .step:hover {
-      transform: translateY(-1px);
-      border-color: rgba(79,70,229,0.35);
+      transform: translateY(-2px);
+      border-color: #fb923c;
+      background: rgba(251,146,60,0.08);
     }
     .step.active {
-      background: linear-gradient(180deg, rgba(251,146,60,0.14), rgba(255,255,255,0.04));
-      border-color: rgba(251,146,60,0.7);
-      box-shadow: 0 14px 36px rgba(251,146,60,0.12);
+      background: linear-gradient(180deg, rgba(251,146,60,0.18), rgba(255,255,255,0.03));
+      border-color: #fb923c;
+      box-shadow: 0 14px 36px rgba(251,146,60,0.2);
       transform: translateY(-2px);
     }
     .step h3 {
@@ -153,15 +145,15 @@
     .step p {
       margin: 0;
       color: #94a3b8;
-      font-size: 0.88rem;
-      line-height: 1.5;
+      font-size: 0.85rem;
+      line-height: 1.4;
     }
 
     .payment-card {
-      background: rgba(15, 23, 42, 0.88);
+      background: rgba(15, 23, 42, 0.85);
       padding: 26px;
       border-radius: 28px;
-      border: 1px solid rgba(148, 163, 184, 0.18);
+      border: 1px solid rgba(148, 163, 184, 0.2);
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
       backdrop-filter: blur(16px);
     }
@@ -173,11 +165,11 @@
       gap: 16px;
       margin-bottom: 24px;
       padding-bottom: 14px;
-      border-bottom: 1px dashed rgba(251,146,60,0.28);
+      border-bottom: 1px dashed rgba(251,146,60,0.35);
     }
     .amount-row .label {
       color: #cbd5e1;
-      font-size: 0.92rem;
+      font-size: 0.85rem;
       font-weight: 600;
       letter-spacing: 0.2em;
       text-transform: uppercase;
@@ -189,7 +181,7 @@
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      text-shadow: 0 0 16px rgba(251,146,60,0.3);
+      text-shadow: 0 0 16px rgba(251,146,60,0.4);
       white-space: nowrap;
     }
 
@@ -203,6 +195,35 @@
     .btn {
       min-width: 150px;
       justify-content: center;
+      border-radius: 999px;
+      border: none;
+      padding: 12px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      background: linear-gradient(135deg, #fb923c, #facc15);
+      color: #111827;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      box-shadow: 0 14px 30px rgba(248, 181, 75, 0.5);
+    }
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 18px 38px rgba(248, 181, 75, 0.7);
+    }
+    .btn-ghost {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(251,146,60,0.6);
+      color: #facc15;
+      box-shadow: none;
+    }
+    .btn-ghost:hover {
+      background: rgba(251,146,60,0.2);
+      border-color: #fb923c;
+      color: #facc15;
+      transform: translateY(-1px);
     }
 
     .online-ui {
@@ -211,34 +232,39 @@
       animation: fadeSlideUp 0.35s ease;
     }
 
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     .upi-box {
       display: grid;
       grid-template-columns: minmax(220px, 260px) minmax(240px, 1fr);
       gap: 22px;
       align-items: center;
-      background: rgba(2, 6, 23, 0.72);
+      background: rgba(2, 6, 23, 0.75);
       border-radius: 24px;
       padding: 28px 26px;
-      border: 1px solid rgba(251, 146, 60, 0.25);
+      border: 1px solid rgba(251, 146, 60, 0.3);
       backdrop-filter: blur(6px);
     }
     .upi-qr {
       width: 230px;
       height: 230px;
       background: #ffffff;
-      border-radius: 6px;
+      border-radius: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 22px 48px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 22px 48px rgba(0, 0, 0, 0.3);
       overflow: hidden;
-      border: 2px solid rgba(255,255,255,0.92);
+      border: 2px solid rgba(255,255,255,0.95);
     }
     .upi-qr canvas,
     .upi-qr img {
       width: 100% !important;
       height: 100% !important;
-      border-radius: 4px;
+      border-radius: 12px;
     }
     .upi-details {
       display: flex;
@@ -248,18 +274,24 @@
       gap: 14px;
     }
     .upi-details .small {
-      font-size: 0.8rem;
+      font-size: 0.7rem;
       color: #c7cfda;
       letter-spacing: 0.16em;
       text-transform: uppercase;
+      font-weight: 500;
     }
     #upiId {
       margin: 0;
       font-weight: 700;
-      font-size: 1.05rem;
+      font-size: 1.1rem;
       color: #facc15;
       word-break: break-word;
       letter-spacing: 0.01em;
+      background: rgba(0,0,0,0.4);
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 40px;
+      width: fit-content;
     }
 
     .copy-row {
@@ -271,24 +303,25 @@
     .copy-row input {
       flex: 1 1 180px;
       min-width: 160px;
-      background: rgba(2, 6, 23, 0.9);
-      border: 1px solid rgba(255,255,255,0.22);
+      background: #020617;
+      border: 1px solid rgba(255,255,255,0.2);
       border-radius: 999px;
       padding: 12px 18px;
       color: #e5e7eb;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       text-align: center;
       transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
     .copy-row input:focus {
-      border-color: #4f46e5;
-      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.25);
+      border-color: #fb923c;
+      box-shadow: 0 0 0 3px rgba(251,146,60,0.25);
+      outline: none;
     }
 
     .pay-intent-btn {
       margin-top: 20px;
       width: 100%;
-      background: linear-gradient(135deg, rgba(251,146,60,0.16), rgba(15,23,42,0.95));
+      background: linear-gradient(135deg, rgba(251,146,60,0.18), rgba(15,23,42,0.95));
       border: 1px solid #fb923c;
       color: #facc15;
       font-size: 1rem;
@@ -299,17 +332,24 @@
       align-items: center;
       justify-content: center;
       gap: 12px;
+      transition: all 0.2s ease;
+    }
+    .pay-intent-btn:hover {
+      transform: translateY(-2px);
+      background: linear-gradient(135deg, rgba(251,146,60,0.28), rgba(15,23,42,1));
+      border-color: #facc15;
+      box-shadow: 0 20px 40px rgba(251,146,60,0.35);
     }
 
     .hint {
       margin-top: 20px;
-      background: rgba(2, 6, 23, 0.55);
+      background: rgba(2, 6, 23, 0.65);
       border-left: 4px solid #fb923c;
       padding: 16px 18px;
       border-radius: 22px;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       color: #cbd5e6;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
     }
 
     footer {
@@ -319,7 +359,7 @@
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       color: #94a3b8;
     }
 
@@ -338,12 +378,12 @@
     @media (max-width: 520px) {
       body { padding: 16px; }
       .container { padding: 22px 18px; }
-      header h1 { font-size: 1.75rem; }
+      header h1 { font-size: 1.75rem; letter-spacing: 2px; }
       .step { padding: 16px 12px; }
       .upi-qr { width: 160px; height: 160px; }
       .copy-row input { font-size: 0.9rem; }
       .pay-intent-btn { padding: 14px 16px; font-size: 0.95rem; }
-      footer { font-size: 0.8rem; }
+      footer { font-size: 0.75rem; }
     }
   </style>
 </head>
@@ -380,7 +420,7 @@
     <div class="online-ui" id="onlineUI" aria-hidden="true">
       <div class="upi-box">
         <div class="upi-qr" id="qrPlaceholder">
-          <i class="fa-solid fa-qrcode" style="font-size: 38px; color: #fb923c;"></i>
+          <i class="fa-solid fa-qrcode" style="font-size: 42px; color: #fb923c;"></i>
         </div>
         <div class="upi-details">
           <div class="small"><i class="fa-regular fa-circle-user"></i> PAYEE UPI ID</div>
@@ -567,7 +607,6 @@
   const stepOnline = document.getElementById('stepOnline');
   const onlineUI = document.getElementById('onlineUI');
   const payCashBtn = document.getElementById('payCashBtn');
-  const chooseOnlineBtn = document.getElementById('chooseOnlineBtn');
   const chooseCashBackBtn = document.getElementById('chooseCashBackBtn');
   const iPaidBtn = document.getElementById('iPaidBtn');
   const copyUpiBtn = document.getElementById('copyUpiBtn');
@@ -585,7 +624,6 @@
     onlineUI.style.display = 'block';
     onlineUI.setAttribute('aria-hidden', 'false');
     payCashBtn.style.display = 'none';
-    if (chooseOnlineBtn) chooseOnlineBtn.style.display = 'inline-flex';
     fetchUpiSettings();
     updateUpiDisplay();
     refreshAmountAndQR();
@@ -597,11 +635,9 @@
     onlineUI.style.display = 'none';
     onlineUI.setAttribute('aria-hidden', 'true');
     payCashBtn.style.display = 'inline-flex';
-    if (chooseOnlineBtn) chooseOnlineBtn.style.display = 'inline-flex';
   }
 
   stepOnline.addEventListener('click', showOnlineUI);
-  if (chooseOnlineBtn) chooseOnlineBtn.addEventListener('click', showOnlineUI);
   stepCash.addEventListener('click', hideOnlineUI);
   chooseCashBackBtn.addEventListener('click', hideOnlineUI);
 
@@ -692,4 +728,3 @@
 </script>
 </body>
 </html>
-```

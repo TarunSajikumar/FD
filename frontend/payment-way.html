@@ -2,15 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Payment Options</title>
-  <link rel="stylesheet" href="css/style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+  <title>FOOD POINT · Choose Payment</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', 'Poppins', sans-serif;
       -webkit-tap-highlight-color: transparent;
     }
 
@@ -19,341 +20,515 @@
       -webkit-text-size-adjust: 100%;
     }
 
-    body {
-      background: #0a0e1a url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><defs><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" result="noise"/></filter></defs><rect width="100" height="100" fill="%23000" filter="url(%23noise)" opacity="0.03"/></svg>');
-      background-attachment: fixed;
-      min-height: 100vh;
-      min-height: 100dvh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      color: #e8e9ed;
-      overflow-x: hidden;
-      position: relative;
-    }
-
+    /* premium dark layered background with warm orange-gold glow (FOOD POINT signature) */
     body::before {
-      content: '';
+      content: "";
       position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: radial-gradient(circle at 20% 50%, rgba(255,140,0,0.15), transparent 50%), radial-gradient(circle at 80% 80%, rgba(0,200,150,0.1), transparent 50%);
+      inset: 0;
+      background: radial-gradient(circle at 18% 30%, rgba(255, 100, 30, 0.12), transparent 45%),
+                  radial-gradient(circle at 85% 70%, rgba(255, 180, 50, 0.08), transparent 55%),
+                  linear-gradient(145deg, #030308 0%, #0E0E18 100%);
+      z-index: -2;
       pointer-events: none;
-      z-index: 0;
     }
 
-    body > * { position: relative; z-index: 1; }
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgdmlld0JveD0iMCAwIDQwIDQwIj48Y2lyY2xlIGN4PSIyMCIgY3k9IjIwIiByPSIxLjgiIGZpbGw9InJnYmEoMjU1LDE0MCw2MCwwLjA0KSIvPjwvc3ZnPg==');
+      background-repeat: repeat;
+      opacity: 0.5;
+      z-index: -1;
+      pointer-events: none;
+    }
 
+    /* premium glassmorphic card */
     .pay-container {
-      background: linear-gradient(135deg, rgba(30,35,50,0.78), rgba(25,30,45,0.73));
-      border-radius: 28px;
-      padding: 36px 30px 30px;
-      max-width: 480px;
+      background: linear-gradient(135deg, rgba(18, 20, 30, 0.92), rgba(12, 14, 22, 0.96));
+      border-radius: 44px;
+      padding: 40px 34px 38px;
+      max-width: 500px;
       width: 100%;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.08);
-      backdrop-filter: blur(12px) saturate(140%);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 110, 40, 0.35);
+      box-shadow: 0 30px 55px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 120, 30, 0.12) inset;
       text-align: center;
+      transition: all 0.25s ease;
+    }
+
+    @media (max-width: 550px) {
+      body { padding: 16px; }
+      .pay-container { padding: 32px 22px 30px; border-radius: 32px; }
     }
 
     h3 {
-      font-size: 24px;
+      font-size: 1.9rem;
       font-weight: 800;
-      color: #f5e6d3;
-      margin-bottom: 8px;
+      background: linear-gradient(135deg, #FFD199, #FFB85C);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      letter-spacing: -0.3px;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
-      text-shadow: 0 0 15px rgba(255,140,0,0.3);
+      margin-bottom: 8px;
     }
 
     .pay-sub {
-      color: #aeb5c4;
-      font-size: 14px;
-      margin-bottom: 20px;
-      letter-spacing: 0.02em;
+      color: #BCB5D4;
+      font-size: 0.9rem;
+      margin-bottom: 28px;
+      border-bottom: 1px dashed rgba(255, 130, 50, 0.3);
+      display: inline-block;
+      padding-bottom: 8px;
     }
 
+    /* amount box — bold & elegant */
     .amount-box {
-      background: linear-gradient(135deg, rgba(40,50,70,0.4), rgba(35,45,65,0.35));
-      border-radius: 16px;
-      padding: 18px 20px;
-      text-align: center;
-      margin-bottom: 24px;
-      border: 1px solid rgba(255,255,255,0.08);
-      backdrop-filter: blur(8px);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+      background: rgba(0, 0, 0, 0.55);
+      border-radius: 28px;
+      padding: 24px 20px;
+      margin-bottom: 32px;
+      border: 1px solid rgba(255, 140, 50, 0.35);
+      backdrop-filter: blur(6px);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 12px 24px -12px rgba(0,0,0,0.4);
     }
 
     .amount-label {
-      font-size: 13px;
-      color: #aeb5c4;
-      margin-bottom: 4px;
-      letter-spacing: 0.04em;
+      font-size: 0.8rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #FFC286;
+      margin-bottom: 10px;
+      font-weight: 600;
     }
 
     .amount-value {
-      font-size: 28px;
-      font-weight: 900;
-      color: #00d9a3;
-      text-shadow: 0 0 12px rgba(0,220,170,0.35);
+      font-size: 3.2rem;
+      font-weight: 800;
+      background: linear-gradient(125deg, #FFB347, #FF7E2E);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      letter-spacing: -0.5px;
+      text-shadow: 0 2px 12px rgba(255, 100, 0, 0.3);
     }
 
-    .pay-toggle-row {
+    /* payment method buttons grid */
+    .pay-methods {
       display: flex;
       flex-direction: column;
-      gap: 14px;
-      margin-bottom: 20px;
+      gap: 18px;
+      margin: 20px 0 18px;
     }
 
-    .pay-tab {
-      padding: 14px 20px;
-      border-radius: 12px;
-      border: none;
-      font-size: 14px;
-      font-weight: 700;
+    .pay-option {
+      background: rgba(10, 12, 20, 0.7);
+      border: 1px solid rgba(255, 140, 50, 0.45);
+      border-radius: 60px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       cursor: pointer;
-      transition: all 200ms ease;
-      min-height: 44px;
-      touch-action: manipulation;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      display: inline-flex;
+      transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      backdrop-filter: blur(4px);
+    }
+
+    .pay-option:hover {
+      background: rgba(30, 32, 48, 0.9);
+      border-color: #FF9F4A;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 22px -8px rgba(255, 100, 30, 0.3);
+    }
+
+    .pay-option-left {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .pay-option-left i {
+      font-size: 1.8rem;
+      color: #FFAA55;
+      width: 38px;
+      text-align: center;
+    }
+
+    .pay-option-text {
+      text-align: left;
+    }
+
+    .pay-option-title {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #FFE0B5;
+    }
+
+    .pay-option-desc {
+      font-size: 0.7rem;
+      color: #9F99BB;
+      margin-top: 2px;
+    }
+
+    .pay-option-arrow {
+      color: #FFA85C;
+      font-size: 1.2rem;
+      opacity: 0.8;
+      transition: 0.2s;
+    }
+
+    .pay-option:hover .pay-option-arrow {
+      transform: translateX(5px);
+      opacity: 1;
+    }
+
+    /* note & footer */
+    .note {
+      font-size: 0.75rem;
+      color: #8E89AD;
+      margin-top: 28px;
+      display: flex;
       align-items: center;
       justify-content: center;
-    }
-
-    .pay-tab.primary {
-      background: linear-gradient(135deg, #ffaa00, #ff8c00);
-      color: #0a0e1a;
-      box-shadow: 0 0 20px rgba(255,140,0,0.4);
-    }
-
-    .pay-tab.primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 0 28px rgba(255,140,0,0.6), 0 10px 22px rgba(0,0,0,0.3);
-    }
-
-    .pay-tab.primary:active {
-      transform: scale(0.98);
-    }
-
-    .pay-tab.secondary {
-      background: linear-gradient(135deg, rgba(40,50,70,0.3), rgba(35,45,65,0.25));
-      color: #00d9a3;
-      border: 1.5px solid rgba(0,220,170,0.4);
-      box-shadow: 0 0 16px rgba(0,220,170,0.2);
-      backdrop-filter: blur(8px);
-    }
-
-    .pay-tab.secondary:hover {
-      background: linear-gradient(135deg, rgba(40,50,70,0.4), rgba(35,45,65,0.35));
-      border-color: rgba(0,220,170,0.6);
-      box-shadow: 0 0 24px rgba(0,220,170,0.35);
-      transform: translateY(-2px);
-    }
-
-    .pay-tab.secondary:active {
-      transform: scale(0.98);
-    }
-
-    .note {
-      font-size: 12px;
-      color: #aeb5c4;
-      letter-spacing: 0.02em;
-      margin-top: 12px;
+      gap: 8px;
+      border-top: 1px solid rgba(255, 130, 50, 0.2);
+      padding-top: 20px;
     }
 
     .back-btn {
       position: absolute;
       top: 20px;
       left: 20px;
-      background: linear-gradient(135deg, rgba(40,50,70,0.5), rgba(35,45,65,0.45));
-      border-radius: 12px;
-      padding: 10px 14px;
-      border: 1px solid rgba(255,255,255,0.1);
-      font-size: 13px;
+      background: rgba(12, 14, 22, 0.7);
+      border-radius: 60px;
+      padding: 10px 20px;
+      border: 1px solid rgba(255, 140, 50, 0.5);
+      font-size: 0.85rem;
+      font-weight: 600;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.08);
-      color: #aeb5c4;
+      gap: 8px;
+      backdrop-filter: blur(12px);
+      color: #FFD7A5;
+      transition: all 0.2s;
       z-index: 200;
-      min-height: 44px;
-      min-width: 44px;
-      touch-action: manipulation;
-      backdrop-filter: blur(8px);
-      transition: all 200ms ease;
     }
 
     .back-btn:hover {
-      background: linear-gradient(135deg, rgba(40,50,70,0.65), rgba(35,45,65,0.6));
-      border-color: rgba(0,220,170,0.2);
-      color: #f5e6d3;
-      box-shadow: 0 0 16px rgba(0,220,170,0.2), inset 0 1px 0 rgba(255,255,255,0.1);
+      background: rgba(30, 32, 48, 0.9);
+      border-color: #FF9F4A;
       transform: translateY(-1px);
+      color: #FFEFCF;
     }
 
-    .back-btn:active {
-      transform: scale(0.98);
-    }
-
-    /* PREMIUM GLASSMORPHIC USER-BAR */
+    /* premium user bar matching FOOD POINT brand */
     .user-bar {
       position: fixed !important;
-      top: 14px !important;
+      top: 18px !important;
       left: 50% !important;
       transform: translateX(-50%) !important;
-      max-width: 720px !important;
-      width: calc(100% - 28px) !important;
-      background: linear-gradient(135deg, rgba(30,35,50,0.8), rgba(25,30,45,0.77)) !important;
-      backdrop-filter: blur(16px) saturate(160%) !important;
-      border-radius: 20px !important;
-      padding: 12px 20px !important;
+      max-width: 700px !important;
+      width: calc(100% - 32px) !important;
+      background: rgba(12, 14, 22, 0.85) !important;
+      backdrop-filter: blur(20px) saturate(180%) !important;
+      border-radius: 80px !important;
+      padding: 8px 20px 8px 20px !important;
       display: flex !important;
       align-items: center !important;
       justify-content: space-between !important;
       z-index: 999 !important;
-      box-shadow: 0 16px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.12) !important;
-      border: 1px solid rgba(255,255,255,0.08) !important;
+      border: 1px solid rgba(255, 110, 40, 0.45) !important;
+      box-shadow: 0 18px 32px -12px rgba(0, 0, 0, 0.5), 0 1px 0 rgba(255, 200, 120, 0.2) inset !important;
     }
 
     .user-info {
       display: flex !important;
       align-items: center !important;
-      gap: 10px !important;
+      gap: 14px !important;
     }
 
     .user-avatar {
       width: 48px !important;
       height: 48px !important;
-      border-radius: 12px !important;
-      background: linear-gradient(135deg, rgba(255,140,0,0.5), rgba(255,160,20,0.45)) !important;
+      border-radius: 40px !important;
+      background: linear-gradient(145deg, #FF7E2E, #FFA045) !important;
       display: flex !important;
       align-items: center !important;
       justify-content: center !important;
-      color: #f5e6d3 !important;
       font-weight: 800 !important;
-      font-size: 18px !important;
-      box-shadow: 0 0 20px rgba(255,160,0,0.4) !important;
-      border: 1px solid rgba(255,255,255,0.1) !important;
+      font-size: 1.2rem !important;
+      color: #1A161F !important;
+      box-shadow: 0 6px 14px rgba(255, 100, 0, 0.3) !important;
     }
 
     .user-text {
       display: flex !important;
       flex-direction: column !important;
-      gap: 2px !important;
     }
 
     .user-name {
-      color: #f5e6d3 !important;
-      font-weight: 700 !important;
-      font-size: 13px !important;
-      letter-spacing: 0.04em !important;
+      font-weight: 800 !important;
+      font-size: 0.85rem !important;
+      letter-spacing: 0.5px !important;
+      color: #FFDFB0 !important;
+      text-transform: uppercase;
     }
 
     .user-email {
-      color: #aeb5c4 !important;
-      font-size: 11px !important;
-      letter-spacing: 0.02em !important;
+      font-size: 0.7rem !important;
+      color: #BCB3D4 !important;
     }
 
     .logout-btn {
-      background: linear-gradient(135deg, rgba(0,200,150,0.3), rgba(0,180,140,0.25)) !important;
-      border: 1px solid rgba(0,220,170,0.3) !important;
-      color: #00d9a3 !important;
-      padding: 8px 16px !important;
-      border-radius: 10px !important;
-      font-size: 12px !important;
+      background: rgba(0, 0, 0, 0.5) !important;
+      border: 1px solid rgba(255, 140, 50, 0.6) !important;
+      color: #FFC285 !important;
+      padding: 8px 20px !important;
+      border-radius: 60px !important;
       font-weight: 700 !important;
+      font-size: 0.75rem !important;
       cursor: pointer !important;
-      transition: all 200ms ease !important;
-      box-shadow: 0 0 16px rgba(0,220,170,0.35) !important;
-      letter-spacing: 0.04em !important;
-      text-transform: uppercase !important;
+      transition: all 0.2s !important;
+      backdrop-filter: blur(4px);
+      text-transform: uppercase;
     }
 
     .logout-btn:hover {
-      background: linear-gradient(135deg, rgba(0,220,170,0.4), rgba(0,200,150,0.35)) !important;
-      box-shadow: 0 0 24px rgba(0,220,170,0.5) !important;
-      transform: translateY(-1px) !important;
+      background: #FF7A2C !important;
+      color: #0A0A10 !important;
+      border-color: #FFC285 !important;
+      transform: translateY(-1px);
     }
 
-    .logout-btn:active {
-      transform: scale(0.98) !important;
-    }
-
-    /* Adjust container for fixed header */
     .page-with-header {
-      margin-top: 82px !important;
+      margin-top: 88px !important;
     }
 
-    @media (max-width: 480px) {
-      .pay-container {
-        border-radius: 16px;
-        padding: 24px 16px 20px;
-        margin-top: 40px;
-      }
-
-      h3 {
-        font-size: 20px;
-      }
-
-      .pay-tab {
-        font-size: 13px;
-        padding: 12px 16px;
-      }
-
-      .back-btn {
-        top: 10px;
-        left: 10px;
-        padding: 10px 12px;
-        font-size: 12px;
-      }
+    @media (max-width: 550px) {
+      .user-bar { padding: 6px 16px !important; width: calc(100% - 20px) !important; top: 12px !important; }
+      .user-avatar { width: 40px !important; height: 40px !important; font-size: 1rem !important; }
+      .user-name { font-size: 0.7rem !important; }
+      .logout-btn { padding: 6px 14px !important; font-size: 0.7rem !important; }
+      .page-with-header { margin-top: 78px !important; }
+      .amount-value { font-size: 2.3rem; }
+      .pay-option-left i { font-size: 1.5rem; width: 32px; }
+      .pay-option-title { font-size: 1rem; }
     }
   </style>
 </head>
 <body>
+
+<!-- external compatibility scripts (preserved) -->
 <script src="fp-config.js"></script>
 <script src="fp-fetch-proxy.js"></script>
 <script src="api.js"></script>
 <script src="dev-check.js"></script>
-  <div class="user-bar">
-    <div class="user-info">
-      <div class="user-avatar">FP</div>
-      <div class="user-text">
-        <div class="user-name">Food Point</div>
-        <div class="user-email">Payment</div>
-      </div>
+
+<div class="user-bar">
+  <div class="user-info">
+    <div class="user-avatar">🍔</div>
+    <div class="user-text">
+      <div class="user-name">FOOD POINT</div>
+      <div class="user-email">secure checkout</div>
     </div>
-    <button class="logout-btn" onclick="location.href='menu.html'">menu</button>
+  </div>
+  <button class="logout-btn" onclick="location.href='menu.html'"><i class="fas fa-utensils"></i> Menu</button>
+</div>
+
+<button class="back-btn" onclick="history.back()"><i class="fas fa-arrow-left"></i> Back</button>
+
+<div class="pay-container page-with-header">
+  <h3>PAYMENT</h3>
+  <p class="pay-sub">Choose your preferred method</p>
+
+  <div class="amount-box">
+    <div class="amount-label">TOTAL AMOUNT</div>
+    <div id="amountValue" class="amount-value">₹0.00</div>
   </div>
 
-  <button class="back-btn" onclick="history.back()">← Back</button>
-  <div class="pay-container page-with-header">
-    <h3>PAYMENT</h3>
-    <p class="pay-sub">Choose how you want to pay.</p>
-    <div class="amount-box">
-      <div class="amount-label">Amount to pay</div>
-      <div id="amountValue" class="amount-value">₹0.00</div>
+  <div class="pay-methods">
+    <!-- Cash on Delivery option -->
+    <div class="pay-option" id="cashOption">
+      <div class="pay-option-left">
+        <i class="fas fa-money-bill-wave"></i>
+        <div class="pay-option-text">
+          <div class="pay-option-title">Cash on Delivery</div>
+          <div class="pay-option-desc">Pay when order arrives</div>
+        </div>
+      </div>
+      <div class="pay-option-arrow"><i class="fas fa-chevron-right"></i></div>
     </div>
-    <div class="pay-toggle-row">
-      <button id="btnPay" class="pay-tab primary" onclick="goToPayment()">PAY</button>
+
+    <!-- Online / UPI option -->
+    <div class="pay-option" id="onlineOption">
+      <div class="pay-option-left">
+        <i class="fas fa-qrcode"></i>
+        <div class="pay-option-text">
+          <div class="pay-option-title">UPI / Online</div>
+          <div class="pay-option-desc">Google Pay, PhonePe, Paytm & more</div>
+        </div>
+      </div>
+      <div class="pay-option-arrow"><i class="fas fa-chevron-right"></i></div>
     </div>
-    <p class="note">You can still see full details on the next screen.</p>
   </div>
-  <script>
-    function getAmount() { return localStorage.getItem('amountPaid') || '₹149.99'; }
-    function setPayment(m) { localStorage.setItem('paymentMethod', m); localStorage.setItem('amountPaid', getAmount()); }
-    function selectCash() { setPayment('cash'); localStorage.setItem('justPaid','1'); location.href='thank-you.html'; }
-    function selectOnline() { setPayment('online'); location.href='payment.html'; }
-    function goToPayment() { try { localStorage.setItem('amountPaid', getAmount()); } catch(e){}; location.href='payment.html'; }
-    document.addEventListener('DOMContentLoaded', () => { document.getElementById('amountValue').textContent = getAmount(); });
-    // Defensive cleanup in case of stray 'uud' or tiny text nodes
-    document.addEventListener('DOMContentLoaded', () => {
-      const bodyChildren = Array.from(document.body.childNodes);
-      bodyChildren.forEach((n) => { if (n.nodeType === Node.TEXT_NODE && n.nodeValue.trim().toLowerCase().includes('uud')) n.parentNode.removeChild(n); });
+
+  <div class="note">
+    <i class="fas fa-lock"></i> 100% secure transaction · Instant confirmation
+  </div>
+</div>
+
+<script>
+  // ------------------- Helper functions (consistent with payment flow) -------------------
+  function safeGet(key) { try { return localStorage.getItem(key); } catch(e) { return null; } }
+  function safeSet(key, val) { try { localStorage.setItem(key, String(val)); } catch(e) {} }
+
+  // Get current amount from storage (priority: amountPaidNumeric, amountPaid, cartItems calculation)
+  function getCurrentAmount() {
+    // first check numeric amount stored by cart
+    let numeric = null;
+    const amountNumRaw = safeGet('amountPaidNumeric');
+    if (amountNumRaw && !isNaN(parseFloat(amountNumRaw))) {
+      numeric = parseFloat(amountNumRaw);
+    }
+    if (numeric !== null && numeric > 0) {
+      return '₹' + numeric.toFixed(2);
+    }
+    // check amountPaid string
+    const amountStr = safeGet('amountPaid');
+    if (amountStr && amountStr !== '₹0.00') {
+      const cleaned = amountStr.replace(/[₹, ]+/g, '');
+      const val = parseFloat(cleaned);
+      if (!isNaN(val) && val > 0) return '₹' + val.toFixed(2);
+    }
+    // fallback: compute from cartItems / selectedFoods
+    try {
+      const cartJson = safeGet('cartItems') || safeGet('selectedFoods_v1') || safeGet('selectedFoods');
+      if (cartJson) {
+        const parsed = JSON.parse(cartJson);
+        if (Array.isArray(parsed) && parsed.length) {
+          let total = 0;
+          parsed.forEach(it => {
+            const price = (it && (it.price || it.priceNumeric || it.amount)) || 0;
+            const qty = (it && (it.qty || it.quantity || it.qtyOrdered)) || 1;
+            const pnum = parseFloat(String(price).replace(/[₹, ]+/g, '')) || 0;
+            const qnum = parseFloat(qty) || 1;
+            total += pnum * qnum;
+          });
+          if (total > 0) return '₹' + total.toFixed(2);
+        }
+      }
+    } catch(e) {}
+    // default fallback
+    return '₹149.00';
+  }
+
+  // store amount consistently before proceeding
+  function syncAmountToStorage() {
+    const displayAmount = document.getElementById('amountValue').innerText;
+    const numericRaw = displayAmount.replace('₹', '').replace(/,/g, '');
+    const numeric = parseFloat(numericRaw);
+    if (!isNaN(numeric)) {
+      safeSet('amountPaid', displayAmount);
+      safeSet('amountPaidNumeric', numeric);
+    } else {
+      // fallback if something odd
+      const fallback = getCurrentAmount();
+      const fallbackNum = parseFloat(fallback.replace('₹', ''));
+      safeSet('amountPaid', fallback);
+      safeSet('amountPaidNumeric', fallbackNum);
+      document.getElementById('amountValue').innerText = fallback;
+    }
+  }
+
+  // ----- Payment method handlers (preserve flow: cash redirect to thank-you, online to payment.html) -----
+  function handleCashPayment() {
+    // get latest amount and store
+    const amountDisplay = document.getElementById('amountValue').innerText;
+    const amountNum = parseFloat(amountDisplay.replace('₹', '').replace(/,/g, ''));
+    safeSet('paymentMethod', 'cash');
+    safeSet('amountPaid', amountDisplay);
+    if (!isNaN(amountNum)) safeSet('amountPaidNumeric', amountNum);
+    safeSet('justPaid', '1');      // marks that a fresh payment just happened (thank-you will create order)
+    // redirect to thank-you page (cash on delivery)
+    window.location.href = 'thank-you.html';
+  }
+
+  function handleOnlinePayment() {
+    // store payment method & amount, then go to payment.html (QR/UPI interface)
+    const amountDisplay = document.getElementById('amountValue').innerText;
+    const amountNum = parseFloat(amountDisplay.replace('₹', '').replace(/,/g, ''));
+    safeSet('paymentMethod', 'online');
+    safeSet('amountPaid', amountDisplay);
+    if (!isNaN(amountNum)) safeSet('amountPaidNumeric', amountNum);
+    // important: do NOT set justPaid=1 here, because actual payment confirmation happens inside payment.html
+    // But we ensure the amount is synced. Redirect to the UPI/online flow (payment.html)
+    window.location.href = 'payment.html';
+  }
+
+  // ----- UI initialization & event binding -----
+  document.addEventListener('DOMContentLoaded', () => {
+    // display the correct amount from cart or saved data
+    const amountSpan = document.getElementById('amountValue');
+    if (amountSpan) {
+      let displayAmount = getCurrentAmount();
+      // also attempt to read from any recently stored value (if redirected from cart)
+      const storedAmount = safeGet('amountPaid');
+      if (storedAmount && storedAmount !== '₹0.00') {
+        const cleaned = storedAmount.replace(/[₹, ]+/g, '');
+        const num = parseFloat(cleaned);
+        if (!isNaN(num) && num > 0) displayAmount = '₹' + num.toFixed(2);
+      }
+      amountSpan.innerText = displayAmount;
+      // sync numeric storage
+      const numericVal = parseFloat(displayAmount.replace('₹', '').replace(/,/g, ''));
+      if (!isNaN(numericVal)) {
+        safeSet('amountPaidNumeric', numericVal);
+        safeSet('amountPaid', displayAmount);
+      }
+    }
+
+    // bind click events for cash & online options
+    const cashDiv = document.getElementById('cashOption');
+    const onlineDiv = document.getElementById('onlineOption');
+
+    if (cashDiv) {
+      cashDiv.addEventListener('click', (e) => {
+        e.preventDefault();
+        syncAmountToStorage();
+        handleCashPayment();
+      });
+    }
+
+    if (onlineDiv) {
+      onlineDiv.addEventListener('click', (e) => {
+        e.preventDefault();
+        syncAmountToStorage();
+        handleOnlinePayment();
+      });
+    }
+
+    // listen for storage changes (if cart updates from another tab)
+    window.addEventListener('storage', (event) => {
+      if (event.key === 'amountPaidNumeric' || event.key === 'cartItems' || event.key === 'selectedFoods') {
+        const freshAmount = getCurrentAmount();
+        if (amountSpan && freshAmount !== amountSpan.innerText) {
+          amountSpan.innerText = freshAmount;
+          const numericVal = parseFloat(freshAmount.replace('₹', '').replace(/,/g, ''));
+          if (!isNaN(numericVal)) safeSet('amountPaidNumeric', numericVal);
+        }
+      }
     });
-  </script>
+
+    // tiny defensive cleanup: remove any stray text nodes that might appear (legacy)
+    const bodyChildren = Array.from(document.body.childNodes);
+    bodyChildren.forEach((n) => {
+      if (n.nodeType === Node.TEXT_NODE && n.nodeValue && n.nodeValue.trim().toLowerCase().includes('uud')) {
+        if (n.parentNode) n.parentNode.removeChild(n);
+      }
+    });
+  });
+</script>
 </body>
 </html>
