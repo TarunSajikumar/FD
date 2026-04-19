@@ -3,10 +3,521 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Food Menu | Food Point</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Food Menu | Food Point • Crypto Style</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Backgrounds - Crypto Dark Theme */
+            --bg-primary: #0A0A0F;
+            --bg-secondary: #111116;
+            --bg-card: #15171E;
+            --bg-elevated: #1A1C23;
+            --bg-userbar: #0D0D12;
+            
+            /* Text Colors */
+            --text-primary: #FFFFFF;
+            --text-secondary: #8A8F9E;
+            --text-muted: #5A5F73;
+            
+            /* Accent Colors */
+            --accent-green: #00FF85;
+            --accent-blue: #3B82F6;
+            --accent-red: #FF4D4D;
+            --accent-orange: #F97316;
+            
+            /* Borders */
+            --border-subtle: #1E1E2E;
+            --border-card: rgba(255, 255, 255, 0.05);
+            
+            /* Spacing */
+            --spacing-xs: 0.5rem;
+            --spacing-sm: 1rem;
+            --spacing-md: 1.5rem;
+            --spacing-lg: 2rem;
+            --spacing-xl: 3rem;
+            
+            /* Border Radius */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            
+            /* Gradients */
+            --gradient-primary: linear-gradient(135deg, #00FF85 0%, #00C96D 100%);
+            --gradient-card-hover: linear-gradient(180deg, #1A1C23 0%, #111116 100%);
+            --gradient-glow: radial-gradient(circle at 50% 0%, rgba(0, 255, 133, 0.08), transparent);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-glow);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Premium User Bar */
+        .user-bar {
+            background: var(--bg-userbar);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 44px;
+            height: 44px;
+            background: var(--gradient-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+            color: #0A0A0F;
+        }
+
+        .user-text .user-name {
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--text-primary);
+        }
+
+        .user-text .user-email {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+            padding: 8px 20px;
+            border-radius: 100px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .logout-btn:hover {
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+            background: rgba(255, 77, 77, 0.05);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px 20px 100px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Brand */
+        .brand {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-align: center;
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
+        }
+
+        .tagline {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 32px;
+        }
+
+        /* Search Bar */
+        .search-container {
+            margin-bottom: 32px;
+        }
+
+        .search-bar {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 100px;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .search-bar:focus-within {
+            border-color: var(--accent-green);
+            box-shadow: 0 0 0 3px rgba(0, 255, 133, 0.1);
+        }
+
+        .search-bar i {
+            color: var(--text-muted);
+            font-size: 16px;
+        }
+
+        .search-bar input {
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 15px;
+            width: 100%;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+        }
+
+        .search-bar input::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* Category Tabs */
+        .category-tabs {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+            scrollbar-width: thin;
+        }
+
+        .category-tabs::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .category-tabs::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+            border-radius: 10px;
+        }
+
+        .category-tabs::-webkit-scrollbar-thumb {
+            background: var(--accent-green);
+            border-radius: 10px;
+        }
+
+        .category-tab {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 100px;
+            padding: 8px 20px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+        }
+
+        .category-tab.active {
+            background: var(--gradient-primary);
+            color: #0A0A0F;
+            border-color: transparent;
+        }
+
+        .category-tab:hover:not(.active) {
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        /* Menu Sections */
+        .menu-section {
+            margin-bottom: 32px;
+        }
+
+        .section-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+            border-bottom: 1px solid var(--border-subtle);
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .section-title span:first-child {
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* Food Items */
+        .food-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .food-item:hover {
+            transform: translateX(4px);
+            border-color: rgba(0, 255, 133, 0.3);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .food-item.selected {
+            border-color: var(--accent-green);
+            background: linear-gradient(180deg, #1A1C23 0%, #111116 100%);
+            box-shadow: 0 0 20px rgba(0, 255, 133, 0.1);
+        }
+
+        .food-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 8px;
+        }
+
+        .food-name {
+            font-weight: 600;
+            font-size: 16px;
+            color: var(--text-primary);
+        }
+
+        .variant-label {
+            font-size: 12px;
+            color: var(--accent-green);
+            margin-left: 8px;
+        }
+
+        .food-price {
+            font-weight: 700;
+            color: var(--accent-green);
+            font-size: 15px;
+        }
+
+        .food-description {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        /* Price Options */
+        .price-options {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .price-opt {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 100px;
+            padding: 4px 12px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .price-opt[aria-pressed="true"] {
+            background: var(--accent-green);
+            color: #0A0A0F;
+            border-color: transparent;
+        }
+
+        .price-opt:hover:not([aria-pressed="true"]) {
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        .selected-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 24px;
+            height: 24px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0A0A0F;
+            font-size: 12px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: var(--bg-card);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--border-card);
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            color: var(--text-muted);
+        }
+
+        /* Bottom Action Bar */
+        .bottom-bar-spacer {
+            height: 80px;
+        }
+
+        .bottom-action-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-elevated);
+            border-top: 1px solid var(--border-subtle);
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+        }
+
+        .selection-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .selection-count {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .selection-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--accent-green);
+        }
+
+        .add-to-cart-btn {
+            background: var(--gradient-primary);
+            border: none;
+            border-radius: 100px;
+            padding: 12px 24px;
+            font-weight: 700;
+            font-size: 14px;
+            color: #0A0A0F;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .add-to-cart-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 255, 133, 0.3);
+        }
+
+        .add-to-cart-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .cart-btn-icon {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .cart-fab-count {
+            position: absolute;
+            top: -8px;
+            right: -12px;
+            background: #0A0A0F;
+            color: var(--accent-green);
+            font-size: 10px;
+            font-weight: 700;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Animation */
+        @keyframes pulse {
+            0% { transform: scale(1); border-color: var(--border-card); }
+            50% { transform: scale(1.02); border-color: var(--accent-green); box-shadow: 0 0 20px rgba(0, 255, 133, 0.2); }
+            100% { transform: scale(1); border-color: var(--border-card); }
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .container {
+                padding: 16px 16px 100px;
+            }
+            .brand {
+                font-size: 1.75rem;
+            }
+            .user-bar {
+                padding: 10px 16px;
+            }
+            .selection-price {
+                font-size: 14px;
+            }
+            .add-to-cart-btn {
+                padding: 10px 18px;
+                font-size: 12px;
+            }
+        }
+    </style>
 </head>
 <body>
   <!-- Premium User Bar with integrated buttons (no floating elements) -->
@@ -28,8 +539,8 @@
 
   <div class="container page-with-header">
     <!-- Brand Header -->
-    <div class="brand">FOOD POINT</div>
-    <div class="tagline">Premium Dining Experience</div>
+    <div class="brand">🍽️ FOOD POINT</div>
+    <div class="tagline">Premium Dining Experience • Crypto Style</div>
 
     <!-- Search Bar -->
     <div class="search-container">
@@ -243,7 +754,7 @@
         section.className = "menu-section";
         const title = document.createElement("div");
         title.className = "section-title";
-        title.innerHTML = `<span>${cat.category}</span><span style="font-size:14px;color:#666;margin-left:auto">${cat.items.length} items</span>`;
+        title.innerHTML = `<span>${cat.category}</span><span style="font-size:14px;color:#5A5F73;margin-left:auto">${cat.items.length} items</span>`;
         section.appendChild(title);
 
         cat.items.forEach((item, itemIndex) => {
@@ -491,4 +1002,3 @@
   </script>
 </body>
 </html>
-```

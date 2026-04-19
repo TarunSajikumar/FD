@@ -3,26 +3,402 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Food Point</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>Food Point | Premium Crypto-Style Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      /* Backgrounds - Crypto Dark Theme */
+      --bg-primary: #0A0A0F;
+      --bg-secondary: #111116;
+      --bg-card: #15171E;
+      --bg-elevated: #1A1C23;
+      --bg-modal: #1A1C23;
+      
+      /* Text Colors */
+      --text-primary: #FFFFFF;
+      --text-secondary: #8A8F9E;
+      --text-muted: #5A5F73;
+      
+      /* Accent Colors */
+      --accent-green: #00FF85;
+      --accent-blue: #3B82F6;
+      --accent-red: #FF4D4D;
+      --accent-orange: #F97316;
+      
+      /* Borders */
+      --border-subtle: #1E1E2E;
+      --border-card: rgba(255, 255, 255, 0.05);
+      
+      /* Spacing */
+      --spacing-xs: 0.5rem;
+      --spacing-sm: 1rem;
+      --spacing-md: 1.5rem;
+      --spacing-lg: 2rem;
+      --spacing-xl: 3rem;
+      
+      /* Border Radius */
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      
+      /* Gradients */
+      --gradient-primary: linear-gradient(135deg, #00FF85 0%, #00C96D 100%);
+      --gradient-card-hover: linear-gradient(180deg, #1A1C23 0%, #111116 100%);
+      --gradient-glow: radial-gradient(circle at 50% 0%, rgba(0, 255, 133, 0.08), transparent);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--spacing-lg);
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Animated background gradient */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--gradient-glow);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Page Card - Premium Crypto Style */
+    .page-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-xl);
+      backdrop-filter: blur(0px);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 255, 133, 0.05);
+      transition: all 0.3s ease;
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 520px;
+    }
+
+    .page-card:hover {
+      box-shadow: 0 30px 60px -15px rgba(0, 255, 133, 0.15), 0 0 0 1px rgba(0, 255, 133, 0.15);
+      transform: translateY(-2px);
+    }
+
+    .page-card-centered {
+      text-align: center;
+    }
+
+    /* Typography - Crypto Style */
+    .section-title {
+      font-size: 3rem;
+      font-weight: 800;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      letter-spacing: -0.02em;
+      margin-bottom: var(--spacing-sm);
+      text-shadow: 0 0 30px rgba(0, 255, 133, 0.2);
+    }
+
+    .subtitle {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: var(--spacing-lg);
+    }
+
+    /* Buttons - Crypto Trading Style */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 28px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      border-radius: 100px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      border: none;
+      gap: 8px;
+      letter-spacing: -0.01em;
+    }
+
+    .primary-btn {
+      background: var(--gradient-primary);
+      color: #0A0A0F;
+      box-shadow: 0 4px 15px rgba(0, 255, 133, 0.2);
+    }
+
+    .primary-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 255, 133, 0.3);
+    }
+
+    .primary-btn:active {
+      transform: translateY(0);
+    }
+
+    /* Ghost Button - Owner Corner */
+    .ghost-btn {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      padding: 8px 20px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      border-radius: 100px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      backdrop-filter: blur(10px);
+      z-index: 100;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .ghost-btn:hover {
+      border-color: var(--accent-green);
+      color: var(--accent-green);
+      background: rgba(0, 255, 133, 0.05);
+      box-shadow: 0 0 15px rgba(0, 255, 133, 0.1);
+    }
+
+    /* Status Message */
+    .status-message {
+      margin-top: var(--spacing-md);
+      padding: var(--spacing-sm) var(--spacing-md);
+      background: rgba(255, 77, 77, 0.1);
+      border: 1px solid rgba(255, 77, 77, 0.2);
+      border-radius: var(--radius-md);
+      color: #FF6B6B;
+      font-size: 0.85rem;
+      text-align: center;
+    }
+
+    /* Modal Overlay - Crypto Style */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(10, 10, 15, 0.95);
+      backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* Modal Content */
+    .password-modal {
+      background: var(--bg-modal);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-xl);
+      max-width: 420px;
+      width: 90%;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 255, 133, 0.1);
+      transform: scale(0.95);
+      transition: transform 0.3s ease;
+    }
+
+    .modal-overlay.active .password-modal {
+      transform: scale(1);
+    }
+
+    .password-modal h2 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .password-modal p {
+      color: var(--text-secondary);
+      margin-bottom: var(--spacing-md);
+      font-size: 0.9rem;
+    }
+
+    /* Input Field - Crypto Style */
+    .password-input {
+      width: 100%;
+      padding: 14px 18px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      font-size: 1rem;
+      font-family: 'Inter', monospace;
+      transition: all 0.2s ease;
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .password-input:focus {
+      outline: none;
+      border-color: var(--accent-green);
+      box-shadow: 0 0 0 3px rgba(0, 255, 133, 0.1);
+    }
+
+    .password-input.error {
+      border-color: var(--accent-red);
+      box-shadow: 0 0 0 3px rgba(255, 77, 77, 0.1);
+    }
+
+    /* Error & Warning Messages */
+    .error-message {
+      color: var(--accent-red);
+      font-size: 0.8rem;
+      margin-top: -6px;
+      margin-bottom: var(--spacing-sm);
+      display: none;
+    }
+
+    .error-message.show {
+      display: block;
+    }
+
+    .attempts-warning {
+      color: var(--accent-orange);
+      font-size: 0.8rem;
+      margin-bottom: var(--spacing-sm);
+      display: none;
+    }
+
+    .attempts-warning.show {
+      display: block;
+    }
+
+    /* Modal Buttons */
+    .modal-buttons {
+      display: flex;
+      gap: var(--spacing-sm);
+      margin-top: var(--spacing-md);
+    }
+
+    .modal-btn {
+      flex: 1;
+      padding: 12px 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      border-radius: 100px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'Inter', sans-serif;
+      border: none;
+    }
+
+    .modal-btn-primary {
+      background: var(--gradient-primary);
+      color: #0A0A0F;
+    }
+
+    .modal-btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 15px rgba(0, 255, 133, 0.3);
+    }
+
+    .modal-btn-secondary {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+    }
+
+    .modal-btn-secondary:hover {
+      border-color: var(--accent-blue);
+      color: var(--accent-blue);
+      background: rgba(59, 130, 246, 0.05);
+    }
+
+    /* Disabled button state */
+    .primary-btn[disabled], 
+    .modal-btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      body {
+        padding: var(--spacing-md);
+      }
+      
+      .page-card {
+        padding: var(--spacing-lg);
+      }
+      
+      .section-title {
+        font-size: 2.25rem;
+      }
+      
+      .ghost-btn {
+        top: 16px;
+        right: 16px;
+        padding: 6px 16px;
+        font-size: 0.75rem;
+      }
+    }
+
+    /* Subtle glow animation for crypto feel */
+    @keyframes subtlePulse {
+      0%, 100% {
+        opacity: 0.3;
+      }
+      50% {
+        opacity: 0.6;
+      }
+    }
+  </style>
 </head>
 <body>
-  <button id="ownerCornerBtn" type="button" class="ghost-btn corner-action">Owner</button>
+  <button id="ownerCornerBtn" type="button" class="ghost-btn corner-action">🔐 Owner Access</button>
 
   <main class="page-card page-card-centered">
-    <h1 class="section-title">Food Point</h1>
+    <h1 class="section-title">🍽️ Food Point</h1>
     <p class="subtitle">Welcome to Food Point. Use the button below to sign in or create an account.</p>
-    <a id="goToLoginBtn" href="login.html" class="btn primary-btn">Go to Login</a>
+    <a id="goToLoginBtn" href="login.html" class="btn primary-btn">🚀 Go to Login</a>
     <p id="shopStatusMessage" class="status-message"></p>
   </main>
 
   <div class="modal-overlay" id="ownerPasswordModal">
     <div class="password-modal">
-      <h2>Owner Access</h2>
+      <h2>🔑 Owner Access</h2>
       <p>Enter the owner password to open the dashboard.</p>
       <input id="ownerPasswordInput" class="password-input" type="password" placeholder="Owner password" autocomplete="current-password" />
-      <div class="error-message" id="ownerErrorMsg">Incorrect password. Please try again.</div>
-      <div class="attempts-warning" id="ownerAttemptsWarn">Too many failed attempts. Please wait 30 seconds.</div>
+      <div class="error-message" id="ownerErrorMsg">❌ Incorrect password. Please try again.</div>
+      <div class="attempts-warning" id="ownerAttemptsWarn">⚠️ Too many failed attempts. Please wait 30 seconds.</div>
       <div class="modal-buttons">
         <button class="modal-btn modal-btn-secondary" id="ownerCancelBtn" type="button">Cancel</button>
         <button class="modal-btn modal-btn-primary" id="ownerSubmitBtn" type="button">Submit</button>

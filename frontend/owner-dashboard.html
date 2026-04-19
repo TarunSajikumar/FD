@@ -3,14 +3,907 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-  <title>Food Point | Owner Dashboard</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>Food Point • Owner Dashboard • Crypto Style</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="fp-config.js"></script>
   <script src="fp-fetch-proxy.js"></script>
   <script src="api.js"></script>
   <script src="dev-check.js"></script>
-  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      /* Backgrounds - Crypto Dark Theme */
+      --bg-primary: #0A0A0F;
+      --bg-secondary: #111116;
+      --bg-card: #15171E;
+      --bg-elevated: #1A1C23;
+      --bg-userbar: #0D0D12;
+      
+      /* Text Colors */
+      --text-primary: #FFFFFF;
+      --text-secondary: #8A8F9E;
+      --text-muted: #5A5F73;
+      
+      /* Accent Colors */
+      --accent-green: #00FF85;
+      --accent-blue: #3B82F6;
+      --accent-red: #FF4D4D;
+      --accent-orange: #F97316;
+      --accent-gold: #F5A623;
+      
+      /* Borders */
+      --border-subtle: #1E1E2E;
+      --border-card: rgba(255, 255, 255, 0.05);
+      
+      /* Spacing */
+      --spacing-xs: 0.5rem;
+      --spacing-sm: 1rem;
+      --spacing-md: 1.5rem;
+      --spacing-lg: 2rem;
+      --spacing-xl: 3rem;
+      
+      /* Border Radius */
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      
+      /* Gradients */
+      --gradient-primary: linear-gradient(135deg, #00FF85 0%, #00C96D 100%);
+      --gradient-card-hover: linear-gradient(180deg, #1A1C23 0%, #111116 100%);
+      --gradient-glow: radial-gradient(circle at 50% 0%, rgba(0, 255, 133, 0.08), transparent);
+      --gradient-header: linear-gradient(135deg, #0A0A0F 0%, #111116 100%);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--gradient-glow);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Page Container */
+    .page-with-header {
+      position: relative;
+      z-index: 1;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 20px 40px;
+    }
+
+    /* Dashboard Container */
+    .dashboard-container {
+      background: transparent;
+    }
+
+    /* Dashboard Header */
+    .dashboard-header {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-xl);
+      padding: 24px 28px;
+      margin-bottom: 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
+    }
+
+    .header-left h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 8px;
+    }
+
+    .header-left p {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      margin-bottom: 12px;
+    }
+
+    .time-display {
+      background: var(--bg-secondary);
+      padding: 8px 16px;
+      border-radius: 100px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .action-btn {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      padding: 10px 18px;
+      border-radius: 100px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'Inter', sans-serif;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .action-btn:hover {
+      border-color: var(--accent-green);
+      color: var(--accent-green);
+      background: rgba(0, 255, 133, 0.05);
+    }
+
+    .action-btn.primary {
+      background: var(--gradient-primary);
+      color: #0A0A0F;
+      border: none;
+    }
+
+    .action-btn.primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(0, 255, 133, 0.3);
+    }
+
+    .action-btn.danger:hover {
+      border-color: var(--accent-red);
+      color: var(--accent-red);
+    }
+
+    /* Dashboard Grid */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+
+    /* Panels */
+    .panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+    }
+
+    .panel:hover {
+      box-shadow: 0 15px 35px -8px rgba(0, 255, 133, 0.1);
+    }
+
+    .panel h2 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Status Container */
+    .status-container {
+      text-align: center;
+    }
+
+    .status-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 24px;
+      border-radius: 100px;
+      background: var(--bg-secondary);
+      margin-bottom: 20px;
+    }
+
+    .status-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--accent-green);
+      box-shadow: 0 0 8px var(--accent-green);
+    }
+
+    .toggle-btn {
+      background: var(--gradient-primary);
+      border: none;
+      padding: 12px 28px;
+      border-radius: 100px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-top: 10px;
+    }
+
+    .toggle-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 255, 133, 0.3);
+    }
+
+    /* Quick Links */
+    .quick-links {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .quick-link {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      text-align: center;
+      text-decoration: none;
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .quick-link:hover {
+      border-color: var(--accent-green);
+      color: var(--accent-green);
+      transform: translateY(-2px);
+    }
+
+    /* Orders Header */
+    .orders-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .orders-filters {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      padding: 6px 14px;
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text-secondary);
+    }
+
+    .filter-btn.active {
+      background: var(--accent-green);
+      color: #0A0A0F;
+      border-color: transparent;
+    }
+
+    .filter-btn:hover:not(.active) {
+      border-color: var(--accent-green);
+      color: var(--accent-green);
+    }
+
+    .notification-badge {
+      background: var(--accent-red);
+      color: white;
+      border-radius: 100px;
+      padding: 2px 6px;
+      font-size: 0.7rem;
+      margin-left: 5px;
+    }
+
+    .live-indicator {
+      font-size: 0.7rem;
+      color: var(--accent-green);
+      margin-left: 8px;
+    }
+
+    .live-indicator i {
+      font-size: 0.6rem;
+    }
+
+    /* Orders List */
+    .orders-list {
+      max-height: 500px;
+      overflow-y: auto;
+    }
+
+    .order-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      margin-bottom: 12px;
+      transition: all 0.2s ease;
+    }
+
+    .order-card:hover {
+      transform: translateX(4px);
+      border-color: rgba(0, 255, 133, 0.3);
+    }
+
+    .order-card.new {
+      border-left: 3px solid var(--accent-green);
+    }
+
+    .order-card.completed {
+      opacity: 0.8;
+    }
+
+    .order-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .order-id {
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .order-badge {
+      padding: 3px 10px;
+      border-radius: 100px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+
+    .badge-new {
+      background: rgba(0, 255, 133, 0.15);
+      color: var(--accent-green);
+    }
+
+    .badge-pending {
+      background: rgba(245, 166, 35, 0.15);
+      color: var(--accent-gold);
+    }
+
+    .badge-completed {
+      background: rgba(59, 130, 246, 0.15);
+      color: var(--accent-blue);
+    }
+
+    .order-date {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .order-details {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .order-detail {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+    }
+
+    .detail-label {
+      color: var(--text-muted);
+    }
+
+    .detail-value {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .order-items {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .order-items-title {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .order-items span {
+      display: inline-block;
+      background: var(--bg-elevated);
+      padding: 3px 10px;
+      border-radius: 100px;
+      font-size: 0.7rem;
+      margin: 3px;
+    }
+
+    .order-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .order-action-btn {
+      padding: 6px 12px;
+      border-radius: 100px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+    }
+
+    /* Analytics Section */
+    .analytics-section {
+      margin-top: 0;
+    }
+
+    .analytics-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .analytics-tab {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      padding: 8px 20px;
+      border-radius: 100px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .analytics-tab.active {
+      background: var(--accent-green);
+      color: #0A0A0F;
+      border-color: transparent;
+    }
+
+    .analytics-tab:hover:not(.active) {
+      border-color: var(--accent-green);
+      color: var(--accent-green);
+    }
+
+    .analytics-content {
+      display: none;
+    }
+
+    .analytics-content.active {
+      display: block;
+    }
+
+    /* Metric Cards */
+    .analytics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .metric-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      text-align: center;
+    }
+
+    .metric-label {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .metric-value {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--accent-green);
+    }
+
+    .metric-change {
+      font-size: 0.7rem;
+      margin-top: 6px;
+    }
+
+    .metric-change.positive {
+      color: var(--accent-green);
+    }
+
+    .metric-change.negative {
+      color: var(--accent-red);
+    }
+
+    /* Empty Note */
+    .empty-note {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-muted);
+    }
+
+    .empty-note i {
+      font-size: 48px;
+      margin-bottom: 15px;
+      opacity: 0.5;
+    }
+
+    /* Modals */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(10, 10, 15, 0.95);
+      backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-dialog {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-xl);
+      max-width: 500px;
+      width: 90%;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .modal-header h3 {
+      font-size: 1.2rem;
+      margin-bottom: 5px;
+    }
+
+    .modal-header p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .modal-body {
+      padding: 24px;
+    }
+
+    .modal-buttons {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    .modal-btn {
+      padding: 10px 20px;
+      border-radius: 100px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+    }
+
+    .modal-btn-primary {
+      background: var(--gradient-primary);
+      color: #0A0A0F;
+    }
+
+    .modal-btn-secondary {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+    }
+
+    /* Form Groups */
+    .modal-form-group {
+      margin-bottom: 16px;
+    }
+
+    .modal-form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    .modal-form-group input,
+    .modal-form-group select,
+    .modal-form-group textarea {
+      width: 100%;
+      padding: 12px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+    }
+
+    .modal-form-group input:focus,
+    .modal-form-group select:focus,
+    .modal-form-group textarea:focus {
+      outline: none;
+      border-color: var(--accent-green);
+    }
+
+    .modal-error {
+      color: var(--accent-red);
+      font-size: 0.7rem;
+      margin-top: 4px;
+      display: none;
+    }
+
+    .modal-error.show {
+      display: block;
+    }
+
+    /* Menu Item in Manage Modal */
+    .menu-item {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .menu-item-info {
+      flex: 1;
+    }
+
+    .menu-item-name {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .menu-item-details {
+      display: flex;
+      gap: 12px;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .menu-item-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .menu-item-btn {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      padding: 6px 12px;
+      border-radius: 100px;
+      font-size: 0.7rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .menu-item-btn.edit:hover {
+      border-color: var(--accent-blue);
+      color: var(--accent-blue);
+    }
+
+    .menu-item-btn.delete:hover {
+      border-color: var(--accent-red);
+      color: var(--accent-red);
+    }
+
+    /* Toggle Switch */
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 22px;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: var(--border-subtle);
+      transition: 0.3s;
+      border-radius: 34px;
+    }
+
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 2px;
+      bottom: 2px;
+      background-color: white;
+      transition: 0.3s;
+      border-radius: 50%;
+    }
+
+    input:checked + .toggle-slider {
+      background-color: var(--accent-green);
+    }
+
+    input:checked + .toggle-slider:before {
+      transform: translateX(22px);
+    }
+
+    /* Settings Items */
+    .settings-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .setting-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .setting-label {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .setting-description {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    /* Toast Notification */
+    .notification-toast {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-lg);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      z-index: 1100;
+      transform: translateX(400px);
+      transition: transform 0.3s ease;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .notification-toast.show {
+      transform: translateX(0);
+    }
+
+    .toast-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .toast-icon.success {
+      background: rgba(0, 255, 133, 0.15);
+      color: var(--accent-green);
+    }
+
+    .toast-icon.error {
+      background: rgba(255, 77, 77, 0.15);
+      color: var(--accent-red);
+    }
+
+    .toast-icon.info {
+      background: rgba(59, 130, 246, 0.15);
+      color: var(--accent-blue);
+    }
+
+    .toast-content h4 {
+      font-size: 0.9rem;
+      margin-bottom: 4px;
+    }
+
+    .toast-content p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+      .dashboard-header {
+        flex-direction: column;
+        text-align: center;
+      }
+      .header-actions {
+        justify-content: center;
+      }
+      .page-with-header {
+        padding: 0 16px 30px;
+      }
+    }
+
+    @media (max-width: 500px) {
+      .analytics-grid {
+        grid-template-columns: 1fr;
+      }
+      .order-details {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="page-with-header">
@@ -39,7 +932,7 @@
             <i class="fas fa-trash"></i> Clear Data
           </button>
           <div id="ownerAuthStatus" style="display:flex;align-items:center;gap:8px;margin-left:8px;">
-            <div id="ownerAuthLabel" style="font-size:13px;color:var(--muted)">Not connected</div>
+            <div id="ownerAuthLabel" style="font-size:13px;color:var(--text-muted)">Not connected</div>
             <button class="action-btn" id="ownerLogoutBtn" style="display:none;">Logout</button>
           </div>
         </div>
@@ -56,7 +949,7 @@
               <span id="ownerStatusText">Loading...</span>
             </div>
             
-            <p style="color: var(--muted); font-size: 14px; margin-bottom: 25px;">
+            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 25px;">
               Control whether customers can enter the store and place orders.
             </p>
             
@@ -64,8 +957,8 @@
               Toggle Status
             </button>
             
-            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--border);">
-              <div style="font-size: 14px; color: var(--text); margin-bottom: 15px; font-weight: 700;">
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--border-subtle);">
+              <div style="font-size: 14px; color: var(--text-primary); margin-bottom: 15px; font-weight: 700;">
                 <i class="fas fa-bolt"></i> Quick Actions
               </div>
               
@@ -119,7 +1012,7 @@
             </div>
           </div>
           
-          <p style="font-size:14px; color:var(--muted); text-align:center; margin-bottom: 20px;">
+          <p style="font-size:14px; color:var(--text-muted); text-align:center; margin-bottom: 20px;">
             Orders placed by customers (latest first). Click on an order to view details.
           </p>
 
@@ -172,7 +1065,7 @@
           </div>
           
           <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 30px;">
-            <h3 style="font-size: 16px; color: var(--text); margin: 0;">Performance Summary</h3>
+            <h3 style="font-size: 16px; color: var(--text-primary); margin: 0;">Performance Summary</h3>
             <button class="action-btn" id="viewFullReportBtn" onclick="exportDashboardPDF()" style="padding: 8px 16px; font-size: 13px;">
               <i class="fas fa-file-pdf"></i> Export PDF
             </button>
@@ -250,7 +1143,7 @@
     </div>
   </div>
 
-  <!-- All Modals -->
+  <!-- All Modals (same structure, just styled) -->
   <div id="passwordModal" class="modal-overlay">
     <div class="modal-dialog">
       <div class="modal-header">
@@ -484,9 +1377,9 @@
         <p>View all orders placed in your restaurant</p>
       </div>
       <div class="modal-body">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
           <div>
-            <input type="date" id="orderHistoryDateFilter" style="padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: rgba(40,50,70,0.3); color: var(--text);">
+            <input type="date" id="orderHistoryDateFilter" style="padding: 10px; border-radius: 8px; border: 1px solid var(--border-subtle); background: var(--bg-secondary); color: var(--text-primary);">
             <button class="action-btn" onclick="filterOrderHistory()" style="margin-left: 10px;">
               <i class="fas fa-filter"></i> Filter
             </button>
@@ -885,14 +1778,14 @@
       
       if (status === "closed") {
         container.classList.add("status-closed");
-        dot.style.background = "var(--danger)";
+        dot.style.background = "var(--accent-red)";
         text.textContent = "Shop is CLOSED";
         btn.textContent = "Open Shop";
         btn.classList.remove("open");
         btn.classList.add("close");
       } else {
         container.classList.add("status-open");
-        dot.style.background = "var(--success)";
+        dot.style.background = "var(--accent-green)";
         text.textContent = "Shop is OPEN";
         btn.textContent = "Close Shop";
         btn.classList.remove("close");
@@ -1030,16 +1923,16 @@
               <button class="order-action-btn cancel" onclick="cancelOrder('${order.id}')">
                 <i class="fas fa-times"></i> Cancel
               </button>
-              <button class="order-action-btn" onclick="viewOrderDetails('${order.id}')" style="background:rgba(79,172,254,0.2);color:var(--info);">
+              <button class="order-action-btn" onclick="viewOrderDetails('${order.id}')" style="background:rgba(79,172,254,0.2);color:var(--accent-blue);">
                 <i class="fas fa-eye"></i> View
               </button>
             </div>
           ` : `
             <div class="order-actions">
-              <button class="order-action-btn" onclick="viewOrderDetails('${order.id}')" style="background:rgba(79,172,254,0.2);color:var(--info);">
+              <button class="order-action-btn" onclick="viewOrderDetails('${order.id}')" style="background:rgba(79,172,254,0.2);color:var(--accent-blue);">
                 <i class="fas fa-eye"></i> View Details
               </button>
-              <button class="order-action-btn" onclick="reorderItem('${order.id}')" style="background:rgba(255,170,0,0.2);color:var(--accent);">
+              <button class="order-action-btn" onclick="reorderItem('${order.id}')" style="background:rgba(255,170,0,0.2);color:var(--accent-gold);">
                 <i class="fas fa-redo"></i> Reorder
               </button>
             </div>
@@ -1144,60 +2037,60 @@
       const displayName = order.customerName || 'Walk-in';
       const details = `
         <div style="background: rgba(40,50,70,0.3); padding: 20px; border-radius: 12px; margin-bottom: 20px;">
-          <h3 style="color: var(--text); margin-bottom: 15px;">Order #${order.id}</h3>
+          <h3 style="color: var(--text-primary); margin-bottom: 15px;">Order #${order.id}</h3>
           
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
             <div>
-              <div style="color: var(--muted); font-size: 12px;">Date & Time</div>
-              <div style="color: var(--text); font-weight: 700;">${order.date} ${order.time}</div>
+              <div style="color: var(--text-muted); font-size: 12px;">Date & Time</div>
+              <div style="color: var(--text-primary); font-weight: 700;">${order.date} ${order.time}</div>
             </div>
             <div>
-              <div style="color: var(--muted); font-size: 12px;">Status</div>
-              <div style="color: var(--text); font-weight: 700;">${order.status || 'Pending'}</div>
+              <div style="color: var(--text-muted); font-size: 12px;">Status</div>
+              <div style="color: var(--text-primary); font-weight: 700;">${order.status || 'Pending'}</div>
             </div>
             <div>
-              <div style="color: var(--muted); font-size: 12px;">Payment Method</div>
-              <div style="color: var(--text); font-weight: 700;">${order.method || 'Unknown'}</div>
+              <div style="color: var(--text-muted); font-size: 12px;">Payment Method</div>
+              <div style="color: var(--text-primary); font-weight: 700;">${order.method || 'Unknown'}</div>
             </div>
             <div>
-              <div style="color: var(--muted); font-size: 12px;">Amount</div>
-              <div style="color: var(--text); font-weight: 700;">₹${parseFloat(String(order.amount || "0").replace(/₹|,/g, "")).toFixed(2)}</div>
+              <div style="color: var(--text-muted); font-size: 12px;">Amount</div>
+              <div style="color: var(--text-primary); font-weight: 700;">₹${parseFloat(String(order.amount || "0").replace(/₹|,/g, "")).toFixed(2)}</div>
             </div>
           </div>
           
           ${displayName ? `
             <div style="margin-bottom: 15px;">
-              <div style="color: var(--muted); font-size: 12px;">Customer Name</div>
-              <div style="color: var(--text); font-weight: 700;">${escapeHtml(displayName)}</div>
+              <div style="color: var(--text-muted); font-size: 12px;">Customer Name</div>
+              <div style="color: var(--text-primary); font-weight: 700;">${escapeHtml(displayName)}</div>
             </div>
           ` : ''}
           
           ${order.customerPhone ? `
             <div style="margin-bottom: 15px;">
-              <div style="color: var(--muted); font-size: 12px;">Customer Phone</div>
-              <div style="color: var(--text); font-weight: 700;">${order.customerPhone}</div>
+              <div style="color: var(--text-muted); font-size: 12px;">Customer Phone</div>
+              <div style="color: var(--text-primary); font-weight: 700;">${order.customerPhone}</div>
             </div>
           ` : ''}
           
           ${order.specialInstructions ? `
             <div style="margin-bottom: 15px;">
-              <div style="color: var(--muted); font-size: 12px;">Special Instructions</div>
-              <div style="color: var(--text);">${order.specialInstructions}</div>
+              <div style="color: var(--text-muted); font-size: 12px;">Special Instructions</div>
+              <div style="color: var(--text-primary);">${order.specialInstructions}</div>
             </div>
           ` : ''}
         </div>
         
         ${items.length ? `
           <div style="background: rgba(40,50,70,0.3); padding: 20px; border-radius: 12px;">
-            <h3 style="color: var(--text); margin-bottom: 15px;">Order Items (${items.length})</h3>
+            <h3 style="color: var(--text-primary); margin-bottom: 15px;">Order Items (${items.length})</h3>
             <div style="display: grid; gap: 10px;">
               ${items.map((item, index) => `
                 <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
                   <div>
-                    <div style="color: var(--text); font-weight: 700;">${typeof item === 'string' ? item : (item.name || `Item ${index + 1}`)}</div>
-                    ${typeof item === 'object' && item.description ? `<div style="color: var(--muted); font-size: 12px;">${item.description}</div>` : ''}
+                    <div style="color: var(--text-primary); font-weight: 700;">${typeof item === 'string' ? item : (item.name || `Item ${index + 1}`)}</div>
+                    ${typeof item === 'object' && item.description ? `<div style="color: var(--text-muted); font-size: 12px;">${item.description}</div>` : ''}
                   </div>
-                  ${typeof item === 'object' && item.price ? `<div style="color: var(--text); font-weight: 700;">₹${item.price}</div>` : ''}
+                  ${typeof item === 'object' && item.price ? `<div style="color: var(--text-primary); font-weight: 700;">₹${item.price}</div>` : ''}
                 </div>
               `).join('')}
             </div>
@@ -1378,7 +2271,7 @@
       
       if (topItems.length === 0) {
         container.innerHTML = `
-          <div style="text-align: center; color: var(--muted); padding: 40px;">
+          <div style="text-align: center; color: var(--text-muted); padding: 40px;">
             <i class="fas fa-utensils" style="font-size: 48px; margin-bottom: 15px;"></i>
             <p>No order data available</p>
           </div>
@@ -1844,7 +2737,7 @@
       }
 
       if (!menuItems.length) {
-        container.innerHTML = '<div style="color:var(--muted); text-align:center; padding:40px;">No menu items found. Add items first.</div>';
+        container.innerHTML = '<div style="color:var(--text-muted); text-align:center; padding:40px;">No menu items found. Add items first.</div>';
         return;
       }
 
@@ -1860,7 +2753,7 @@
 
       container.innerHTML = Object.keys(itemsByCategory).map(category => `
         <div style="margin-bottom: 20px;">
-          <div style="font-weight: 700; color: var(--text); margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid var(--border);">${escapeHtml(category)}</div>
+          <div style="font-weight: 700; color: var(--text-primary); margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid var(--border-subtle);">${escapeHtml(category)}</div>
           ${itemsByCategory[category].map(item => `
             <div class="menu-item" data-id="${item.id}">
               <div class="menu-item-info">
@@ -1868,7 +2761,7 @@
                 <div class="menu-item-details">
                   <span>₹${item.price}</span>
                   ${item.description ? `<span>${escapeHtml(item.description)}</span>` : ''}
-                  <span style="color: ${item.available ? 'var(--success)' : 'var(--danger)'};">
+                  <span style="color: ${item.available ? 'var(--accent-green)' : 'var(--accent-red)'};">
                     ${item.available ? 'Available' : 'Unavailable'}
                   </span>
                 </div>
@@ -2153,34 +3046,34 @@
       const allOrders = [...orders, ...cancelledOrders].sort((a, b) => new Date(b.createdAt || b.date) - new Date(a.createdAt || a.date));
       
       if (!allOrders.length) {
-        container.innerHTML = '<div style="color:var(--muted); text-align:center; padding:40px;">No order history found.</div>';
+        container.innerHTML = '<div style="color:var(--text-muted); text-align:center; padding:40px;">No order history found.</div>';
         return;
       }
       
       container.innerHTML = allOrders.map(order => `
-        <div style="background: rgba(40,50,70,0.3); padding: 15px; border-radius: 12px; margin-bottom: 10px; border: 1px solid var(--border);">
+        <div style="background: var(--bg-secondary); padding: 15px; border-radius: var(--radius-lg); margin-bottom: 10px; border: 1px solid var(--border-subtle);">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <div style="font-weight: 700; color: var(--text);">Order #${order.id || 'N/A'}</div>
-            <div style="font-size: 12px; color: var(--muted);">${order.date} ${order.time}</div>
+            <div style="font-weight: 700; color: var(--text-primary);">Order #${order.id || 'N/A'}</div>
+            <div style="font-size: 12px; color: var(--text-muted);">${order.date} ${order.time}</div>
           </div>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
             <div>
-              <div style="font-size: 12px; color: var(--muted);">Amount</div>
-              <div style="color: var(--text); font-weight: 700;">₹${parseFloat(String(order.amount || "0").replace(/₹|,/g, "")).toFixed(2)}</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Amount</div>
+              <div style="color: var(--text-primary); font-weight: 700;">₹${parseFloat(String(order.amount || "0").replace(/₹|,/g, "")).toFixed(2)}</div>
             </div>
             <div>
-              <div style="font-size: 12px; color: var(--muted);">Status</div>
-              <div style="color: ${order.status === 'completed' ? 'var(--success)' : order.status === 'cancelled' ? 'var(--danger)' : 'var(--accent)'}; font-weight: 700;">
+              <div style="font-size: 12px; color: var(--text-muted);">Status</div>
+              <div style="color: ${order.status === 'completed' ? 'var(--accent-green)' : order.status === 'cancelled' ? 'var(--accent-red)' : 'var(--accent-gold)'}; font-weight: 700;">
                 ${order.status || 'Pending'}
               </div>
             </div>
             <div>
-              <div style="font-size: 12px; color: var(--muted);">Payment</div>
-              <div style="color: var(--text);">${order.method || 'Unknown'}</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Payment</div>
+              <div style="color: var(--text-primary);">${order.method || 'Unknown'}</div>
             </div>
             <div>
-              <div style="font-size: 12px; color: var(--muted);">Items</div>
-              <div style="color: var(--text);">${Array.isArray(order.items) ? order.items.length : 0}</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Items</div>
+              <div style="color: var(--text-primary);">${Array.isArray(order.items) ? order.items.length : 0}</div>
             </div>
           </div>
         </div>
@@ -2214,34 +3107,34 @@
       const filteredOrders = allOrders.filter(order => order.date === dateFilter);
       
       if (!filteredOrders.length) {
-        container.innerHTML = '<div style="color:var(--muted); text-align:center; padding:40px;">No orders found for selected date.</div>';
+        container.innerHTML = '<div style="color:var(--text-muted); text-align:center; padding:40px;">No orders found for selected date.</div>';
         return;
       }
       
       container.innerHTML = filteredOrders.map(order => `
-        <div style="background: rgba(40,50,70,0.3); padding: 15px; border-radius: 12px; margin-bottom: 10px; border: 1px solid var(--border);">
+        <div style="background: var(--bg-secondary); padding: 15px; border-radius: var(--radius-lg); margin-bottom: 10px; border: 1px solid var(--border-subtle);">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <div style="font-weight: 700; color: var(--text);">Order #${order.id || 'N/A'}</div>
-            <div style="font-size: 12px; color: var(--muted);">${order.date} ${order.time}</div>
+            <div style="font-weight: 700; color: var(--text-primary);">Order #${order.id || 'N/A'}</div>
+            <div style="font-size: 12px; color: var(--text-muted);">${order.date} ${order.time}</div>
           </div>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
             <div>
-              <div style="font-size: 12px; color: var(--muted);">Amount</div>
-              <div style="color: var(--text); font-weight: 700;">₹${parseFloat(String(order.amount || "0").replace(/₹|,/g, "")).toFixed(2)}</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Amount</div>
+              <div style="color: var(--text-primary); font-weight: 700;">₹${parseFloat(String(order.amount || "0").replace(/₹|,/g, "")).toFixed(2)}</div>
             </div>
             <div>
-              <div style="font-size: 12px; color: var(--muted);">Status</div>
-              <div style="color: ${order.status === 'completed' ? 'var(--success)' : order.status === 'cancelled' ? 'var(--danger)' : 'var(--accent)'}; font-weight: 700;">
+              <div style="font-size: 12px; color: var(--text-muted);">Status</div>
+              <div style="color: ${order.status === 'completed' ? 'var(--accent-green)' : order.status === 'cancelled' ? 'var(--accent-red)' : 'var(--accent-gold)'}; font-weight: 700;">
                 ${order.status || 'Pending'}
               </div>
             </div>
             <div>
-              <div style="font-size: 12px; color: var(--muted);">Payment</div>
-              <div style="color: var(--text);">${order.method || 'Unknown'}</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Payment</div>
+              <div style="color: var(--text-primary);">${order.method || 'Unknown'}</div>
             </div>
             <div>
-              <div style="font-size: 12px; color: var(--muted);">Items</div>
-              <div style="color: var(--text);">${Array.isArray(order.items) ? order.items.length : 0}</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Items</div>
+              <div style="color: var(--text-primary);">${Array.isArray(order.items) ? order.items.length : 0}</div>
             </div>
           </div>
         </div>

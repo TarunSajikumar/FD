@@ -3,13 +3,433 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
-  <title>Food Point | Cart</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>Food Point | Cart • Crypto Style</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="fp-config.js"></script>
   <script src="fp-fetch-proxy.js"></script>
   <script src="api.js"></script>
   <script src="dev-check.js"></script>
-  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      /* Backgrounds - Crypto Dark Theme */
+      --bg-primary: #0A0A0F;
+      --bg-secondary: #111116;
+      --bg-card: #15171E;
+      --bg-elevated: #1A1C23;
+      --bg-userbar: #0D0D12;
+      
+      /* Text Colors */
+      --text-primary: #FFFFFF;
+      --text-secondary: #8A8F9E;
+      --text-muted: #5A5F73;
+      
+      /* Accent Colors */
+      --accent-green: #00FF85;
+      --accent-blue: #3B82F6;
+      --accent-red: #FF4D4D;
+      --accent-orange: #F97316;
+      
+      /* Borders */
+      --border-subtle: #1E1E2E;
+      --border-card: rgba(255, 255, 255, 0.05);
+      
+      /* Spacing */
+      --spacing-xs: 0.5rem;
+      --spacing-sm: 1rem;
+      --spacing-md: 1.5rem;
+      --spacing-lg: 2rem;
+      --spacing-xl: 3rem;
+      
+      /* Border Radius */
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      
+      /* Gradients */
+      --gradient-primary: linear-gradient(135deg, #00FF85 0%, #00C96D 100%);
+      --gradient-card-hover: linear-gradient(180deg, #1A1C23 0%, #111116 100%);
+      --gradient-glow: radial-gradient(circle at 50% 0%, rgba(0, 255, 133, 0.08), transparent);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--gradient-glow);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* User Bar */
+    .user-bar {
+      background: var(--bg-userbar);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .user-avatar {
+      width: 44px;
+      height: 44px;
+      background: var(--gradient-primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 18px;
+      color: #0A0A0F;
+    }
+
+    .user-text .user-name {
+      font-weight: 600;
+      font-size: 15px;
+      color: var(--text-primary);
+    }
+
+    .user-text .user-email {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .logout-btn {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      padding: 8px 20px;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .logout-btn:hover {
+      border-color: var(--accent-blue);
+      color: var(--accent-blue);
+      background: rgba(59, 130, 246, 0.05);
+    }
+
+    /* Page */
+    .page {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 24px 20px 60px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Cart Card */
+    .cart-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 255, 133, 0.05);
+      transition: all 0.3s ease;
+    }
+
+    .cart-card:hover {
+      box-shadow: 0 30px 60px -15px rgba(0, 255, 133, 0.15), 0 0 0 1px rgba(0, 255, 133, 0.15);
+    }
+
+    .cart-card h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 24px;
+      letter-spacing: -0.02em;
+    }
+
+    /* Cart List */
+    .cart-list {
+      margin-bottom: 24px;
+    }
+
+    /* Cart Item */
+    .cart-item {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.2s ease;
+    }
+
+    .cart-item:hover {
+      border-color: rgba(0, 255, 133, 0.3);
+      transform: translateX(4px);
+    }
+
+    .cart-left {
+      flex: 1;
+    }
+
+    .item-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .item-name {
+      font-weight: 600;
+      font-size: 15px;
+      color: var(--text-primary);
+    }
+
+    .item-desc {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .item-price {
+      font-weight: 700;
+      color: var(--accent-green);
+      font-size: 14px;
+    }
+
+    /* Quantity Controls */
+    .qty-btn {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .qty-btn:hover {
+      border-color: var(--accent-green);
+      color: var(--accent-green);
+    }
+
+    .qty-num {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    /* Remove Button */
+    .remove-btn {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .remove-btn:hover {
+      border-color: var(--accent-red);
+      color: var(--accent-red);
+      background: rgba(255, 77, 77, 0.05);
+    }
+
+    /* Empty State */
+    .empty-text {
+      text-align: center;
+      padding: 48px 20px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .empty-text i {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    /* Summary Rows */
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .summary-row strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    /* Parcel Section */
+    .parcel-section {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      margin: 16px 0;
+    }
+
+    .parcel-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .parcel-label input {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: var(--accent-green);
+    }
+
+    .parcel-charge {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    /* Total Section */
+    .total-section {
+      background: var(--bg-elevated);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      margin: 16px 0;
+      border: 1px solid var(--border-card);
+    }
+
+    .total-section .summary-row {
+      border-bottom: none;
+      font-size: 18px;
+    }
+
+    .total-section .summary-row strong {
+      font-size: 20px;
+      color: var(--accent-green);
+    }
+
+    /* Pay Button */
+    .pay-btn {
+      width: 100%;
+      padding: 16px;
+      background: var(--gradient-primary);
+      color: #0A0A0F;
+      font-size: 16px;
+      font-weight: 700;
+      border: none;
+      border-radius: 100px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'Inter', sans-serif;
+      margin-top: 8px;
+    }
+
+    .pay-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 255, 133, 0.3);
+    }
+
+    .pay-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Back Button */
+    .back-to-menu {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      padding: 10px 20px;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'Inter', sans-serif;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .back-to-menu:hover {
+      border-color: var(--accent-green);
+      color: var(--accent-green);
+      background: rgba(0, 255, 133, 0.05);
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .user-bar {
+        padding: 10px 16px;
+      }
+      .cart-card {
+        padding: 20px;
+      }
+      .cart-card h2 {
+        font-size: 1.25rem;
+      }
+      .cart-item {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+      }
+      .cart-item > div:last-child {
+        justify-content: space-between;
+      }
+      .total-section .summary-row {
+        font-size: 14px;
+      }
+      .total-section .summary-row strong {
+        font-size: 16px;
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="user-bar" aria-hidden="false">
@@ -20,12 +440,12 @@
         <div class="user-email">Cart</div>
       </div>
     </div>
-    <button class="logout-btn" onclick="location.href='menu.html'">Menu</button>
+    <button class="logout-btn" onclick="location.href='menu.html'">🍽️ Menu</button>
   </div>
 
   <div class="page page-with-header">
     <div class="cart-card" role="main" aria-label="Cart">
-      <h2>🛒 YOUR CART</h2>
+      <h2><i class="fas fa-shopping-cart"></i> YOUR CART</h2>
 
       <div id="cartList" class="cart-list" aria-live="polite"></div>
 
@@ -54,11 +474,11 @@
         </div>
       </div>
 
-      <button id="payBtn" class="pay-btn" disabled>PROCEED TO PAY</button>
+      <button id="payBtn" class="pay-btn" disabled>💳 PROCEED TO PAY</button>
       
-      <div style="text-align:center; margin-top:16px;">
-        <button onclick="location.href='menu.html'" style="background:transparent; border:1px solid rgba(255,255,255,0.1); color:#aeb5c4; padding:10px 20px; border-radius:10px; cursor:pointer; transition:all 200ms ease;">
-          ← Back to Menu
+      <div style="text-align:center; margin-top:20px;">
+        <button onclick="location.href='menu.html'" class="back-to-menu">
+          <i class="fas fa-arrow-left"></i> Back to Menu
         </button>
       </div>
     </div>
@@ -180,7 +600,7 @@ function renderCart() {
   cartList.innerHTML = '';
 
   if (!normalizedCart.length) {
-    cartList.innerHTML = '<div class="empty-text">Your cart is empty.<br><small style="font-size:14px;margin-top:8px;display:block">Add items from the menu first</small></div>';
+    cartList.innerHTML = '<div class="empty-text"><i class="fas fa-shopping-bag"></i><br>Your cart is empty.<br><small style="font-size:14px;margin-top:8px;display:block">Add items from the menu first</small></div>';
     itemCountEl.textContent = '0';
     amountEl.textContent = formatCurrency(0);
     totalEl.textContent = formatCurrency(0);
@@ -199,20 +619,20 @@ function renderCart() {
     row.innerHTML = `
       <div class="cart-left">
         <div class="item-info">
-          <div class="item-name">${escapeHtml(it.name)}<span style="font-size:12px;color:#00d9a3;margin-left:8px">${variantText}</span></div>
+          <div class="item-name">${escapeHtml(it.name)}<span style="font-size:12px;color:#00FF85;margin-left:8px">${variantText}</span></div>
           ${it.description ? `<div class="item-desc">${escapeHtml(it.description)}</div>` : ''}
         </div>
       </div>
 
       <div style="display:flex;align-items:center;gap:12px">
-        <div style="display:flex;align-items:center">
+        <div style="display:flex;align-items:center;gap:6px">
           <button class="qty-btn dec" aria-label="Decrease quantity">−</button>
           <div class="qty-num" style="min-width:28px;text-align:center">${it.quantity}</div>
           <button class="qty-btn inc" aria-label="Increase quantity">+</button>
         </div>
         <div style="text-align:right">
           <div class="item-price">${formatCurrency(it.numericPrice)}</div>
-          <div style="font-size:13px;color:#aeb5c4;margin-top:4px">Subtotal: ${formatCurrency(subtotal)}</div>
+          <div style="font-size:12px;color:#5A5F73;margin-top:4px">Subtotal: ${formatCurrency(subtotal)}</div>
         </div>
         <div style="margin-left:8px">
           <button class="remove-btn" aria-label="Remove item">✕</button>

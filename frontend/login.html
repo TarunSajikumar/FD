@@ -2,15 +2,457 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Food Point | Login</title>
+  <title>Food Point | Crypto-Style Login</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
   <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
   />
   <script src="fp-config.js"></script>
-  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      /* Backgrounds - Crypto Dark Theme */
+      --bg-primary: #0A0A0F;
+      --bg-secondary: #111116;
+      --bg-card: #15171E;
+      --bg-elevated: #1A1C23;
+      --bg-modal: #1A1C23;
+      
+      /* Text Colors */
+      --text-primary: #FFFFFF;
+      --text-secondary: #8A8F9E;
+      --text-muted: #5A5F73;
+      
+      /* Accent Colors */
+      --accent-green: #00FF85;
+      --accent-blue: #3B82F6;
+      --accent-red: #FF4D4D;
+      --accent-orange: #F97316;
+      
+      /* Borders */
+      --border-subtle: #1E1E2E;
+      --border-card: rgba(255, 255, 255, 0.05);
+      
+      /* Spacing */
+      --spacing-xs: 0.5rem;
+      --spacing-sm: 1rem;
+      --spacing-md: 1.5rem;
+      --spacing-lg: 2rem;
+      --spacing-xl: 3rem;
+      
+      /* Border Radius */
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      
+      /* Gradients */
+      --gradient-primary: linear-gradient(135deg, #00FF85 0%, #00C96D 100%);
+      --gradient-card-hover: linear-gradient(180deg, #1A1C23 0%, #111116 100%);
+      --gradient-glow: radial-gradient(circle at 50% 0%, rgba(0, 255, 133, 0.08), transparent);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--spacing-lg);
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--gradient-glow);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body.modal-open {
+      overflow: hidden;
+    }
+
+    /* Auth Card - Premium Crypto Style */
+    .auth-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-xl);
+      max-width: 480px;
+      width: 100%;
+      position: relative;
+      z-index: 1;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 255, 133, 0.05);
+      transition: all 0.3s ease;
+    }
+
+    .auth-card:hover {
+      box-shadow: 0 30px 60px -15px rgba(0, 255, 133, 0.15), 0 0 0 1px rgba(0, 255, 133, 0.15);
+      transform: translateY(-2px);
+    }
+
+    /* Top Links */
+    .top-links {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .top-links button {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      padding: 8px 20px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      border-radius: 100px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .top-links button:hover {
+      border-color: var(--accent-green);
+      color: var(--accent-green);
+      background: rgba(0, 255, 133, 0.05);
+      box-shadow: 0 0 15px rgba(0, 255, 133, 0.1);
+    }
+
+    /* Brand */
+    .brand {
+      font-size: 2rem;
+      font-weight: 800;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-align: center;
+      letter-spacing: -0.02em;
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      margin-bottom: var(--spacing-lg);
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: var(--spacing-md);
+      color: var(--text-primary);
+    }
+
+    /* Input Groups */
+    .input-group {
+      margin-bottom: var(--spacing-md);
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: var(--spacing-xs);
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 14px 18px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      font-size: 0.95rem;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s ease;
+    }
+
+    .input-group input:focus {
+      outline: none;
+      border-color: var(--accent-green);
+      box-shadow: 0 0 0 3px rgba(0, 255, 133, 0.1);
+    }
+
+    .input-group input::placeholder {
+      color: var(--text-muted);
+    }
+
+    /* Messages */
+    .error {
+      background: rgba(255, 77, 77, 0.1);
+      border: 1px solid rgba(255, 77, 77, 0.2);
+      border-radius: var(--radius-md);
+      padding: var(--spacing-sm);
+      color: #FF6B6B;
+      font-size: 0.85rem;
+      margin-bottom: var(--spacing-md);
+      text-align: center;
+    }
+
+    .success {
+      background: rgba(0, 255, 133, 0.1);
+      border: 1px solid rgba(0, 255, 133, 0.2);
+      border-radius: var(--radius-md);
+      padding: var(--spacing-sm);
+      color: var(--accent-green);
+      font-size: 0.85rem;
+      margin-bottom: var(--spacing-md);
+      text-align: center;
+    }
+
+    /* Button */
+    .btn {
+      width: 100%;
+      padding: 14px 28px;
+      background: var(--gradient-primary);
+      color: #0A0A0F;
+      font-size: 1rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 100px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: var(--spacing-md);
+    }
+
+    .btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 255, 133, 0.3);
+    }
+
+    .btn:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Switch Text */
+    .switch-text {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    .switch-text button {
+      background: none;
+      border: none;
+      color: var(--accent-blue);
+      cursor: pointer;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      margin-left: var(--spacing-xs);
+      transition: color 0.2s ease;
+    }
+
+    .switch-text button:hover {
+      color: var(--accent-green);
+      text-decoration: underline;
+    }
+
+    /* Modal Overlay - Crypto Style */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(10, 10, 15, 0.95);
+      backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* Password Modal */
+    .password-modal {
+      background: var(--bg-modal);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-xl);
+      max-width: 420px;
+      width: 90%;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 255, 133, 0.1);
+      transform: scale(0.95);
+      transition: transform 0.3s ease;
+    }
+
+    .modal-overlay.active .password-modal {
+      transform: scale(1);
+    }
+
+    .modal-header {
+      text-align: center;
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .lock-icon {
+      width: 60px;
+      height: 60px;
+      background: rgba(0, 255, 133, 0.1);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto var(--spacing-md);
+    }
+
+    .lock-icon i {
+      font-size: 28px;
+      color: var(--accent-green);
+    }
+
+    .password-modal h2 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .password-modal p {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    .password-input {
+      width: 100%;
+      padding: 14px 18px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      font-size: 1rem;
+      font-family: 'Inter', monospace;
+      transition: all 0.2s ease;
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .password-input:focus {
+      outline: none;
+      border-color: var(--accent-green);
+      box-shadow: 0 0 0 3px rgba(0, 255, 133, 0.1);
+    }
+
+    .password-input.error {
+      border-color: var(--accent-red);
+      box-shadow: 0 0 0 3px rgba(255, 77, 77, 0.1);
+    }
+
+    .error-message {
+      color: var(--accent-red);
+      font-size: 0.8rem;
+      margin-bottom: var(--spacing-sm);
+      display: none;
+    }
+
+    .error-message.show {
+      display: block;
+    }
+
+    .attempts-warning {
+      color: var(--accent-orange);
+      font-size: 0.8rem;
+      margin-bottom: var(--spacing-sm);
+      display: none;
+    }
+
+    .attempts-warning.show {
+      display: block;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: var(--spacing-sm);
+      margin-top: var(--spacing-md);
+    }
+
+    .modal-btn {
+      flex: 1;
+      padding: 12px 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      border-radius: 100px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'Inter', sans-serif;
+      border: none;
+    }
+
+    .modal-btn-primary {
+      background: var(--gradient-primary);
+      color: #0A0A0F;
+    }
+
+    .modal-btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 15px rgba(0, 255, 133, 0.3);
+    }
+
+    .modal-btn-secondary {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+    }
+
+    .modal-btn-secondary:hover {
+      border-color: var(--accent-blue);
+      color: var(--accent-blue);
+      background: rgba(59, 130, 246, 0.05);
+    }
+
+    /* Responsive */
+    @media (max-width: 560px) {
+      body {
+        padding: var(--spacing-md);
+      }
+      
+      .auth-card {
+        padding: var(--spacing-lg);
+      }
+      
+      .brand {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
 </head>
 <body>
 
@@ -21,30 +463,26 @@
 
   <div class="auth-card">
     <div class="top-links">
-      <!-- Owner button with popup -->
       <button id="ownerBtnTop">
-        <i class="fas fa-lock"></i> Owner
+        <i class="fas fa-lock"></i> Owner Access
       </button>
     </div>
 
-    <div class="brand">FOOD POINT</div>
+    <div class="brand">🍽️ FOOD POINT</div>
     <div class="subtitle">Sign in to continue or create an account</div>
 
     <h2 id="formTitle">Log in</h2>
 
-    <!-- LOGIN: email or name -->
     <div class="input-group" id="loginIdGroup">
       <label for="loginIdInput">Email or name</label>
       <input type="text" id="loginIdInput" placeholder="you@example.com or your name">
     </div>
 
-    <!-- SIGNUP ONLY: full name -->
     <div id="nameGroup" class="input-group" style="display:none;">
       <label for="nameInput">Full name</label>
       <input type="text" id="nameInput" placeholder="Your name" autocomplete="name">
     </div>
 
-    <!-- SIGNUP ONLY: email -->
     <div id="emailGroup" class="input-group" style="display:none;">
       <label for="emailInput">Email</label>
       <input type="email" id="emailInput" placeholder="you@example.com" autocomplete="email">
@@ -74,7 +512,6 @@
     </div>
   </div>
 
-  <!-- OWNER PASSWORD MODAL -->
   <div class="modal-overlay" id="ownerPasswordModal">
     <div class="password-modal">
       <div class="modal-header">
@@ -106,7 +543,7 @@
   </div>
 
   <script>
-    // ---------- USER LO  GIN / SIGNUP (same logic) ----------
+    // ---------- USER LOGIN / SIGNUP (same logic) ----------
     const USERS_KEY = "fp_users";
     const CURRENT_USER_KEY = "fp_current_user";
     const SHOP_STATUS_KEY = "shopStatus";
@@ -129,7 +566,7 @@
     const message       = document.getElementById("message");
     const successMsg    = document.getElementById("successMsg");
 
-    let mode = "login"; // or "signup"
+    let mode = "login";
 
     function loadUsers() {
       try {
@@ -222,7 +659,6 @@
             return;
           }
 
-          // Try backend login first; fallback to local users
           try {
             const data = await FPAPI.post('/auth/login', { identifier, password });
             if (data && data.token) localStorage.setItem('fp_token', data.token);
@@ -231,10 +667,9 @@
             setTimeout(() => window.location.href = 'menu.html', 700);
             return;
           } catch (e) {
-            // network error or non-2xx — fall through to local fallback
+            // fallback
           }
 
-          // Fallback: local users
           const user = users.find(u =>
             (u.email && u.email.toLowerCase() === identifier) ||
             (u.name && u.name.toLowerCase() === identifier)
@@ -277,7 +712,6 @@
           return;
         }
 
-        // Try to create user on backend first; fallback to local storage
         try {
           const data = await FPAPI.post('/auth/signup', { name, email, password });
           if (data && data.token) localStorage.setItem('fp_token', data.token);
@@ -286,7 +720,7 @@
           setTimeout(() => window.location.href = 'menu.html', 800);
           return;
         } catch (e) {
-          // network error -> fallback to local storage
+          // fallback
         }
 
         const newUser = {
@@ -316,15 +750,12 @@
 
     refreshShopStatusUI();
 
-    // No automatic login redirect. Users must sign in manually.
-
     // ---------- OWNER PASSWORD POPUP (same connection as index) ----------
     const OWNER_PASSWORD_KEY = "ownerPassword";
     const ATTEMPTS_KEY = "passwordAttempts";
     const LOCKOUT_KEY = "passwordLockout";
 
     function getOwnerPassword() {
-      // default password if not set by owner page
       try {
         const p = localStorage.getItem(OWNER_PASSWORD_KEY);
         if (!p || !p.toString().trim()) return "1515";
@@ -358,7 +789,7 @@
       attempts++;
       localStorage.setItem(ATTEMPTS_KEY, attempts.toString());
       if (attempts >= 3) {
-        const lockoutTime = Date.now() + 30000; // 30s
+        const lockoutTime = Date.now() + 30000;
         localStorage.setItem(LOCKOUT_KEY, lockoutTime.toString());
         document.getElementById("ownerAttemptsWarn").classList.add("show");
         document.getElementById("ownerSubmitBtn").disabled = true;
@@ -374,7 +805,6 @@
       const entered = (input.value || '').toString().trim();
       const correct = (getOwnerPassword() || '1515').toString().trim();
 
-      // Try backend owner login first (graceful fallback to local password)
       (async () => {
         try {
           const data = await FPAPI.post('/auth/login', { identifier: 'Owner', password: entered });
@@ -386,10 +816,9 @@
           window.location.href = 'owner-dashboard.html';
           return;
         } catch (e) {
-          // network error — ignore and fallback
+          // fallback
         }
 
-        // Fallback: local password check
         if (entered === correct) {
           localStorage.removeItem(ATTEMPTS_KEY);
           localStorage.removeItem(LOCKOUT_KEY);

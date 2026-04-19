@@ -3,10 +3,421 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-  <title>Food Point • Your Orders</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>Food Point • Your Orders • Crypto Style</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      /* Backgrounds - Crypto Dark Theme */
+      --bg-primary: #0A0A0F;
+      --bg-secondary: #111116;
+      --bg-card: #15171E;
+      --bg-elevated: #1A1C23;
+      --bg-userbar: #0D0D12;
+      
+      /* Text Colors */
+      --text-primary: #FFFFFF;
+      --text-secondary: #8A8F9E;
+      --text-muted: #5A5F73;
+      
+      /* Accent Colors */
+      --accent-green: #00FF85;
+      --accent-blue: #3B82F6;
+      --accent-red: #FF4D4D;
+      --accent-orange: #F97316;
+      
+      /* Borders */
+      --border-subtle: #1E1E2E;
+      --border-card: rgba(255, 255, 255, 0.05);
+      
+      /* Spacing */
+      --spacing-xs: 0.5rem;
+      --spacing-sm: 1rem;
+      --spacing-md: 1.5rem;
+      --spacing-lg: 2rem;
+      --spacing-xl: 3rem;
+      
+      /* Border Radius */
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      
+      /* Gradients */
+      --gradient-primary: linear-gradient(135deg, #00FF85 0%, #00C96D 100%);
+      --gradient-card-hover: linear-gradient(180deg, #1A1C23 0%, #111116 100%);
+      --gradient-glow: radial-gradient(circle at 50% 0%, rgba(0, 255, 133, 0.08), transparent);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--gradient-glow);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* User Bar */
+    .user-bar {
+      background: var(--bg-userbar);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .user-avatar {
+      width: 44px;
+      height: 44px;
+      background: var(--gradient-primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 18px;
+      color: #0A0A0F;
+    }
+
+    .user-text .user-name {
+      font-weight: 600;
+      font-size: 15px;
+      color: var(--text-primary);
+    }
+
+    .user-text .user-email {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .logout-btn {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      padding: 8px 20px;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .logout-btn:hover {
+      border-color: var(--accent-blue);
+      color: var(--accent-blue);
+      background: rgba(59, 130, 246, 0.05);
+    }
+
+    /* Page Wrap */
+    .page-wrap {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 24px 20px 60px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Card */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 255, 133, 0.05);
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+      box-shadow: 0 30px 60px -15px rgba(0, 255, 133, 0.15), 0 0 0 1px rgba(0, 255, 133, 0.15);
+    }
+
+    /* Home Card / Brand */
+    .home-card {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .brand {
+      font-size: 2rem;
+      font-weight: 800;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    .tagline {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    /* Back Button */
+    .back-btn {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      padding: 10px 20px;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'Inter', sans-serif;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .back-btn:hover {
+      border-color: var(--accent-green);
+      color: var(--accent-green);
+      background: rgba(0, 255, 133, 0.05);
+    }
+
+    /* Title */
+    .title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* Header Row */
+    .header-row {
+      display: grid;
+      grid-template-columns: 1fr 80px 120px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 16px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+    }
+
+    /* Order Block */
+    .order-block {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      margin-bottom: 16px;
+      overflow: hidden;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .order-block:hover {
+      border-color: rgba(0, 255, 133, 0.3);
+      transform: translateX(4px);
+    }
+
+    .order-block.expanded {
+      border-color: var(--accent-green);
+      box-shadow: 0 0 20px rgba(0, 255, 133, 0.1);
+    }
+
+    /* Order ID Label */
+    .order-id-label {
+      padding: 12px 16px;
+      background: var(--bg-elevated);
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: var(--accent-green);
+      border-bottom: 1px solid var(--border-subtle);
+      font-family: monospace;
+    }
+
+    /* Order Header (3 columns) */
+    .order-header {
+      display: grid;
+      grid-template-columns: 1fr 80px 120px;
+      padding: 16px;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .order-summary strong {
+      display: block;
+      font-size: 0.9rem;
+      color: var(--text-primary);
+    }
+
+    .order-meta {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .order-parcel {
+      text-align: center;
+    }
+
+    .order-payment {
+      text-align: right;
+    }
+
+    /* Status Pills */
+    .status-pill {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 100px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+
+    .status-paid {
+      background: rgba(0, 255, 133, 0.15);
+      color: var(--accent-green);
+      border: 1px solid rgba(0, 255, 133, 0.3);
+    }
+
+    .status-unpaid {
+      background: rgba(255, 77, 77, 0.1);
+      color: var(--accent-red);
+      border: 1px solid rgba(255, 77, 77, 0.2);
+    }
+
+    /* Payment Details Row */
+    .payment-details-row {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    /* Order Toggle Button */
+    .order-toggle {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      padding: 4px 12px;
+      border-radius: 100px;
+      font-size: 0.65rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .order-toggle:hover {
+      border-color: var(--accent-blue);
+      color: var(--accent-blue);
+    }
+
+    /* Order Details List */
+    .order-details-list {
+      list-style: none;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      background: rgba(0, 0, 0, 0.2);
+      border-top: none;
+    }
+
+    .order-block.expanded .order-details-list {
+      max-height: 500px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .order-item-line {
+      padding: 10px 16px;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .order-item-line::before {
+      content: "🍽️";
+      font-size: 0.7rem;
+      opacity: 0.7;
+    }
+
+    .order-item-line:last-child {
+      border-bottom: none;
+    }
+
+    /* Empty State */
+    .empty-text {
+      text-align: center;
+      padding: 48px 20px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 560px) {
+      .user-bar {
+        padding: 10px 16px;
+      }
+      .card {
+        padding: 16px;
+      }
+      .brand {
+        font-size: 1.5rem;
+      }
+      .header-row {
+        grid-template-columns: 1fr 70px 100px;
+        font-size: 0.65rem;
+      }
+      .order-header {
+        grid-template-columns: 1fr 70px 100px;
+        padding: 12px;
+      }
+      .payment-details-row {
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 6px;
+      }
+      .order-toggle {
+        font-size: 0.6rem;
+        padding: 3px 8px;
+      }
+      .status-pill {
+        font-size: 0.65rem;
+        padding: 3px 8px;
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="user-bar">
@@ -17,14 +428,14 @@
         <div class="user-email">Your Orders</div>
       </div>
     </div>
-    <button class="logout-btn" onclick="location.href='menu.html'">Menu</button>
+    <button class="logout-btn" onclick="location.href='menu.html'">🍽️ Menu</button>
   </div>
 
   <div class="page-wrap page-with-header">
     <div class="card">
       <div class="home-card">
-        <div class="brand">FOOD POINT</div>
-        <div class="tagline">Fresh, fast & tasty bites for you</div>
+        <div class="brand">🍽️ FOOD POINT</div>
+        <div class="tagline">Fresh, fast & tasty bites • Crypto Style</div>
       </div>
       <!-- go to menu button -->
       <button class="back-btn" onclick="location.href='menu.html'">
@@ -32,18 +443,19 @@
         Go to Menu
       </button>
 
-      <div class="title">your order</div>
+      <div class="title">📋 Your Orders</div>
 
       <!-- table header: item | parcel | payment (with details inline) -->
       <div class="header-row">
-        <span>item</span>
-        <span>parcel</span>
-        <span>payment </span>
+        <span>Item</span>
+        <span>Parcel</span>
+        <span>Payment</span>
       </div>
 
       <div id="ordersContainer"></div>
 
       <div id="emptyState" class="empty-text" style="display:none;">
+        <i class="fas fa-receipt" style="font-size: 32px; margin-bottom: 12px; display: block; opacity: 0.5;"></i>
         No orders yet. Place an order from the store.
       </div>
     </div>
@@ -112,7 +524,7 @@
           // order id label
           const label = document.createElement("div");
           label.className = "order-id-label";
-          label.textContent = `order id #${orderId} • ${dateText}`;
+          label.textContent = `🔑 order id #${orderId} • ${dateText}`;
           block.appendChild(label);
           
           // header row (3 columns)
@@ -123,10 +535,10 @@
           const summaryCol = document.createElement('div');
           summaryCol.className = 'order-summary';
           const foodStrong = document.createElement('strong');
-          foodStrong.textContent = 'FOOD';
+          foodStrong.textContent = '🍕 FOOD';
           const metaSpan = document.createElement('div');
           metaSpan.className = 'order-meta';
-          metaSpan.textContent = parcelSelected ? 'Takeaway' : 'Dine in';
+          metaSpan.textContent = parcelSelected ? '📦 Takeaway' : '🍽️ Dine in';
           summaryCol.appendChild(foodStrong);
           summaryCol.appendChild(metaSpan);
           
