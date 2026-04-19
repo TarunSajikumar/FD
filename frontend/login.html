@@ -79,9 +79,32 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: var(--gradient-glow);
+      background: 
+        radial-gradient(circle at 20% 50%, rgba(255, 157, 77, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(0, 255, 133, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 50% 0%, rgba(255, 100, 50, 0.1) 0%, transparent 60%);
       pointer-events: none;
       z-index: 0;
+      animation: foodGradientShift 15s ease-in-out infinite;
+    }
+
+    body::after {
+      content: '🍽️ 🍔 🍕 🍜 🍱 🍛 🍝 🌮 🍤 🥘';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      font-size: 120px;
+      opacity: 0.03;
+      pointer-events: none;
+      z-index: 0;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-around;
+      overflow: hidden;
+      animation: foodFloat 20s linear infinite;
     }
 
     body.modal-open {
@@ -100,6 +123,20 @@
       z-index: 1;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 255, 133, 0.05);
       transition: all 0.3s ease;
+      animation: cardEnter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+    }
+
+    @keyframes cardEnter {
+      from {
+        opacity: 0;
+        transform: translateY(40px) scale(0.95);
+        filter: blur(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+      }
     }
 
     .auth-card:hover {
@@ -123,15 +160,46 @@
       font-weight: 500;
       border-radius: 100px;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
       font-family: 'Inter', sans-serif;
+      animation: topLinkEnter 0.6s ease-out backwards;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .top-links button::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(0, 255, 133, 0.1) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .top-links button:hover::before {
+      opacity: 1;
     }
 
     .top-links button:hover {
       border-color: var(--accent-green);
       color: var(--accent-green);
       background: rgba(0, 255, 133, 0.05);
-      box-shadow: 0 0 15px rgba(0, 255, 133, 0.1);
+      box-shadow: 0 0 20px rgba(0, 255, 133, 0.2);
+      transform: translateY(-2px);
+    }
+
+    @keyframes topLinkEnter {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     /* Brand */
@@ -145,6 +213,7 @@
       text-align: center;
       letter-spacing: -0.02em;
       margin-bottom: var(--spacing-xs);
+      animation: brandEnter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
     }
 
     .subtitle {
@@ -152,6 +221,7 @@
       color: var(--text-secondary);
       font-size: 0.9rem;
       margin-bottom: var(--spacing-lg);
+      animation: subtitleEnter 0.8s ease-out 0.2s backwards;
     }
 
     h2 {
@@ -159,11 +229,13 @@
       font-weight: 700;
       margin-bottom: var(--spacing-md);
       color: var(--text-primary);
+      animation: titleEnter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s backwards;
     }
 
     /* Input Groups */
     .input-group {
       margin-bottom: var(--spacing-md);
+      animation: inputEnter 0.6s ease-out 0.3s backwards;
     }
 
     .input-group label {
@@ -197,6 +269,16 @@
     }
 
     /* Messages */
+    .error,
+    .success {
+      display: none;
+    }
+
+    .error:not(:empty),
+    .success:not(:empty) {
+      display: block;
+    }
+
     .error {
       background: rgba(255, 77, 77, 0.1);
       border: 1px solid rgba(255, 77, 77, 0.2);
@@ -230,22 +312,44 @@
       border: none;
       border-radius: 100px;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
       font-family: 'Inter', sans-serif;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
       margin-bottom: var(--spacing-md);
+      animation: buttonEnter 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.5s backwards;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      transform: rotate(45deg);
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .btn:hover:not(:disabled)::before {
+      opacity: 1;
+      animation: shimmer 0.6s ease-in-out;
     }
 
     .btn:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(0, 255, 133, 0.3);
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 10px 30px rgba(0, 255, 133, 0.4), inset 0 0 10px rgba(255, 255, 255, 0.1);
+      animation: buttonGlow 1.5s ease-in-out infinite;
     }
 
     .btn:active:not(:disabled) {
-      transform: translateY(0);
+      transform: translateY(0) scale(0.98);
     }
 
     .btn:disabled {
@@ -258,6 +362,7 @@
       text-align: center;
       color: var(--text-secondary);
       font-size: 0.9rem;
+      animation: switchTextEnter 0.8s ease-out 0.6s backwards;
     }
 
     .switch-text button {
@@ -268,12 +373,38 @@
       font-weight: 600;
       font-family: 'Inter', sans-serif;
       margin-left: var(--spacing-xs);
-      transition: color 0.2s ease;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+    }
+
+    .switch-text button::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--accent-green);
+      transition: width 0.3s ease;
     }
 
     .switch-text button:hover {
       color: var(--accent-green);
-      text-decoration: underline;
+    }
+
+    .switch-text button:hover::after {
+      width: 100%;
+    }
+
+    @keyframes switchTextEnter {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     /* Modal Overlay - Crypto Style */
@@ -291,12 +422,41 @@
       z-index: 1000;
       opacity: 0;
       visibility: hidden;
-      transition: all 0.3s ease;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
     .modal-overlay.active {
       opacity: 1;
       visibility: visible;
+    }
+
+    .modal-overlay::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at center, rgba(0, 255, 133, 0.1) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      animation: glowPulse 3s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes glowPulse {
+      0%, 100% {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      50% {
+        opacity: 0.5;
+        transform: scale(1.1);
+      }
+    }
+
+    .modal-overlay.active::before {
+      opacity: 1;
     }
 
     /* Password Modal */
@@ -308,12 +468,34 @@
       max-width: 420px;
       width: 90%;
       box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 255, 133, 0.1);
-      transform: scale(0.95);
-      transition: transform 0.3s ease;
+      transform: scale(0.8) translateY(20px);
+      opacity: 0;
+      transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      overflow: hidden;
+      animation: modalEnter 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+    }
+
+    .password-modal::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(0, 255, 133, 0.1) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.6s ease;
+      pointer-events: none;
     }
 
     .modal-overlay.active .password-modal {
-      transform: scale(1);
+      transform: scale(1) translateY(0);
+      opacity: 1;
+    }
+
+    .modal-overlay.active .password-modal::before {
+      opacity: 1;
     }
 
     .modal-header {
@@ -330,11 +512,80 @@
       align-items: center;
       justify-content: center;
       margin: 0 auto var(--spacing-md);
+      box-shadow: 0 0 20px rgba(0, 255, 133, 0.3), inset 0 0 20px rgba(0, 255, 133, 0.1);
+      animation: lockIconGlow 2s ease-in-out infinite, lockIconBounce 0.6s ease-out 0.3s backwards, lockPulse 2.5s ease-in-out infinite 0.5s;
+      position: relative;
+    }
+
+    @keyframes lockPulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.08);
+      }
+    }
+
+    .lock-icon::after {
+      content: '';
+      position: absolute;
+      top: -10px;
+      left: -10px;
+      right: -10px;
+      bottom: -10px;
+      border: 2px solid rgba(0, 255, 133, 0.3);
+      border-radius: 50%;
+      opacity: 0;
+      animation: lockRingPulse 2s ease-in-out infinite 0.5s;
+    }
+
+    @keyframes lockIconGlow {
+      0%, 100% {
+        box-shadow: 0 0 20px rgba(0, 255, 133, 0.3), inset 0 0 20px rgba(0, 255, 133, 0.1);
+      }
+      50% {
+        box-shadow: 0 0 35px rgba(0, 255, 133, 0.5), inset 0 0 30px rgba(0, 255, 133, 0.2);
+      }
+    }
+
+    @keyframes lockIconBounce {
+      from {
+        transform: scale(0.8) translateY(10px);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes lockRingPulse {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 0.3;
+      }
+      50% {
+        transform: scale(1.2);
+        opacity: 0.6;
+      }
     }
 
     .lock-icon i {
       font-size: 28px;
       color: var(--accent-green);
+      animation: lockIconShake 2s ease-in-out infinite 1s;
+    }
+
+    @keyframes lockIconShake {
+      0%, 100% {
+        transform: rotate(0deg);
+      }
+      25% {
+        transform: rotate(-5deg);
+      }
+      75% {
+        transform: rotate(5deg);
+      }
     }
 
     .password-modal h2 {
@@ -345,6 +596,36 @@
       background-clip: text;
       color: transparent;
       margin-bottom: var(--spacing-sm);
+      animation: titleGlow 2s ease-in-out infinite, titleSlideIn 0.6s ease-out 0.2s backwards, titlePulseScale 2s ease-in-out infinite 0.8s;
+    }
+
+    @keyframes titlePulseScale {
+      0%, 100% {
+        letter-spacing: -0.02em;
+      }
+      50% {
+        letter-spacing: 0.02em;
+      }
+    }
+
+    @keyframes titleGlow {
+      0%, 100% {
+        text-shadow: 0 0 0 rgba(0, 255, 133, 0);
+      }
+      50% {
+        text-shadow: 0 0 15px rgba(0, 255, 133, 0.3);
+      }
+    }
+
+    @keyframes titleSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .password-modal p {
@@ -361,19 +642,50 @@
       color: var(--text-primary);
       font-size: 1rem;
       font-family: 'Inter', monospace;
-      transition: all 0.2s ease;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
       margin-bottom: var(--spacing-sm);
+      animation: inputSlideIn 0.5s ease-out 0.3s backwards;
+      position: relative;
+    }
+
+    .password-input::placeholder {
+      color: var(--text-muted);
     }
 
     .password-input:focus {
       outline: none;
       border-color: var(--accent-green);
-      box-shadow: 0 0 0 3px rgba(0, 255, 133, 0.1);
+      box-shadow: 0 0 0 3px rgba(0, 255, 133, 0.2), 0 0 15px rgba(0, 255, 133, 0.2);
+      transform: translateY(-2px);
     }
 
     .password-input.error {
       border-color: var(--accent-red);
-      box-shadow: 0 0 0 3px rgba(255, 77, 77, 0.1);
+      box-shadow: 0 0 0 3px rgba(255, 77, 77, 0.2), 0 0 15px rgba(255, 77, 77, 0.2);
+      animation: shake 0.4s ease-in-out;
+    }
+
+    @keyframes inputSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes shake {
+      0%, 100% {
+        transform: translateX(0);
+      }
+      25% {
+        transform: translateX(-5px);
+      }
+      75% {
+        transform: translateX(5px);
+      }
     }
 
     .error-message {
@@ -385,6 +697,7 @@
 
     .error-message.show {
       display: block;
+      animation: messageSlideDown 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
     .attempts-warning {
@@ -396,6 +709,18 @@
 
     .attempts-warning.show {
       display: block;
+      animation: messageSlideDown 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes messageSlideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .modal-buttons {
@@ -411,19 +736,57 @@
       font-weight: 600;
       border-radius: 100px;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
       font-family: 'Inter', sans-serif;
       border: none;
+      position: relative;
+      overflow: hidden;
+      animation: buttonSlideIn 0.5s ease-out 0.4s backwards;
+    }
+
+    .modal-btn::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transform: rotate(45deg);
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .modal-btn:hover::before {
+      opacity: 1;
+      animation: shimmer 0.5s ease-in-out;
+    }
+
+    @keyframes buttonSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .modal-btn-primary {
       background: var(--gradient-primary);
       color: #0A0A0F;
+      box-shadow: 0 0 15px rgba(0, 255, 133, 0.2);
     }
 
     .modal-btn-primary:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 15px rgba(0, 255, 133, 0.3);
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 8px 25px rgba(0, 255, 133, 0.4), inset 0 0 15px rgba(255, 255, 255, 0.1);
+      animation: buttonGlow 1s ease-in-out infinite;
+    }
+
+    .modal-btn-primary:hover::before {
+      left: 100%;
     }
 
     .modal-btn-secondary {
@@ -435,7 +798,135 @@
     .modal-btn-secondary:hover {
       border-color: var(--accent-blue);
       color: var(--accent-blue);
-      background: rgba(59, 130, 246, 0.05);
+      background: rgba(59, 130, 246, 0.1);
+      box-shadow: 0 0 25px rgba(59, 130, 246, 0.4), inset 0 0 10px rgba(59, 130, 246, 0.1);
+      transform: translateY(-2px);
+      animation: buttonSecondaryGlow 1s ease-in-out infinite;
+    }
+
+    @keyframes buttonSecondaryGlow {
+      0%, 100% {
+        box-shadow: 0 0 25px rgba(59, 130, 246, 0.4), inset 0 0 10px rgba(59, 130, 246, 0.1);
+      }
+      50% {
+        box-shadow: 0 0 40px rgba(59, 130, 246, 0.6), inset 0 0 15px rgba(59, 130, 246, 0.2);
+      }
+    }
+
+    /* Animation Keyframes */
+    @keyframes foodGradientShift {
+      0%, 100% {
+        background: 
+          radial-gradient(circle at 20% 50%, rgba(255, 157, 77, 0.15) 0%, transparent 50%),
+          radial-gradient(circle at 80% 80%, rgba(0, 255, 133, 0.08) 0%, transparent 50%),
+          radial-gradient(circle at 50% 0%, rgba(255, 100, 50, 0.1) 0%, transparent 60%);
+      }
+      50% {
+        background: 
+          radial-gradient(circle at 80% 20%, rgba(255, 157, 77, 0.15) 0%, transparent 50%),
+          radial-gradient(circle at 20% 80%, rgba(0, 255, 133, 0.08) 0%, transparent 50%),
+          radial-gradient(circle at 50% 100%, rgba(255, 100, 50, 0.1) 0%, transparent 60%);
+      }
+    }
+
+    @keyframes foodFloat {
+      0% {
+        transform: translateY(0) translateX(0);
+        opacity: 0.03;
+      }
+      50% {
+        opacity: 0.06;
+      }
+      100% {
+        transform: translateY(-100vh) translateX(50px);
+        opacity: 0.01;
+      }
+    }
+
+    @keyframes brandEnter {
+      from {
+        opacity: 0;
+        transform: scale(0.8) translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    @keyframes titleEnter {
+      from {
+        opacity: 0;
+        transform: translateY(-15px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes subtitleEnter {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes inputEnter {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes buttonEnter {
+      from {
+        opacity: 0;
+        transform: scale(0.8) translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    @keyframes buttonGlow {
+      0%, 100% {
+        box-shadow: 0 10px 30px rgba(0, 255, 133, 0.4), inset 0 0 10px rgba(255, 255, 255, 0.1);
+      }
+      50% {
+        box-shadow: 0 15px 40px rgba(0, 255, 133, 0.6), inset 0 0 15px rgba(255, 255, 255, 0.2);
+      }
+    }
+
+    @keyframes shimmer {
+      0% {
+        background-position: -1000px 0;
+      }
+      100% {
+        background-position: 1000px 0;
+      }
+    }
+
+    @keyframes modalEnter {
+      from {
+        opacity: 0;
+        transform: scale(0.9) translateY(30px);
+        filter: blur(10px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+        filter: blur(0);
+      }
     }
 
     /* Responsive */
@@ -443,13 +934,52 @@
       body {
         padding: var(--spacing-md);
       }
-      
+
       .auth-card {
         padding: var(--spacing-lg);
       }
-      
+
       .brand {
         font-size: 1.5rem;
+      }
+
+      /* Disable heavy animations on mobile for performance */
+      .modal-overlay {
+        transition: all 0.2s ease;
+      }
+
+      .modal-overlay::before {
+        display: none;
+      }
+
+      .password-modal {
+        animation: none;
+        transition: all 0.2s ease;
+      }
+
+      .password-modal::before {
+        display: none;
+      }
+
+      .lock-icon {
+        animation: none;
+      }
+
+      .lock-icon::after {
+        display: none;
+      }
+
+      .modal-btn {
+        animation: none;
+        transition: all 0.2s ease;
+      }
+
+      .modal-btn::before {
+        display: none;
+      }
+
+      .password-modal h2 {
+        animation: none;
       }
     }
   </style>
@@ -675,8 +1205,13 @@
             (u.name && u.name.toLowerCase() === identifier)
           );
 
-          if (!user || user.password !== password) {
-            message.textContent = "Invalid details. Try again.";
+          if (!user) {
+            message.textContent = "Email is not found.";
+            return;
+          }
+
+          if (user.password !== password) {
+            message.textContent = "Password is wrong.";
             return;
           }
 

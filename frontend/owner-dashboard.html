@@ -80,6 +80,26 @@
       background: var(--gradient-glow);
       pointer-events: none;
       z-index: 0;
+      animation: foodGradientShift 18s ease-in-out infinite;
+    }
+
+    body::after {
+      content: '🍽️ 🍔 🍕 🍜 🍱 🍛 🍝 🌮 🍤 🥘';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      font-size: 120px;
+      opacity: 0.03;
+      pointer-events: none;
+      z-index: 0;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-around;
+      overflow: hidden;
+      animation: foodFloat 20s linear infinite;
     }
 
     /* Page Container */
@@ -89,6 +109,7 @@
       max-width: 1400px;
       margin: 0 auto;
       padding: 0 20px 40px;
+      animation: pageEnter 0.9s cubic-bezier(0.22, 1, 0.36, 1) backwards;
     }
 
     /* Dashboard Container */
@@ -108,7 +129,9 @@
       align-items: center;
       flex-wrap: wrap;
       gap: 20px;
-      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 10px 30px -10px rgba(0, 255, 133, 0.08);
+      background-image: radial-gradient(circle at top left, rgba(0, 255, 133, 0.08), transparent 45%);
+      animation: cardEnter 0.85s ease-out backwards;
     }
 
     .header-left h1 {
@@ -155,11 +178,27 @@
       font-size: 0.8rem;
       font-weight: 500;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.25s ease;
       font-family: 'Inter', sans-serif;
       display: inline-flex;
       align-items: center;
       gap: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .action-btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top left, rgba(0, 255, 133, 0.14), transparent 40%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+
+    .action-btn:hover::after {
+      opacity: 1;
     }
 
     .action-btn:hover {
@@ -200,6 +239,7 @@
       padding: 24px;
       transition: all 0.3s ease;
       box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+      animation: cardEnter 0.85s ease-out backwards;
     }
 
     .panel:hover {
@@ -254,6 +294,64 @@
     .toggle-btn:hover {
       transform: translateY(-2px);
       box-shadow: 0 6px 20px rgba(0, 255, 133, 0.3);
+    }
+
+    .quick-link {
+      transition: all 0.25s ease;
+    }
+
+    .quick-link:hover {
+      transform: translateY(-3px);
+    }
+
+    .order-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      margin-bottom: 12px;
+      transition: all 0.2s ease;
+      animation: cardEnter 0.9s ease-out backwards;
+    }
+
+    .metric-card {
+      animation: cardEnter 0.9s ease-out backwards;
+    }
+
+    .modal-dialog {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-xl);
+      max-width: 500px;
+      width: 90%;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+      animation: dialogEnter 0.35s ease-out backwards;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+      animation: overlayFadeIn 0.35s ease-out backwards;
+    }
+
+    .notification-toast {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-lg);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      z-index: 1100;
+      transform: translateX(400px);
+      transition: transform 0.3s ease;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      animation: toastSlide 0.35s ease-out backwards;
     }
 
     /* Quick Links */
@@ -876,6 +974,99 @@
     .toast-content p {
       font-size: 0.8rem;
       color: var(--text-muted);
+    }
+
+    @keyframes foodGradientShift {
+      0%, 100% {
+        background: radial-gradient(circle at 20% 50%, rgba(255, 157, 77, 0.15) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 80%, rgba(0, 255, 133, 0.08) 0%, transparent 50%),
+                    radial-gradient(circle at 50% 0%, rgba(255, 100, 50, 0.1) 0%, transparent 60%);
+      }
+      50% {
+        background: radial-gradient(circle at 80% 20%, rgba(255, 157, 77, 0.15) 0%, transparent 50%),
+                    radial-gradient(circle at 20% 80%, rgba(0, 255, 133, 0.08) 0%, transparent 50%),
+                    radial-gradient(circle at 50% 100%, rgba(255, 100, 50, 0.1) 0%, transparent 60%);
+      }
+    }
+
+    @keyframes foodFloat {
+      0% {
+        transform: translateY(0) translateX(0);
+        opacity: 0.03;
+      }
+      50% {
+        opacity: 0.06;
+      }
+      100% {
+        transform: translateY(-100vh) translateX(50px);
+        opacity: 0.01;
+      }
+    }
+
+    @keyframes pageEnter {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes cardEnter {
+      from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.98);
+        filter: blur(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+      }
+    }
+
+    @keyframes buttonGlow {
+      0%, 100% {
+        box-shadow: 0 0 18px rgba(0, 255, 133, 0.16);
+      }
+      50% {
+        box-shadow: 0 0 28px rgba(0, 255, 133, 0.28);
+      }
+    }
+
+    @keyframes dialogEnter {
+      from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.97);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes overlayFadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.98);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes toastSlide {
+      from {
+        transform: translateX(400px) translateY(10px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0) translateY(0);
+        opacity: 1;
+      }
     }
 
     /* Responsive */
