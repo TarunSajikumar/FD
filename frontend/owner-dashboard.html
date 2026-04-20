@@ -84,7 +84,7 @@
     }
 
     body::after {
-      content: '🍽️ 🍔 🍕 🍜 🍱 🍛 🍝 🌮 🍤 🥘 🍲 🥘 🥗 🍱 🍜 🫕 🍣 🍴 🍝 🍛 🥗 🍚 🫕 🍲 🥘'; 🥘 🥗 🍱 🍜 🫕 🍣 🍴 🍝 🍛 🥗 🍚 🫕 🍲 🥘';
+      content: '🍽️ 🍔 🍕 🍜 🍱 🍛 🍝 🌮 🍤 🥘 🍲  🍱 🍜 🫕 🍣 🍴 🍝 🍛 🥗 🍚 🫕 🍲 🥘';
       position: fixed;
       top: 0;
       left: 0;
@@ -728,6 +728,164 @@
       display: flex;
       justify-content: flex-end;
       gap: 12px;
+    }
+
+    .history-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .history-filter-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      width: min(100%, 100%);
+    }
+
+    .history-filter-label {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+
+    .history-date-input {
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      min-width: 180px;
+    }
+
+    .history-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .history-summary {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      flex-wrap: wrap;
+    }
+
+    .history-summary span {
+      background: rgba(255, 255, 255, 0.04);
+      padding: 9px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .order-history-list {
+      max-height: 420px;
+      overflow-y: auto;
+      display: grid;
+      gap: 12px;
+    }
+
+    .order-history-item {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .order-history-item-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .order-history-item-title {
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .order-history-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      color: var(--text-muted);
+      font-size: 0.82rem;
+    }
+
+    .order-history-meta span {
+      background: rgba(255, 255, 255, 0.04);
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .order-history-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+    }
+
+    .order-history-grid-item {
+      display: grid;
+      gap: 6px;
+    }
+
+    .order-history-grid-item .label {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+    }
+
+    .order-history-grid-item .value {
+      color: var(--text-primary);
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .order-history-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .order-history-item-chip {
+      background: rgba(0, 255, 133, 0.08);
+      color: var(--accent-green);
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+    }
+
+    .history-empty {
+      color: var(--text-muted);
+      text-align: center;
+      padding: 50px 20px;
+      border: 1px dashed rgba(255,255,255,0.12);
+      border-radius: var(--radius-lg);
+    }
+
+    .action-btn.secondary {
+      border-color: var(--border-subtle);
+      color: var(--text-secondary);
+    }
+
+    .action-btn.secondary:hover {
+      border-color: var(--accent-blue);
+      color: var(--accent-blue);
     }
 
     .modal-btn {
@@ -1568,18 +1726,28 @@
         <p>View all orders placed in your restaurant</p>
       </div>
       <div class="modal-body">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
-          <div>
-            <input type="date" id="orderHistoryDateFilter" style="padding: 10px; border-radius: 8px; border: 1px solid var(--border-subtle); background: var(--bg-secondary); color: var(--text-primary);">
-            <button class="action-btn" onclick="filterOrderHistory()" style="margin-left: 10px;">
+        <div class="history-controls">
+          <div class="history-filter-row">
+            <label class="history-filter-label" for="orderHistoryDateFilter">Filter by date</label>
+            <input type="date" id="orderHistoryDateFilter" class="history-date-input">
+            <button class="action-btn" onclick="filterOrderHistory()">
               <i class="fas fa-filter"></i> Filter
             </button>
+            <button class="action-btn secondary" onclick="resetOrderHistoryFilter()">
+              <i class="fas fa-eraser"></i> Reset
+            </button>
           </div>
-          <button class="action-btn" onclick="exportOrderHistoryCSV()">
-            <i class="fas fa-file-csv"></i> Export CSV
-          </button>
+          <div class="history-actions">
+            <div class="history-summary">
+              <span id="historyOrderCount">0 orders</span>
+              <span id="historyRevenueTotal">Revenue: ₹0.00</span>
+            </div>
+            <button class="action-btn" onclick="exportOrderHistoryCSV()">
+              <i class="fas fa-file-csv"></i> Export CSV
+            </button>
+          </div>
         </div>
-        <div id="orderHistoryList" style="max-height: 400px; overflow-y: auto;">
+        <div id="orderHistoryList" class="order-history-list">
           <!-- Order history will be loaded here -->
         </div>
       </div>
@@ -3217,119 +3385,104 @@
       document.getElementById('orderHistoryModal').classList.remove('active');
     }
 
-    function loadOrderHistory() {
-      const container = document.getElementById("orderHistoryList");
-      let orders = [];
-      try { 
-        orders = JSON.parse(localStorage.getItem(ORDERS_KEY) || '[]'); 
-      } catch(e) { 
-        orders = []; 
-      }
-      
-      // Add cancelled orders
-      let cancelledOrders = [];
-      try {
-        cancelledOrders = JSON.parse(localStorage.getItem('cancelledOrders') || '[]');
-      } catch(e) {
-        cancelledOrders = [];
-      }
-      
-      const allOrders = [...orders, ...cancelledOrders].sort((a, b) => new Date(b.createdAt || b.date) - new Date(a.createdAt || a.date));
-      
-      if (!allOrders.length) {
-        container.innerHTML = '<div style="color:var(--text-muted); text-align:center; padding:40px;">No order history found.</div>';
-        return;
-      }
-      
-      container.innerHTML = allOrders.map(order => `
-        <div style="background: var(--bg-secondary); padding: 15px; border-radius: var(--radius-lg); margin-bottom: 10px; border: 1px solid var(--border-subtle);">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <div style="font-weight: 700; color: var(--text-primary);">Order #${order.id || 'N/A'}</div>
-            <div style="font-size: 12px; color: var(--text-muted);">${order.date} ${order.time}</div>
+    function formatOrderCurrency(value) {
+      const n = parseFloat(String(value || '0').replace(/₹|,/g, ''));
+      return isNaN(n) ? '₹0.00' : '₹' + n.toFixed(2);
+    }
+
+    function formatDateInputToDisplay(value) {
+      if (!value) return '';
+      const date = new Date(value);
+      if (isNaN(date.getTime())) return value;
+      return date.toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
+    }
+
+    function buildOrderHistoryCard(order) {
+      const statusColor = order.status === 'completed'
+        ? 'var(--accent-green)'
+        : order.status === 'cancelled'
+          ? 'var(--accent-red)'
+          : 'var(--accent-gold)';
+
+      const items = Array.isArray(order.items) ? order.items : [];
+      const itemLabels = items.length
+        ? items.map(item => `<span class="order-history-item-chip">${escapeHtml(String(item))}</span>`).join('')
+        : '<span class="order-history-item-chip">No items</span>';
+
+      return `
+        <div class="order-history-item">
+          <div class="order-history-item-header">
+            <div class="order-history-item-title">
+              <i class="fas fa-receipt"></i>
+              Order #${escapeHtml(order.id || 'N/A')}
+            </div>
+            <div class="order-history-meta">
+              <span>${escapeHtml(order.date || '')} ${escapeHtml(order.time || '')}</span>
+              <span style="color:${statusColor}; border-color:${statusColor}; background:rgba(0,0,0,0.12);">${escapeHtml(order.status || 'Pending')}</span>
+              <span>${escapeHtml(order.method || 'Unknown')}</span>
+            </div>
           </div>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
-            <div>
-              <div style="font-size: 12px; color: var(--text-muted);">Amount</div>
-              <div style="color: var(--text-primary); font-weight: 700;">₹${parseFloat(String(order.amount || "0").replace(/₹|,/g, "")).toFixed(2)}</div>
+          <div class="order-history-grid">
+            <div class="order-history-grid-item">
+              <div class="label">Amount</div>
+              <div class="value">${formatOrderCurrency(order.amount)}</div>
             </div>
-            <div>
-              <div style="font-size: 12px; color: var(--text-muted);">Status</div>
-              <div style="color: ${order.status === 'completed' ? 'var(--accent-green)' : order.status === 'cancelled' ? 'var(--accent-red)' : 'var(--accent-gold)'}; font-weight: 700;">
-                ${order.status || 'Pending'}
-              </div>
+            <div class="order-history-grid-item">
+              <div class="label">Customer</div>
+              <div class="value">${escapeHtml(order.customerName || 'Guest')}</div>
             </div>
-            <div>
-              <div style="font-size: 12px; color: var(--text-muted);">Payment</div>
-              <div style="color: var(--text-primary);">${order.method || 'Unknown'}</div>
+            <div class="order-history-grid-item">
+              <div class="label">Items Count</div>
+              <div class="value">${items.length}</div>
             </div>
-            <div>
-              <div style="font-size: 12px; color: var(--text-muted);">Items</div>
-              <div style="color: var(--text-primary);">${Array.isArray(order.items) ? order.items.length : 0}</div>
-            </div>
+          </div>
+          <div>
+            <div class="label">Ordered Items</div>
+            <div class="order-history-items">${itemLabels}</div>
           </div>
         </div>
-      `).join('');
+      `;
+    }
+
+    function loadOrderHistory() {
+      const container = document.getElementById("orderHistoryList");
+      const countLabel = document.getElementById("historyOrderCount");
+      const revenueLabel = document.getElementById("historyRevenueTotal");
+      const dateFilter = document.getElementById("orderHistoryDateFilter").value;
+      const orders = getAllOrders();
+      const filterDateLabel = dateFilter ? formatDateInputToDisplay(dateFilter) : '';
+
+      const filteredOrders = filterDateLabel
+        ? orders.filter(order => order.date === filterDateLabel)
+        : orders;
+
+      const sortedOrders = filteredOrders.sort((a, b) => new Date(b.createdAt || b.date) - new Date(a.createdAt || a.date));
+      const totalRevenue = sortedOrders.reduce((sum, order) => sum + parseFloat(String(order.amount || '0').replace(/₹|,/g, '')) || 0, 0);
+
+      countLabel.textContent = `${sortedOrders.length} order${sortedOrders.length === 1 ? '' : 's'}`;
+      revenueLabel.textContent = `Revenue: ${formatOrderCurrency(totalRevenue)}`;
+
+      if (!sortedOrders.length) {
+        container.innerHTML = `
+          <div class="history-empty">
+            <i class="fas fa-receipt" style="font-size: 32px; display: block; margin-bottom: 12px; color: rgba(255,255,255,0.4);"></i>
+            <div>No orders found</div>
+            <div style="margin-top: 8px; color: var(--text-muted);">Try clearing the date filter or add orders from the store.</div>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = sortedOrders.map(buildOrderHistoryCard).join('');
     }
 
     function filterOrderHistory() {
-      const dateFilter = document.getElementById("orderHistoryDateFilter").value;
-      if (!dateFilter) {
-        loadOrderHistory();
-        return;
-      }
-      
-      const container = document.getElementById("orderHistoryList");
-      let orders = [];
-      try { 
-        orders = JSON.parse(localStorage.getItem(ORDERS_KEY) || '[]'); 
-      } catch(e) { 
-        orders = []; 
-      }
-      
-      // Add cancelled orders
-      let cancelledOrders = [];
-      try {
-        cancelledOrders = JSON.parse(localStorage.getItem('cancelledOrders') || '[]');
-      } catch(e) {
-        cancelledOrders = [];
-      }
-      
-      const allOrders = [...orders, ...cancelledOrders];
-      const filteredOrders = allOrders.filter(order => order.date === dateFilter);
-      
-      if (!filteredOrders.length) {
-        container.innerHTML = '<div style="color:var(--text-muted); text-align:center; padding:40px;">No orders found for selected date.</div>';
-        return;
-      }
-      
-      container.innerHTML = filteredOrders.map(order => `
-        <div style="background: var(--bg-secondary); padding: 15px; border-radius: var(--radius-lg); margin-bottom: 10px; border: 1px solid var(--border-subtle);">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <div style="font-weight: 700; color: var(--text-primary);">Order #${order.id || 'N/A'}</div>
-            <div style="font-size: 12px; color: var(--text-muted);">${order.date} ${order.time}</div>
-          </div>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
-            <div>
-              <div style="font-size: 12px; color: var(--text-muted);">Amount</div>
-              <div style="color: var(--text-primary); font-weight: 700;">₹${parseFloat(String(order.amount || "0").replace(/₹|,/g, "")).toFixed(2)}</div>
-            </div>
-            <div>
-              <div style="font-size: 12px; color: var(--text-muted);">Status</div>
-              <div style="color: ${order.status === 'completed' ? 'var(--accent-green)' : order.status === 'cancelled' ? 'var(--accent-red)' : 'var(--accent-gold)'}; font-weight: 700;">
-                ${order.status || 'Pending'}
-              </div>
-            </div>
-            <div>
-              <div style="font-size: 12px; color: var(--text-muted);">Payment</div>
-              <div style="color: var(--text-primary);">${order.method || 'Unknown'}</div>
-            </div>
-            <div>
-              <div style="font-size: 12px; color: var(--text-muted);">Items</div>
-              <div style="color: var(--text-primary);">${Array.isArray(order.items) ? order.items.length : 0}</div>
-            </div>
-          </div>
-        </div>
-      `).join('');
+      loadOrderHistory();
+    }
+
+    function resetOrderHistoryFilter() {
+      document.getElementById("orderHistoryDateFilter").value = '';
+      loadOrderHistory();
     }
 
     function exportOrderHistoryCSV() {
