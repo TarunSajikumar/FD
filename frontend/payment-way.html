@@ -355,6 +355,33 @@
       color: var(--accent-green);
     }
 
+    /* Proceed Button */
+    .proceed-btn {
+      width: 100%;
+      background: var(--gradient-primary);
+      border: none;
+      color: #0A0A0F;
+      padding: 16px;
+      border-radius: var(--radius-lg);
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'Inter', sans-serif;
+      margin-bottom: 32px;
+      box-shadow: 0 10px 25px -5px rgba(0, 255, 133, 0.3);
+      animation: cardEnter 0.9s ease-out backwards;
+    }
+
+    .proceed-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 18px 45px -12px rgba(0, 255, 133, 0.5);
+    }
+
+    .proceed-btn:active {
+      transform: translateY(0);
+    }
+
     .user-bar,
     .back-btn,
     .logout-btn {
@@ -516,31 +543,7 @@
     <div id="amountValue" class="amount-value">₹0.00</div>
   </div>
 
-  <div class="pay-methods">
-    <!-- Cash on Delivery option -->
-    <div class="pay-option" id="cashOption">
-      <div class="pay-option-left">
-        <i class="fas fa-money-bill-wave"></i>
-        <div class="pay-option-text">
-          <div class="pay-option-title">Cash on Delivery</div>
-          <div class="pay-option-desc">Pay when order arrives</div>
-        </div>
-      </div>
-      <div class="pay-option-arrow"><i class="fas fa-chevron-right"></i></div>
-    </div>
-
-    <!-- Online / UPI option -->
-    <div class="pay-option" id="onlineOption">
-      <div class="pay-option-left">
-        <i class="fas fa-qrcode"></i>
-        <div class="pay-option-text">
-          <div class="pay-option-title">UPI / Online</div>
-          <div class="pay-option-desc">Google Pay, PhonePe, Paytm & more</div>
-        </div>
-      </div>
-      <div class="pay-option-arrow"><i class="fas fa-chevron-right"></i></div>
-    </div>
-  </div>
+  <button class="proceed-btn" onclick="proceedToPayment()">Proceed to Payment</button>
 
   <div class="note">
     <i class="fas fa-lock"></i> 100% secure transaction · Instant confirmation
@@ -622,28 +625,14 @@
     }
   }
 
-  // ----- Payment method handlers (preserve flow: cash redirect to thank-you, online to payment.html) -----
-  function handleCashPayment() {
+  // ----- Payment method handler (single button to payment.html) -----
+  function proceedToPayment() {
     // get latest amount and store
     const amountDisplay = document.getElementById('amountValue').innerText;
     const amountNum = parseFloat(amountDisplay.replace('₹', '').replace(/,/g, ''));
-    safeSet('paymentMethod', 'cash');
     safeSet('amountPaid', amountDisplay);
     if (!isNaN(amountNum)) safeSet('amountPaidNumeric', amountNum);
-    safeSet('justPaid', '1');      // marks that a fresh payment just happened (thank-you will create order)
-    // redirect to thank-you page (cash on delivery)
-    window.location.href = 'thank-you.html';
-  }
-
-  function handleOnlinePayment() {
-    // store payment method & amount, then go to payment.html (QR/UPI interface)
-    const amountDisplay = document.getElementById('amountValue').innerText;
-    const amountNum = parseFloat(amountDisplay.replace('₹', '').replace(/,/g, ''));
-    safeSet('paymentMethod', 'online');
-    safeSet('amountPaid', amountDisplay);
-    if (!isNaN(amountNum)) safeSet('amountPaidNumeric', amountNum);
-    // important: do NOT set justPaid=1 here, because actual payment confirmation happens inside payment.html
-    // But we ensure the amount is synced. Redirect to the UPI/online flow (payment.html)
+    // redirect to payment.html
     window.location.href = 'payment.html';
   }
 
@@ -669,23 +658,12 @@
       }
     }
 
-    // bind click events for cash & online options
-    const cashDiv = document.getElementById('cashOption');
-    const onlineDiv = document.getElementById('onlineOption');
-
-    if (cashDiv) {
-      cashDiv.addEventListener('click', (e) => {
+    // bind click events for payment button
+    const proceedBtn = document.querySelector('.proceed-btn');
+    if (proceedBtn) {
+      proceedBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        syncAmountToStorage();
-        handleCashPayment();
-      });
-    }
-
-    if (onlineDiv) {
-      onlineDiv.addEventListener('click', (e) => {
-        e.preventDefault();
-        syncAmountToStorage();
-        handleOnlinePayment();
+        proceedToPayment();
       });
     }
 

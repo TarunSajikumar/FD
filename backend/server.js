@@ -27,7 +27,6 @@ const DATA_DIR = path.join(__dirname, 'data');
 const USERS_FILE = path.join(DATA_DIR, 'users.json');
 const MENU_FILE = path.join(DATA_DIR, 'menu.json');
 const ORDERS_FILE = path.join(DATA_DIR, 'orders.json');
-const OWNER_SETTINGS_FILE = path.join(DATA_DIR, 'owner-settings.json');
 
 // MongoDB Schemas (only used when not using local storage)
 let User, MenuItem, Order;
@@ -39,7 +38,6 @@ if (!USE_LOCAL_STORAGE) {
     password: { type: String, required: true },
     plainPassword: { type: String, default: '' },
     role: { type: String, default: 'customer', enum: ['customer', 'owner'] },
-    settings: { type: Object, default: {} },
     createdAt: { type: Date, default: Date.now }
   });
 
@@ -383,123 +381,6 @@ app.get(`${API_BASE}/user/profile`, requireAuth, async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch profile' });
   }
 });
-
-// ====== OWNER UPI SETTINGS ENDPOINTS ======
-
-// Get owner UPI settings
-app.get(`${API_BASE}/owner/upi-settings`, requireAuth, requireOwner, async (req, res) => {
-  try {
-    let settings = {
-      restaurantName: 'Food Point',
-      upiId: '',
-      accountHolderName: '',
-      parcelCharge: 5
-    };
-
-    if (USE_LOCAL_STORAGE) {
-      try {
-        const fileSettings = await loadJson(OWNER_SETTINGS_FILE);
-        if (fileSettings) {
-          settings = { ...settings, ...fileSettings };
-        }
-      } catch (err) {
-        // File doesn't exist yet, return defaults
-      }
-    } else {
-      // MongoDB: Try to get from owner user document
-      const owner = await User.findOne({ role: 'owner' });
-      if (owner && owner.settings) {
-        settings = { ...settings, ...owner.settings };
-      }
-    }
-
-    res.json(settings);
-  } catch (error) {
-    console.error('Error fetching owner settings:', error);
-    res.status(500).json({ error: 'Failed to fetch owner settings' });
-  }
-});
-
-// Update owner UPI settings
-app.put(`${API_BASE}/owner/upi-settings`, requireAuth, requireOwner, async (req, res) => {
-  try {
-    const { restaurantName, upiId, accountHolderName, parcelCharge } = req.body;
-
-    const settings = {
-      restaurantName: restaurantName || 'Food Point',
-      upiId: upiId || '',
-      accountHolderName: accountHolderName || '',
-      parcelCharge: parcelCharge || 5,
-      updatedAt: new Date().toISOString()
-    };
-
-    if (USE_LOCAL_STORAGE) {
-      await saveJson(OWNER_SETTINGS_FILE, settings);
-    } else {
-      // MongoDB: Update owner user document
-      const owner = await User.findOne({ role: 'owner' });
-      if (owner) {
-        owner.settings = settings;
-        await owner.save();
-      }
-    }
-
-    res.json({
-      message: 'Owner settings updated successfully',
-      settings
-    });
-  } catch (error) {
-    console.error('Error updating owner settings:', error);
-    res.status(500).json({ error: 'Failed to update owner settings' });
-  }
-});
-
-// Get owner UPI QR code data
-app.get(`${API_BASE}/owner/upi-qr`, requireAuth, requireOwner, async (req, res) => {
-  try {
-    const { amount } = req.query;
-
-    let settings = {
-      restaurantName: 'Food Point',
-      upiId: '',
-      accountHolderName: ''
-    };
-
-    if (USE_LOCAL_STORAGE) {
-      try {
-        const fileSettings = await loadJson(OWNER_SETTINGS_FILE);
-        if (fileSettings) {
-          settings = { ...settings, ...fileSettings };
-        }
-      } catch (err) {
-        // File doesn't exist yet, return defaults
-      }
-    } else {
-      // MongoDB: Get from owner user document
-      const owner = await User.findOne({ role: 'owner' });
-      if (owner && owner.settings) {
-        settings = { ...settings, ...owner.settings };
-      }
-    }
-
-    // Generate UPI URL
-    const numericAmount = parseFloat(String(amount || 0).replace(/[₹, ]+/g, '')) || 0;
-    const upiUrl = `upi://pay?pa=${encodeURIComponent(settings.upiId)}&pn=${encodeURIComponent(settings.restaurantName)}&am=${numericAmount.toFixed(2)}&cu=INR`;
-
-    res.json({
-      upiId: settings.upiId,
-      restaurantName: settings.restaurantName,
-      accountHolderName: settings.accountHolderName,
-      amount: numericAmount.toFixed(2),
-      upiUrl: upiUrl,
-      qrData: upiUrl // QR code text/data
-    });
-  } catch (error) {
-    console.error('Error generating QR data:', error);
-    res.status(500).json({ error: 'Failed to generate QR code data' });
-  }
-});
-
 app.post(`${API_BASE}/auth/login`, async (req, res) => {
   try {
     const { identifier, password } = req.body;
@@ -758,12 +639,6 @@ async function start() {
         }
       ]);
       await ensureFile(ORDERS_FILE, []);
-      await ensureFile(OWNER_SETTINGS_FILE, {
-        restaurantName: 'Food Point',
-        upiId: 'foodpoint@okicici',
-        accountHolderName: 'Food Point',
-        parcelCharge: 5
-      });
       console.log('Local storage files initialized');
     }
 
