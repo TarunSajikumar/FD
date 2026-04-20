@@ -604,7 +604,7 @@
 
   function fetchUpiSettings() {
     try {
-      const settingsRaw = safeGet('RESTAURANT_SETTINGS') || safeGet('fp_settings');
+      const settingsRaw = safeGet('restaurantSettings') || safeGet('fp_settings');
       if (settingsRaw) {
         const settings = JSON.parse(settingsRaw);
         if (settings.upiId && typeof settings.upiId === 'string' && settings.upiId.trim() !== '') {
@@ -783,7 +783,9 @@
 
   /* storage event listener for owner dashboard changes */
   window.addEventListener('storage', (event) => {
-    if (event.key === 'RESTAURANT_SETTINGS' || event.key === 'fp_settings' || event.key === 'upiId') {
+    console.log('Storage event:', event.key, event.newValue);
+    if (event.key === 'restaurantSettings' || event.key === 'fp_settings' || event.key === 'upiId') {
+      console.log('UPI settings changed, updating...');
       fetchUpiSettings();
       updateUpiDisplay();
       refreshAmountAndQR();
@@ -809,6 +811,18 @@
     }
   }
 
+  /* periodic UPI settings sync */
+  function periodicUpiSync() {
+    const oldUpi = currentUpiId;
+    const oldName = restaurantName;
+    fetchUpiSettings();
+    if (oldUpi !== currentUpiId || oldName !== restaurantName) {
+      console.log('UPI settings updated via periodic sync:', currentUpiId, restaurantName);
+      updateUpiDisplay();
+      refreshAmountAndQR();
+    }
+  }
+
   /* INIT */
   (function init() {
     fetchUpiSettings();
@@ -819,6 +833,7 @@
     if (prevMethod === 'online') showOnlineUI();
     else hideOnlineUI();
     setInterval(periodicCartSync, 1200);
+    setInterval(periodicUpiSync, 2000); // check UPI settings every 2 seconds
   })();
 
   window.refreshPaymentQR = function() {
