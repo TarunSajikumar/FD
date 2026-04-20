@@ -79,7 +79,6 @@
       padding: 20px;
     }
 
-    /* User Bar */
     .user-bar {
       background: linear-gradient(135deg, rgba(13, 13, 18, 0.95) 0%, rgba(21, 23, 30, 0.9) 100%);
       backdrop-filter: blur(20px);
@@ -91,21 +90,28 @@
       position: fixed;
       top: 20px;
       left: 50%;
-      transform: translateX(-50%);
       border-radius: 50px;
       z-index: 100;
       max-width: 600px;
       width: calc(100% - 40px);
       box-shadow: 0 8px 32px rgba(0, 255, 133, 0.08), 0 0 20px rgba(0, 255, 133, 0.04);
-      animation: floatingBar 3s ease-in-out infinite;
+      animation: floatingBar 3s ease-in-out infinite, userBarEnter 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
-    @keyframes floatingBar {
-      0%, 100% {
-        transform: translateX(-50%) translateY(0);
+    .user-bar:hover {
+      box-shadow: 0 12px 40px rgba(0, 255, 133, 0.15), 0 0 30px rgba(0, 255, 133, 0.08);
+      border-color: rgba(0, 255, 133, 0.2);
+    }
+
+    @keyframes userBarEnter {
+      from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-20px);
       }
-      50% {
-        transform: translateX(-50%) translateY(-8px);
+      to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
       }
     }
 
@@ -126,6 +132,22 @@
       font-weight: 700;
       font-size: 20px;
       color: #0A0A0F;
+      animation: avatarPulse 2s ease-in-out infinite;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .user-avatar:hover {
+      transform: scale(1.1) rotate(5deg);
+      box-shadow: 0 0 20px rgba(0, 255, 133, 0.4);
+    }
+
+    @keyframes avatarPulse {
+      0%, 100% {
+        box-shadow: 0 0 0 0 rgba(0, 255, 133, 0.4);
+      }
+      50% {
+        box-shadow: 0 0 0 8px rgba(0, 255, 133, 0);
+      }
     }
 
     .user-text .user-name {
@@ -149,17 +171,20 @@
       font-size: 13px;
       font-weight: 500;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
       font-family: 'Inter', sans-serif;
       display: flex;
       align-items: center;
       gap: 8px;
+      animation: buttonEnter 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s backwards;
     }
 
     .logout-btn:hover {
       border-color: var(--accent-blue);
       color: var(--accent-blue);
       background: rgba(59, 130, 246, 0.05);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(59, 130, 246, 0.25);
     }
 
     body::before {
@@ -169,29 +194,29 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: var(--gradient-glow);
+      background: 
+        radial-gradient(circle at 20% 50%, rgba(0, 255, 133, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(255, 157, 77, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 50% 0%, rgba(255, 100, 50, 0.12) 0%, transparent 60%);
       pointer-events: none;
       z-index: 0;
-      animation: foodGradientShift 18s ease-in-out infinite;
+      animation: gradientShift 15s ease-in-out infinite;
     }
 
     body::after {
-      content: '🍽️ 🍔 🍕 🍜 🍱 🍛 🍝 🌮 🍤 🥘 🍲 🥘 🥗 🍱 🍜 🫕 🍣 🍴 🍝 🍛 🥗 🍚 🫕 🍲 🥘';
+      content: '';
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
       bottom: 0;
-      font-size: 100px;
-      opacity: 0.03;
+      background-image: 
+        linear-gradient(90deg, transparent 1px, rgba(0, 255, 133, 0.03) 1px),
+        linear-gradient(transparent 1px, rgba(0, 255, 133, 0.03) 1px);
+      background-size: 50px 50px;
       pointer-events: none;
       z-index: 0;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-around;
-      overflow: hidden;
-      animation: foodFloat 20s linear infinite;
+      animation: gridShift 20s linear infinite;
     }
 
     .container {
@@ -200,8 +225,19 @@
       margin: 0 auto;
       position: relative;
       z-index: 1;
-      animation: fadeInUp 0.4s ease-out;
+      animation: containerEnter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
       padding-top: 80px;
+    }
+
+    @keyframes containerEnter {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     header {
@@ -218,11 +254,34 @@
       color: transparent;
       letter-spacing: -0.02em;
       margin-bottom: 8px;
+      filter: drop-shadow(0 0 20px rgba(0, 255, 133, 0.3));
+      animation: titleShimmer 3s ease-in-out infinite;
+    }
+
+    @keyframes titleShimmer {
+      0%, 100% {
+        filter: drop-shadow(0 0 20px rgba(0, 255, 133, 0.3));
+      }
+      50% {
+        filter: drop-shadow(0 0 30px rgba(0, 255, 133, 0.5));
+      }
     }
 
     header p {
       font-size: 0.8rem;
       color: var(--text-secondary);
+      animation: subtitleEnter 0.8s ease-out 0.15s backwards;
+    }
+
+    @keyframes subtitleEnter {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     /* Steps */
@@ -240,18 +299,38 @@
       padding: 16px;
       text-align: center;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      animation: cardEnter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .step::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0, 255, 133, 0.1), transparent);
+      transition: left 0.6s ease;
+      pointer-events: none;
+    }
+
+    .step:hover::before {
+      left: 100%;
     }
 
     .step:hover {
-      transform: translateY(-2px);
+      transform: translateY(-3px) scale(1.02);
       border-color: rgba(0, 255, 133, 0.3);
+      box-shadow: 0 12px 28px rgba(0, 255, 133, 0.2);
     }
 
     .step.active {
       border-color: var(--accent-green);
       background: linear-gradient(180deg, #1A1C23 0%, #111116 100%);
-      box-shadow: 0 0 20px rgba(0, 255, 133, 0.1);
+      box-shadow: 0 0 20px rgba(0, 255, 133, 0.2), inset 0 0 15px rgba(0, 255, 133, 0.08);
     }
 
     .step h3 {
@@ -266,32 +345,64 @@
       color: var(--text-muted);
     }
 
-    /* Payment Card */
     .payment-card {
       background: var(--bg-card);
       border: 1px solid var(--border-card);
       border-radius: var(--radius-xl);
       padding: 28px;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 255, 133, 0.05);
-      transition: all 0.3s ease;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      animation: cardEnter 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s backwards;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .payment-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, rgba(0, 255, 133, 0.15), transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 0.3;
+      animation: shimmerPulse 4s ease-in-out infinite;
     }
 
     .payment-card:hover {
-      box-shadow: 0 30px 60px -15px rgba(0, 255, 133, 0.18), 0 0 0 1px rgba(0, 255, 133, 0.15);
-      transform: translateY(-2px);
+      box-shadow: 0 30px 60px -15px rgba(0, 255, 133, 0.25), inset 0 0 20px rgba(0, 255, 133, 0.08);
+      transform: translateY(-3px);
+      border-color: rgba(0, 255, 133, 0.2);
     }
 
-    .payment-card {
-      animation: cardEnter 0.9s ease-out backwards;
-    }
-
-    .steps .step {
-      animation: cardEnter 0.8s ease-out backwards;
+    @keyframes shimmerPulse {
+      0%, 100% {
+        opacity: 0.2;
+      }
+      50% {
+        opacity: 0.5;
+      }
     }
 
     .btn {
       position: relative;
       overflow: hidden;
+      background: var(--gradient-primary);
+      border: none;
+      padding: 12px 24px;
+      border-radius: 100px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      font-family: 'Inter', sans-serif;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #0A0A0F;
+      animation: buttonEnter 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
     }
 
     .btn::after {
@@ -308,67 +419,49 @@
       opacity: 1;
     }
 
-    /* Amount Row */
-    .amount-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      padding-bottom: 20px;
-      margin-bottom: 24px;
-      border-bottom: 1px solid var(--border-subtle);
-    }
-
-    .amount-row .label {
-      font-size: 0.7rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      color: var(--text-muted);
-    }
-
-    .amount-row .value {
-      font-size: 2rem;
-      font-weight: 800;
-      background: var(--gradient-amount);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-
-    /* Buttons */
-    .btn {
-      background: var(--gradient-primary);
-      border: none;
-      padding: 12px 24px;
-      border-radius: 100px;
-      font-weight: 600;
-      font-size: 0.85rem;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      font-family: 'Inter', sans-serif;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      color: #0A0A0F;
-    }
-
     .btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(0, 255, 133, 0.3);
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 12px 28px rgba(0, 255, 133, 0.3);
+      animation: buttonGlow 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+    }
+
+    .btn:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+    @keyframes buttonGlow {
+      0%, 100% {
+        box-shadow: 0 12px 28px rgba(0, 255, 133, 0.3);
+      }
+      50% {
+        box-shadow: 0 16px 36px rgba(0, 255, 133, 0.5);
+      }
+    }
+
+    @keyframes buttonEnter {
+      from {
+        opacity: 0;
+        transform: scale(0.9) translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
     }
 
     .btn-ghost {
       background: transparent;
       border: 1px solid var(--border-subtle);
       color: var(--text-secondary);
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
     .btn-ghost:hover {
       border-color: var(--accent-green);
       color: var(--accent-green);
       background: rgba(0, 255, 133, 0.05);
-      transform: translateY(-1px);
-      box-shadow: none;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 255, 133, 0.2);
     }
 
     .pay-intent-btn {
@@ -376,10 +469,12 @@
       color: white;
       width: 100%;
       justify-content: center;
+      animation: buttonEnter 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s backwards;
     }
 
     .pay-intent-btn:hover {
-      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
+      box-shadow: 0 12px 28px rgba(59, 130, 246, 0.4);
+      transform: translateY(-3px) scale(1.01);
     }
 
     /* Online UI */
@@ -396,6 +491,31 @@
       gap: 20px;
       flex-wrap: wrap;
       margin-bottom: 20px;
+      animation: cardEnter 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s backwards;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .upi-box::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0, 255, 133, 0.1), transparent);
+      transition: left 0.6s ease;
+      pointer-events: none;
+    }
+
+    .upi-box:hover::before {
+      left: 100%;
+    }
+
+    .upi-box:hover {
+      border-color: rgba(0, 255, 133, 0.3);
+      box-shadow: 0 8px 20px rgba(0, 255, 133, 0.15);
     }
 
     .upi-qr {
@@ -461,6 +581,43 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      animation: noteEnter 0.6s ease-out 0.5s backwards;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hint::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0, 255, 133, 0.1), transparent);
+      transition: left 0.6s ease;
+      pointer-events: none;
+    }
+
+    .hint:hover::before {
+      left: 100%;
+    }
+
+    .hint:hover {
+      border-color: rgba(0, 255, 133, 0.3);
+      box-shadow: 0 6px 16px rgba(0, 255, 133, 0.15);
+      transform: translateY(-2px);
+    }
+
+    @keyframes noteEnter {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     /* Footer */
@@ -479,41 +636,81 @@
     }
 
     /* Animations */
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes foodGradientShift {
+    @keyframes gradientShift {
       0%, 100% {
-        background: radial-gradient(circle at 20% 40%, rgba(255, 157, 77, 0.15) 0%, transparent 45%),
-                    radial-gradient(circle at 80% 80%, rgba(0, 255, 133, 0.08) 0%, transparent 45%),
-                    radial-gradient(circle at 55% 10%, rgba(255, 100, 50, 0.1) 0%, transparent 55%);
+        background: 
+          radial-gradient(circle at 20% 50%, rgba(0, 255, 133, 0.15) 0%, transparent 50%),
+          radial-gradient(circle at 80% 80%, rgba(255, 157, 77, 0.1) 0%, transparent 50%),
+          radial-gradient(circle at 50% 0%, rgba(255, 100, 50, 0.12) 0%, transparent 60%);
       }
       50% {
-        background: radial-gradient(circle at 80% 30%, rgba(255, 157, 77, 0.15) 0%, transparent 45%),
-                    radial-gradient(circle at 20% 80%, rgba(0, 255, 133, 0.08) 0%, transparent 45%),
-                    radial-gradient(circle at 50% 95%, rgba(255, 100, 50, 0.1) 0%, transparent 55%);
+        background: 
+          radial-gradient(circle at 80% 20%, rgba(0, 255, 133, 0.15) 0%, transparent 50%),
+          radial-gradient(circle at 20% 80%, rgba(255, 157, 77, 0.1) 0%, transparent 50%),
+          radial-gradient(circle at 50% 100%, rgba(255, 100, 50, 0.12) 0%, transparent 60%);
       }
     }
 
-    @keyframes foodFloat {
+    @keyframes gridShift {
       0% {
-        transform: translateY(0) translateX(0);
-        opacity: 0.04;
-      }
-      50% {
-        opacity: 0.06;
+        background-position: 0 0, 0 0;
       }
       100% {
-        transform: translateY(-100vh) translateX(60px);
-        opacity: 0.01;
+        background-position: 50px 50px, 50px 50px;
+      }
+    }
+
+    @keyframes floatComplex1 {
+      0%, 100% {
+        transform: translate(0, 0) scale(1) rotate(0deg);
+      }
+      25% {
+        transform: translate(30px, -40px) scale(1.1) rotate(90deg);
+      }
+      50% {
+        transform: translate(-20px, 30px) scale(0.95) rotate(180deg);
+      }
+      75% {
+        transform: translate(40px, 20px) scale(1.05) rotate(270deg);
+      }
+    }
+
+    @keyframes floatComplex2 {
+      0%, 100% {
+        transform: translate(0, 0) scale(1) rotate(0deg);
+      }
+      25% {
+        transform: translate(-35px, 25px) scale(0.9) rotate(-90deg);
+      }
+      50% {
+        transform: translate(25px, -35px) scale(1.08) rotate(-180deg);
+      }
+      75% {
+        transform: translate(-20px, -15px) scale(0.98) rotate(-270deg);
+      }
+    }
+
+    @keyframes floatComplex3 {
+      0%, 100% {
+        transform: translate(-50%, -50%) scale(1) rotate(0deg);
+      }
+      25% {
+        transform: translate(-50%, -40%) scale(1.08) rotate(45deg);
+      }
+      50% {
+        transform: translate(-60%, -50%) scale(0.95) rotate(90deg);
+      }
+      75% {
+        transform: translate(-40%, -60%) scale(1.05) rotate(135deg);
+      }
+    }
+
+    @keyframes floatingBar {
+      0%, 100% {
+        transform: translateX(-50%) translateY(0);
+      }
+      50% {
+        transform: translateX(-50%) translateY(-8px);
       }
     }
 
@@ -530,8 +727,55 @@
       }
     }
 
-    /* Responsive */
-    @media (max-width: 560px) {
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Floating circles */
+    .bg-circle-1,
+    .bg-circle-2,
+    .bg-circle-3 {
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+      filter: blur(40px);
+    }
+
+    .bg-circle-1 {
+      width: 300px;
+      height: 300px;
+      top: 10%;
+      right: 5%;
+      background: radial-gradient(circle, rgba(0, 255, 133, 0.3) 0%, rgba(0, 255, 133, 0.1) 40%, transparent 70%);
+      animation: floatComplex1 25s ease-in-out infinite;
+    }
+
+    .bg-circle-2 {
+      width: 250px;
+      height: 250px;
+      bottom: 15%;
+      left: 8%;
+      background: radial-gradient(circle, rgba(255, 157, 77, 0.25) 0%, rgba(255, 157, 77, 0.08) 40%, transparent 70%);
+      animation: floatComplex2 30s ease-in-out infinite;
+    }
+
+    .bg-circle-3 {
+      width: 280px;
+      height: 280px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(circle, rgba(255, 100, 50, 0.2) 0%, rgba(255, 100, 50, 0.05) 40%, transparent 70%);
+      animation: floatComplex3 35s ease-in-out infinite;
+    }
       body {
         padding: 16px;
       }

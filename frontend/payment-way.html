@@ -73,29 +73,29 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: var(--gradient-glow);
+      background: 
+        radial-gradient(circle at 20% 50%, rgba(0, 255, 133, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(255, 157, 77, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 50% 0%, rgba(255, 100, 50, 0.12) 0%, transparent 60%);
       pointer-events: none;
       z-index: 0;
-      animation: foodGradientShift 18s ease-in-out infinite;
+      animation: gradientShift 15s ease-in-out infinite;
     }
 
     body::after {
-      content: '🍽️ 🍔 🍕 🍜 🍱 🍛 🍝 🌮 🍤 🥘 🍲 🥘 🥗 🍱 🍜 🫕 🍣 🍴 🍝 🍛 🥗 🍚 🫕 🍲 🥘';
+      content: '';
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
       bottom: 0;
-      font-size: 110px;
-      opacity: 0.03;
+      background-image: 
+        linear-gradient(90deg, transparent 1px, rgba(0, 255, 133, 0.03) 1px),
+        linear-gradient(transparent 1px, rgba(0, 255, 133, 0.03) 1px);
+      background-size: 50px 50px;
       pointer-events: none;
       z-index: 0;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-around;
-      overflow: hidden;
-      animation: foodFloat 20s linear infinite;
+      animation: gridShift 20s linear infinite;
     }
 
     /* User Bar */
@@ -110,13 +110,23 @@
       position: fixed;
       top: 20px;
       left: 50%;
-      transform: translateX(-50%);
       border-radius: 50px;
       z-index: 100;
       max-width: 600px;
       width: calc(100% - 40px);
       box-shadow: 0 8px 32px rgba(0, 255, 133, 0.08), 0 0 20px rgba(0, 255, 133, 0.04);
-      animation: floatingBar 3s ease-in-out infinite;
+      animation: floatingBar 3s ease-in-out infinite, userBarEnter 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);\n    }\n\n    .user-bar:hover {\n      box-shadow: 0 12px 40px rgba(0, 255, 133, 0.15), 0 0 30px rgba(0, 255, 133, 0.08);\n      border-color: rgba(0, 255, 133, 0.2);\n    }
+
+    @keyframes userBarEnter {
+      from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
     }
 
     @keyframes floatingBar {
@@ -145,6 +155,22 @@
       font-weight: 700;
       font-size: 20px;
       color: #0A0A0F;
+      animation: avatarPulse 2s ease-in-out infinite;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .user-avatar:hover {
+      transform: scale(1.1) rotate(5deg);
+      box-shadow: 0 0 20px rgba(0, 255, 133, 0.4);
+    }
+
+    @keyframes avatarPulse {
+      0%, 100% {
+        box-shadow: 0 0 0 0 rgba(0, 255, 133, 0.4);
+      }
+      50% {
+        box-shadow: 0 0 0 8px rgba(0, 255, 133, 0);
+      }
     }
 
     .user-text .user-name {
@@ -168,17 +194,67 @@
       font-size: 13px;
       font-weight: 500;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
       font-family: 'Inter', sans-serif;
       display: flex;
       align-items: center;
       gap: 8px;
+      animation: buttonEnter 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s backwards;
     }
 
     .logout-btn:hover {
       border-color: var(--accent-blue);
       color: var(--accent-blue);
       background: rgba(59, 130, 246, 0.05);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(59, 130, 246, 0.25);\n    }
+
+    @keyframes buttonHoverGlow {
+      0% {
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+      }
+    }
+
+    /* Floating circles */
+    .bg-circle-1,
+    .bg-circle-2,
+    .bg-circle-3 {
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+      filter: blur(40px);
+    }
+
+    .bg-circle-1 {
+      width: 300px;
+      height: 300px;
+      top: 10%;
+      right: 5%;
+      background: radial-gradient(circle, rgba(0, 255, 133, 0.3) 0%, rgba(0, 255, 133, 0.1) 40%, transparent 70%);
+      animation: floatComplex1 25s ease-in-out infinite;
+    }
+
+    .bg-circle-2 {
+      width: 250px;
+      height: 250px;
+      bottom: 15%;
+      left: 8%;
+      background: radial-gradient(circle, rgba(255, 157, 77, 0.25) 0%, rgba(255, 157, 77, 0.08) 40%, transparent 70%);
+      animation: floatComplex2 30s ease-in-out infinite;
+    }
+
+    .bg-circle-3 {
+      width: 280px;
+      height: 280px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(circle, rgba(255, 100, 50, 0.2) 0%, rgba(255, 100, 50, 0.05) 40%, transparent 70%);
+      animation: floatComplex3 35s ease-in-out infinite;
     }
 
     /* Back Button */
@@ -194,20 +270,22 @@
       font-size: 13px;
       font-weight: 500;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
       font-family: 'Inter', sans-serif;
       display: inline-flex;
       align-items: center;
       gap: 8px;
       z-index: 99;
       backdrop-filter: blur(10px);
+      animation: buttonEnter 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s backwards;
     }
 
     .back-btn:hover {
       border-color: var(--accent-green);
       color: var(--accent-green);
       background: rgba(0, 255, 133, 0.05);
-      transform: translateX(-2px);
+      transform: translateX(-4px);
+      box-shadow: 0 0 20px rgba(0, 255, 133, 0.25);
     }
 
     /* Payment Container */
@@ -217,7 +295,7 @@
       padding: 120px 20px 60px;
       position: relative;
       z-index: 1;
-      animation: pageEnter 0.8s ease-out backwards;
+      animation: pageEnter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
     }
 
     .pay-container h3 {
@@ -230,6 +308,17 @@
       text-align: center;
       letter-spacing: -0.02em;
       margin-bottom: 8px;
+      filter: drop-shadow(0 0 20px rgba(0, 255, 133, 0.3));
+      animation: titleShimmer 3s ease-in-out infinite;
+    }
+
+    @keyframes titleShimmer {
+      0%, 100% {
+        filter: drop-shadow(0 0 20px rgba(0, 255, 133, 0.3));
+      }
+      50% {
+        filter: drop-shadow(0 0 30px rgba(0, 255, 133, 0.5));
+      }
     }
 
     .pay-sub {
@@ -237,6 +326,18 @@
       color: var(--text-secondary);
       font-size: 0.85rem;
       margin-bottom: 32px;
+      animation: subtitleEnter 0.8s ease-out 0.15s backwards;
+    }
+
+    @keyframes subtitleEnter {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     /* Amount Box */
@@ -248,17 +349,39 @@
       text-align: center;
       margin-bottom: 32px;
       box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
-      transition: all 0.3s ease;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      animation: cardEnter 0.85s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .amount-box::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, rgba(0, 255, 133, 0.15), transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 0.3;
+      animation: shimmerPulse 4s ease-in-out infinite;
+    }
+
+    @keyframes shimmerPulse {
+      0%, 100% {
+        opacity: 0.2;
+      }
+      50% {
+        opacity: 0.5;
+      }
     }
 
     .amount-box:hover {
-      box-shadow: 0 18px 45px -12px rgba(0, 255, 133, 0.18);
-      border-color: rgba(0, 255, 133, 0.22);
-      transform: translateY(-2px);
-    }
-
-    .amount-box {
-      animation: cardEnter 0.85s ease-out backwards;
+      box-shadow: 0 18px 45px -12px rgba(0, 255, 133, 0.25), inset 0 0 20px rgba(0, 255, 133, 0.08);
+      border-color: rgba(0, 255, 133, 0.3);
+      transform: translateY(-3px) scale(1.01);
     }
 
     .amount-label {
@@ -268,6 +391,7 @@
       letter-spacing: 2px;
       color: var(--text-muted);
       margin-bottom: 12px;
+      animation: fadeInUp 0.6s ease-out 0.15s backwards;
     }
 
     .amount-value {
@@ -278,6 +402,7 @@
       background-clip: text;
       color: transparent;
       letter-spacing: -0.02em;
+      animation: fadeInUp 0.6s ease-out 0.25s backwards;
     }
 
     /* Payment Methods */
@@ -297,17 +422,39 @@
       justify-content: space-between;
       align-items: center;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pay-option:nth-child(1) {
+      animation: cardEnter 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s backwards;
+    }
+
+    .pay-option:nth-child(2) {
+      animation: cardEnter 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s backwards;
+    }
+
+    .pay-option::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0, 255, 133, 0.15), transparent);
+      transition: left 0.6s ease;
+      pointer-events: none;
+    }
+
+    .pay-option:hover::before {
+      left: 100%;
     }
 
     .pay-option:hover {
-      transform: translateX(6px);
+      transform: translateX(6px) scale(1.02);
       border-color: var(--accent-green);
-      box-shadow: 0 12px 28px rgba(0, 255, 133, 0.18);
-    }
-
-    .pay-option {
-      animation: cardEnter 0.9s ease-out backwards;
+      box-shadow: 0 12px 28px rgba(0, 255, 133, 0.25), inset 0 0 15px rgba(0, 255, 133, 0.08);
     }
 
     .pay-option-left {
@@ -344,12 +491,8 @@
 
     .pay-option-arrow {
       color: var(--text-muted);
-      transition: all 0.2s ease;
-    }
-
-    .pay-option:hover .pay-option-arrow {
-      transform: translateX(4px);
-      color: var(--accent-green);
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);\n    }\n\n    .pay-option:hover .pay-option-arrow {
+      transform: translateX(6px);\n      color: var(--accent-green);
     }
 
     /* Note */
@@ -365,10 +508,47 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      animation: noteEnter 0.6s ease-out 0.6s backwards;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .note::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0, 255, 133, 0.1), transparent);
+      transition: left 0.6s ease;
+      pointer-events: none;
+    }
+
+    .note:hover::before {
+      left: 100%;
+    }
+
+    .note:hover {
+      border-color: rgba(0, 255, 133, 0.3);
+      box-shadow: 0 6px 16px rgba(0, 255, 133, 0.15);
+      transform: translateY(-2px);
     }
 
     .note i {
       color: var(--accent-green);
+    }
+
+    @keyframes noteEnter {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     /* Proceed Button */
@@ -382,20 +562,59 @@
       font-size: 1rem;
       font-weight: 700;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
       font-family: 'Inter', sans-serif;
       margin-bottom: 32px;
       box-shadow: 0 10px 25px -5px rgba(0, 255, 133, 0.3);
-      animation: cardEnter 0.9s ease-out backwards;
+      animation: buttonEnter 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.5s backwards;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .proceed-btn::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transform: rotate(45deg);
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .proceed-btn:hover::before {
+      opacity: 1;
+      animation: shimmer 0.6s ease-in-out;
     }
 
     .proceed-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 18px 45px -12px rgba(0, 255, 133, 0.5);
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 16px 40px rgba(0, 255, 133, 0.4), inset 0 0 10px rgba(255, 255, 255, 0.1);
+      animation: buttonGlow 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
     }
 
     .proceed-btn:active {
-      transform: translateY(0);
+      transform: translateY(0) scale(0.98);
+    }
+
+    @keyframes shimmer {
+      0% {
+        background-position: -1000px 0;
+      }
+      100% {
+        background-position: 1000px 0;
+      }
+    }
+
+    @keyframes buttonGlow {
+      0%, 100% {
+        box-shadow: 0 16px 40px rgba(0, 255, 133, 0.4), inset 0 0 10px rgba(255, 255, 255, 0.1);
+      }
+      50% {
+        box-shadow: 0 20px 50px rgba(0, 255, 133, 0.6), inset 0 0 15px rgba(255, 255, 255, 0.2);
+      }
     }
 
     .user-bar,
@@ -409,30 +628,72 @@
       animation: buttonGlow 1.5s ease-in-out infinite;
     }
 
-    @keyframes foodGradientShift {
+    @keyframes gradientShift {
       0%, 100% {
-        background: radial-gradient(circle at 20% 30%, rgba(255, 157, 77, 0.15) 0%, transparent 45%),
-                    radial-gradient(circle at 80% 80%, rgba(0, 255, 133, 0.08) 0%, transparent 45%),
-                    radial-gradient(circle at 55% 5%, rgba(255, 100, 50, 0.1) 0%, transparent 55%);
+        background: 
+          radial-gradient(circle at 20% 50%, rgba(0, 255, 133, 0.15) 0%, transparent 50%),
+          radial-gradient(circle at 80% 80%, rgba(255, 157, 77, 0.1) 0%, transparent 50%),
+          radial-gradient(circle at 50% 0%, rgba(255, 100, 50, 0.12) 0%, transparent 60%);
       }
       50% {
-        background: radial-gradient(circle at 80% 20%, rgba(255, 157, 77, 0.15) 0%, transparent 45%),
-                    radial-gradient(circle at 20% 80%, rgba(0, 255, 133, 0.08) 0%, transparent 45%),
-                    radial-gradient(circle at 55% 100%, rgba(255, 100, 50, 0.1) 0%, transparent 55%);
+        background: 
+          radial-gradient(circle at 80% 20%, rgba(0, 255, 133, 0.15) 0%, transparent 50%),
+          radial-gradient(circle at 20% 80%, rgba(255, 157, 77, 0.1) 0%, transparent 50%),
+          radial-gradient(circle at 50% 100%, rgba(255, 100, 50, 0.12) 0%, transparent 60%);
       }
     }
 
-    @keyframes foodFloat {
+    @keyframes gridShift {
       0% {
-        transform: translateY(0) translateX(0);
-        opacity: 0.03;
-      }
-      50% {
-        opacity: 0.06;
+        background-position: 0 0, 0 0;
       }
       100% {
-        transform: translateY(-100vh) translateX(50px);
-        opacity: 0.01;
+        background-position: 50px 50px, 50px 50px;
+      }
+    }
+
+    @keyframes floatComplex1 {
+      0%, 100% {
+        transform: translate(0, 0) scale(1) rotate(0deg);
+      }
+      25% {
+        transform: translate(30px, -40px) scale(1.1) rotate(90deg);
+      }
+      50% {
+        transform: translate(-20px, 30px) scale(0.95) rotate(180deg);
+      }
+      75% {
+        transform: translate(40px, 20px) scale(1.05) rotate(270deg);
+      }
+    }
+
+    @keyframes floatComplex2 {
+      0%, 100% {
+        transform: translate(0, 0) scale(1) rotate(0deg);
+      }
+      25% {
+        transform: translate(-35px, 25px) scale(0.9) rotate(-90deg);
+      }
+      50% {
+        transform: translate(25px, -35px) scale(1.08) rotate(-180deg);
+      }
+      75% {
+        transform: translate(-20px, -15px) scale(0.98) rotate(-270deg);
+      }
+    }
+
+    @keyframes floatComplex3 {
+      0%, 100% {
+        transform: translate(-50%, -50%) scale(1) rotate(0deg);
+      }
+      25% {
+        transform: translate(-50%, -40%) scale(1.08) rotate(45deg);
+      }
+      50% {
+        transform: translate(-60%, -50%) scale(0.95) rotate(90deg);
+      }
+      75% {
+        transform: translate(-40%, -60%) scale(1.05) rotate(135deg);
       }
     }
 
@@ -457,6 +718,17 @@
         opacity: 1;
         transform: translateY(0) scale(1);
         filter: blur(0);
+      }
+    }
+
+    @keyframes buttonEnter {
+      from {
+        opacity: 0;
+        transform: scale(0.9) translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
       }
     }
 
@@ -530,6 +802,11 @@
   </style>
 </head>
 <body>
+
+<!-- Floating circle decorations -->
+<div class="bg-circle-1"></div>
+<div class="bg-circle-2"></div>
+<div class="bg-circle-3"></div>
 
 <!-- external compatibility scripts (preserved) -->
 <script src="fp-config.js"></script>

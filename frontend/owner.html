@@ -3,10 +3,465 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Food Point Owner</title>
   <meta http-equiv="refresh" content="0;url=owner-dashboard.html" />
+  <title>Food Point Owner Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-primary: #0A0A0F;
+      --bg-secondary: #111116;
+      --bg-card: #15171E;
+      --text-primary: #FFFFFF;
+      --text-secondary: #8A8F9E;
+      --accent-green: #00FF85;
+      --accent-orange: #F97316;
+      --gradient-primary: linear-gradient(135deg, #00FF85 0%, #00C96D 100%);
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        radial-gradient(circle at 20% 50%, rgba(0, 255, 133, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(255, 157, 77, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 50% 0%, rgba(255, 100, 50, 0.12) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+      animation: gradientShift 15s ease-in-out infinite;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: 
+        linear-gradient(90deg, transparent 1px, rgba(0, 255, 133, 0.03) 1px),
+        linear-gradient(transparent 1px, rgba(0, 255, 133, 0.03) 1px);
+      background-size: 50px 50px;
+      pointer-events: none;
+      z-index: 0;
+      animation: gridShift 20s linear infinite;
+    }
+
+    /* Floating circles */
+    .bg-circle-1,
+    .bg-circle-2,
+    .bg-circle-3 {
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+      filter: blur(40px);
+    }
+
+    .bg-circle-1 {
+      width: 300px;
+      height: 300px;
+      top: 10%;
+      right: 5%;
+      background: radial-gradient(circle, rgba(0, 255, 133, 0.3) 0%, rgba(0, 255, 133, 0.1) 40%, transparent 70%);
+      animation: floatComplex1 25s ease-in-out infinite;
+    }
+
+    .bg-circle-2 {
+      width: 250px;
+      height: 250px;
+      bottom: 15%;
+      left: 8%;
+      background: radial-gradient(circle, rgba(255, 157, 77, 0.25) 0%, rgba(255, 157, 77, 0.08) 40%, transparent 70%);
+      animation: floatComplex2 30s ease-in-out infinite;
+    }
+
+    .bg-circle-3 {
+      width: 280px;
+      height: 280px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(circle, rgba(255, 100, 50, 0.2) 0%, rgba(255, 100, 50, 0.05) 40%, transparent 70%);
+      animation: floatComplex3 35s ease-in-out infinite;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      animation: containerEnter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+    }
+
+    .brand {
+      font-size: 3rem;
+      font-weight: 800;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 16px;
+      filter: drop-shadow(0 0 20px rgba(0, 255, 133, 0.3));
+      animation: brandEnter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+      letter-spacing: -0.02em;
+    }
+
+    .brand:hover {
+      animation: brandGlow 3s ease-in-out infinite;
+    }
+
+    @keyframes brandGlow {
+      0%, 100% {
+        filter: drop-shadow(0 0 30px rgba(0, 255, 133, 0.5));
+      }
+      50% {
+        filter: drop-shadow(0 0 40px rgba(0, 255, 133, 0.8));
+      }
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      color: var(--text-secondary);
+      margin-bottom: 32px;
+      animation: subtitleEnter 0.8s ease-out 0.15s backwards;
+    }
+
+    .loader {
+      display: inline-block;
+      width: 60px;
+      height: 60px;
+      margin: 20px auto 30px;
+      animation: loaderEnter 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.25s backwards;
+    }
+
+    .loader-circle {
+      position: absolute;
+      border: 3px solid transparent;
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .loader-circle:nth-child(1) {
+      width: 60px;
+      height: 60px;
+      border-top-color: var(--accent-green);
+      border-right-color: var(--accent-green);
+      animation: spin 1.8s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+    }
+
+    .loader-circle:nth-child(2) {
+      width: 45px;
+      height: 45px;
+      border-bottom-color: rgba(0, 255, 133, 0.6);
+      border-left-color: rgba(0, 255, 133, 0.6);
+      animation: spin 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) infinite reverse;
+    }
+
+    .loader-circle:nth-child(3) {
+      width: 30px;
+      height: 30px;
+      border-top-color: rgba(0, 255, 133, 0.3);
+      border-right-color: rgba(0, 255, 133, 0.3);
+      animation: spin 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+    }
+
+    .redirect-text {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      animation: fadeInUp 0.6s ease-out 0.4s backwards;
+    }
+
+    .redirect-link {
+      display: inline-block;
+      margin-top: 24px;
+      padding: 14px 32px;
+      background: var(--gradient-primary);
+      color: var(--bg-primary);
+      text-decoration: none;
+      border-radius: 100px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      overflow: hidden;
+      animation: buttonEnter 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.5s backwards;
+    }
+
+    .redirect-link::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transform: rotate(45deg);
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .redirect-link:hover::before {
+      opacity: 1;
+      animation: shimmer 0.6s ease-in-out;
+    }
+
+    .redirect-link:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 12px 35px rgba(0, 255, 133, 0.4), inset 0 0 10px rgba(255, 255, 255, 0.1);
+    }
+
+    .redirect-link:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+    @keyframes gradientShift {
+      0%, 100% {
+        background: 
+          radial-gradient(circle at 20% 50%, rgba(0, 255, 133, 0.15) 0%, transparent 50%),
+          radial-gradient(circle at 80% 80%, rgba(255, 157, 77, 0.1) 0%, transparent 50%),
+          radial-gradient(circle at 50% 0%, rgba(255, 100, 50, 0.12) 0%, transparent 60%);
+      }
+      50% {
+        background: 
+          radial-gradient(circle at 80% 20%, rgba(0, 255, 133, 0.15) 0%, transparent 50%),
+          radial-gradient(circle at 20% 80%, rgba(255, 157, 77, 0.1) 0%, transparent 50%),
+          radial-gradient(circle at 50% 100%, rgba(255, 100, 50, 0.12) 0%, transparent 60%);
+      }
+    }
+
+    @keyframes gridShift {
+      0% {
+        background-position: 0 0, 0 0;
+      }
+      100% {
+        background-position: 50px 50px, 50px 50px;
+      }
+    }
+
+    @keyframes floatComplex1 {
+      0%, 100% {
+        transform: translate(0, 0) scale(1) rotate(0deg);
+      }
+      25% {
+        transform: translate(30px, -40px) scale(1.1) rotate(90deg);
+      }
+      50% {
+        transform: translate(-20px, 30px) scale(0.95) rotate(180deg);
+      }
+      75% {
+        transform: translate(40px, 20px) scale(1.05) rotate(270deg);
+      }
+    }
+
+    @keyframes floatComplex2 {
+      0%, 100% {
+        transform: translate(0, 0) scale(1) rotate(0deg);
+      }
+      25% {
+        transform: translate(-35px, 25px) scale(0.9) rotate(-90deg);
+      }
+      50% {
+        transform: translate(25px, -35px) scale(1.08) rotate(-180deg);
+      }
+      75% {
+        transform: translate(-20px, -15px) scale(0.98) rotate(-270deg);
+      }
+    }
+
+    @keyframes floatComplex3 {
+      0%, 100% {
+        transform: translate(-50%, -50%) scale(1) rotate(0deg);
+      }
+      25% {
+        transform: translate(-50%, -40%) scale(1.08) rotate(45deg);
+      }
+      50% {
+        transform: translate(-60%, -50%) scale(0.95) rotate(90deg);
+      }
+      75% {
+        transform: translate(-40%, -60%) scale(1.05) rotate(135deg);
+      }
+    }
+
+    @keyframes containerEnter {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes brandEnter {
+      from {
+        opacity: 0;
+        transform: scale(0.8) translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    @keyframes subtitleEnter {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes loaderEnter {
+      from {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes spin {
+      to {
+        transform: translate(-50%, -50%) rotate(360deg);
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes buttonEnter {
+      from {
+        opacity: 0;
+        transform: scale(0.8) translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    @keyframes shimmer {
+      0% {
+        background-position: -1000px 0;
+      }
+      100% {
+        background-position: 1000px 0;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .brand {
+        font-size: 2rem;
+      }
+
+      .subtitle {
+        font-size: 0.95rem;
+      }
+
+      .loader {
+        width: 50px;
+        height: 50px;
+        margin: 15px auto 20px;
+      }
+
+      .loader-circle:nth-child(1) {
+        width: 50px;
+        height: 50px;
+      }
+
+      .loader-circle:nth-child(2) {
+        width: 37px;
+        height: 37px;
+      }
+
+      .loader-circle:nth-child(3) {
+        width: 24px;
+        height: 24px;
+      }
+
+      .redirect-link {
+        padding: 12px 24px;
+        font-size: 0.9rem;
+      }
+    }
+  </style>
 </head>
 <body>
-  <p>Redirecting to <a href="owner-dashboard.html">owner dashboard</a>…</p>
+  <!-- Floating circle decorations -->
+  <div class="bg-circle-1"></div>
+  <div class="bg-circle-2"></div>
+  <div class="bg-circle-3"></div>
+
+  <div class="container">
+    <div class="brand">🍽️ FOOD POINT</div>
+    <div class="subtitle">Owner Dashboard</div>
+    
+    <div class="loader">
+      <div class="loader-circle"></div>
+      <div class="loader-circle"></div>
+      <div class="loader-circle"></div>
+    </div>
+
+    <div class="redirect-text">
+      Redirecting to your dashboard…
+    </div>
+
+    <a href="owner-dashboard.html" class="redirect-link">
+      <i class="fas fa-arrow-right"></i> Go to Dashboard
+    </a>
+  </div>
+
+  <script>
+    // Auto-redirect after 2 seconds (backup for meta refresh)
+    setTimeout(() => {
+      window.location.href = 'owner-dashboard.html';
+    }, 2000);
+  </script>
 </body>
 </html>
