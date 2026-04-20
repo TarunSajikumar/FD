@@ -162,35 +162,6 @@
       background: rgba(59, 130, 246, 0.05);
     }
 
-    /* Back Button */
-    .back-btn {
-      position: fixed;
-      top: 80px;
-      left: 24px;
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-subtle);
-      color: var(--text-secondary);
-      padding: 10px 18px;
-      border-radius: 100px;
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      font-family: 'Inter', sans-serif;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      z-index: 99;
-      backdrop-filter: blur(10px);
-    }
-
-    .back-btn:hover {
-      border-color: var(--accent-green);
-      color: var(--accent-green);
-      background: rgba(0, 255, 133, 0.05);
-      transform: translateX(-2px);
-    }
-
     body::before {
       content: '';
       position: fixed;
@@ -598,10 +569,8 @@
       <div class="user-email">secure checkout</div>
     </div>
   </div>
-  <button class="logout-btn" onclick="location.href='menu.html'"><i class="fas fa-utensils"></i> Menu</button>
+  <button class="logout-btn" onclick="history.back()"><i class="fas fa-arrow-left"></i> Back</button>
 </div>
-
-<button class="back-btn" onclick="history.back()"><i class="fas fa-arrow-left"></i> Back</button>
 
 <div class="container">
   <header>
