@@ -3,49 +3,288 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Food Point</title>
+  <title>Food Point - Fresh Meals Delivered</title>
   <style>
-    body {
-      font-family: Segoe UI, Tahoma, Geneva, Verdana, sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      background: #020617;
-      color: #f8fafc;
+    * {
       margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #020617 0%, #0f172a 50%, #111827 100%);
+      color: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
       position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Animated background elements */
+    .bg-decoration {
+      position: fixed;
+      pointer-events: none;
+      opacity: 0.05;
+    }
+
+    .bg-circle-1 {
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, #f59e0b 0%, transparent 70%);
+      border-radius: 50%;
+      top: -100px;
+      right: -100px;
+      animation: float 20s ease-in-out infinite;
+    }
+
+    .bg-circle-2 {
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, #22c55e 0%, transparent 70%);
+      border-radius: 50%;
+      bottom: -50px;
+      left: -50px;
+      animation: float 25s ease-in-out infinite reverse;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(30px); }
+    }
+
+    /* Header */
+    header {
+      padding: 20px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      z-index: 100;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .logo {
+      font-size: 1.6rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.5px;
     }
 
     #ownerCornerBtn {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      padding: 10px 16px;
+      padding: 10px 18px;
       border-radius: 999px;
-      border: none;
-      background: rgba(255, 255, 255, 0.08);
+      border: 1.5px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.05);
       color: #f8fafc;
-      font-weight: 700;
+      font-weight: 600;
       cursor: pointer;
-      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.25);
-      transition: transform 0.2s ease, background 0.2s ease;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
     }
 
     #ownerCornerBtn:hover {
-      transform: translateY(-1px);
-      background: rgba(255, 255, 255, 0.14);
+      transform: translateY(-2px);
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.2);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
     }
 
+    #ownerCornerBtn:active {
+      transform: translateY(0);
+    }
+
+    /* Main Content */
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px;
+      position: relative;
+      z-index: 10;
+    }
+
+    .container {
+      max-width: 900px;
+      width: 100%;
+    }
+
+    /* Hero Section */
+    .hero {
+      text-align: center;
+      margin-bottom: 60px;
+      animation: slideUp 0.8s ease;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .hero-title {
+      font-size: clamp(2rem, 8vw, 3.5rem);
+      font-weight: 800;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #ec4899 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.2;
+      letter-spacing: -1px;
+    }
+
+    .hero-subtitle {
+      font-size: 1.1rem;
+      color: #cbd5e1;
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      padding: 8px 16px;
+      background: rgba(34, 197, 94, 0.15);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      border-radius: 999px;
+      color: #86efac;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 24px;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    /* CTA Button */
+    .cta-button {
+      display: inline-block;
+      padding: 16px 40px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: #111827;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 1.05rem;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 12px 32px rgba(245, 158, 11, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.2);
+      transition: left 0.3s ease;
+    }
+
+    .cta-button:hover::before {
+      left: 100%;
+    }
+
+    .cta-button:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 40px rgba(245, 158, 11, 0.4);
+    }
+
+    .cta-button:active {
+      transform: translateY(-1px);
+    }
+
+    .cta-button.disabled {
+      background: linear-gradient(135deg, #a855f7 0%, #9333ea 100%);
+      color: #f8fafc;
+      pointer-events: none;
+      opacity: 0.6;
+    }
+
+    /* Features Grid */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 24px;
+      margin: 60px 0;
+      padding: 40px 24px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+    }
+
+    .feature-item {
+      text-align: center;
+      animation: slideUp 0.8s ease forwards;
+      animation-delay: var(--delay, 0s);
+    }
+
+    .feature-icon {
+      font-size: 2.5rem;
+      margin-bottom: 12px;
+    }
+
+    .feature-title {
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 8px;
+    }
+
+    .feature-desc {
+      font-size: 0.9rem;
+      color: #94a3b8;
+      line-height: 1.5;
+    }
+
+    /* Status Message */
+    #shopStatusMessage {
+      margin-top: 20px;
+      padding: 16px 24px;
+      border-radius: 12px;
+      background: rgba(249, 115, 22, 0.15);
+      border: 1px solid rgba(249, 115, 22, 0.3);
+      color: #ffedd5;
+      min-height: auto;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    /* Modal Styles */
     .modal-overlay {
       position: fixed;
       inset: 0;
       display: none;
       align-items: center;
       justify-content: center;
-      backdrop-filter: blur(6px);
-      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(8px);
+      background: rgba(0, 0, 0, 0.75);
       z-index: 1000;
+      animation: fadeIn 0.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
 
     .modal-overlay.active {
@@ -54,47 +293,73 @@
 
     .password-modal {
       width: min(420px, calc(100% - 32px));
-      background: #111827;
-      border-radius: 16px;
-      padding: 28px;
-      box-shadow: 0 30px 70px rgba(0, 0, 0, 0.35);
+      background: linear-gradient(135deg, #111827 0%, #0f172a 100%);
+      border-radius: 20px;
+      padding: 32px;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
       text-align: left;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      animation: modalSlideUp 0.3s ease;
+    }
+
+    @keyframes modalSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .password-modal h2 {
       margin: 0 0 8px;
-      font-size: 1.4rem;
+      font-size: 1.5rem;
       color: #fef2f2;
+      font-weight: 700;
     }
 
     .password-modal p {
-      margin: 0 0 20px;
+      margin: 0 0 24px;
       color: #cbd5e1;
       line-height: 1.6;
     }
 
     .password-input {
       width: 100%;
-      padding: 12px 14px;
+      padding: 14px 16px;
       border-radius: 12px;
-      border: 1px solid #374151;
-      background: #0f172a;
+      border: 1.5px solid #374151;
+      background: rgba(15, 23, 42, 0.5);
       color: #f8fafc;
       font-size: 1rem;
       margin-bottom: 12px;
       outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .password-input:focus {
+      border-color: #f59e0b;
+      background: rgba(15, 23, 42, 0.8);
+      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
     }
 
     .password-input.error {
       border-color: #f87171;
+      background: rgba(248, 113, 113, 0.05);
     }
 
     .error-message,
     .attempts-warning {
       color: #fca5a5;
-      font-size: 0.94rem;
+      font-size: 0.9rem;
       display: none;
       margin: 0 0 14px;
+      padding: 10px 12px;
+      background: rgba(248, 113, 113, 0.1);
+      border-radius: 8px;
+      border-left: 3px solid #f87171;
     }
 
     .error-message.show,
@@ -104,58 +369,151 @@
 
     .modal-buttons {
       display: flex;
-      gap: 10px;
+      gap: 12px;
       justify-content: flex-end;
       flex-wrap: wrap;
+      margin-top: 24px;
     }
 
     .modal-btn {
-      padding: 10px 18px;
+      padding: 12px 20px;
       border: none;
-      border-radius: 999px;
-      font-weight: 700;
+      border-radius: 8px;
+      font-weight: 600;
       cursor: pointer;
-      transition: transform 0.2s ease, opacity 0.2s ease;
+      transition: all 0.2s ease;
+      font-size: 0.95rem;
     }
 
     .modal-btn:hover {
-      transform: translateY(-1px);
+      transform: translateY(-2px);
+    }
+
+    .modal-btn:active {
+      transform: translateY(0);
     }
 
     .modal-btn-primary {
-      background: #22c55e;
+      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
       color: #ffffff;
+      box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3);
+    }
+
+    .modal-btn-primary:hover {
+      box-shadow: 0 12px 28px rgba(34, 197, 94, 0.4);
     }
 
     .modal-btn-secondary {
       background: #374151;
       color: #f8fafc;
+      border: 1px solid #4b5563;
     }
 
-    @media (max-width: 520px) {
+    .modal-btn-secondary:hover {
+      background: #4b5563;
+    }
+
+    .modal-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      header {
+        padding: 16px 16px;
+      }
+
+      .logo {
+        font-size: 1.4rem;
+      }
+
+      main {
+        padding: 24px 16px;
+      }
+
+      .hero-title {
+        font-size: 1.8rem;
+      }
+
+      .hero-subtitle {
+        font-size: 1rem;
+      }
+
+      .features {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        padding: 24px 16px;
+      }
+
+      .cta-button {
+        width: 100%;
+        padding: 14px 24px;
+      }
+
       #ownerCornerBtn {
-        top: 12px;
-        right: 12px;
         padding: 9px 14px;
+        font-size: 0.85rem;
       }
     }
   </style>
 </head>
 <body>
-  <button id="ownerCornerBtn" type="button">Owner</button>
+  <!-- Background Decorations -->
+  <div class="bg-decoration bg-circle-1"></div>
+  <div class="bg-decoration bg-circle-2"></div>
 
-  <main style="text-align:center;padding:24px;max-width:420px;">
-    <h1 style="font-size:2rem;margin-bottom:1rem;color:#fbbf24;">Food Point</h1>
-    <p style="margin-bottom:1.5rem;color:#cbd5e1;">Welcome to Food Point. Use the button below to sign in or create an account.</p>
-    <a id="goToLoginBtn" href="login.html" style="display:inline-block;padding:12px 24px;border-radius:999px;background:#f59e0b;color:#111827;text-decoration:none;font-weight:700;">Go to Login</a>
-    <p id="shopStatusMessage" style="margin-top:1rem;color:#fca5a5;font-size:0.95rem;min-height:1.2rem;"></p>
+  <!-- Header -->
+  <header>
+    <div class="logo">🍽️ Food Point</div>
+    <button id="ownerCornerBtn" type="button">Owner Access</button>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <div class="container">
+      <!-- Hero Section -->
+      <section class="hero">
+        <div class="hero-badge">✨ Fresh & Delicious</div>
+        <h1 class="hero-title">Welcome to Food Point</h1>
+        <p class="hero-subtitle">Discover amazing meals delivered to your door. Fresh ingredients, authentic flavors, and exceptional service.</p>
+        <a id="goToLoginBtn" href="login.html" class="cta-button">Start Ordering Now</a>
+        <div id="shopStatusMessage"></div>
+      </section>
+
+      <!-- Features Section -->
+      <section class="features">
+        <div class="feature-item" style="--delay: 0s;">
+          <div class="feature-icon">⚡</div>
+          <div class="feature-title">Fast Delivery</div>
+          <div class="feature-desc">Get your meals delivered in 30 minutes or less</div>
+        </div>
+        <div class="feature-item" style="--delay: 0.1s;">
+          <div class="feature-icon">🌱</div>
+          <div class="feature-title">Fresh Ingredients</div>
+          <div class="feature-desc">Sourced from local suppliers daily</div>
+        </div>
+        <div class="feature-item" style="--delay: 0.2s;">
+          <div class="feature-icon">💰</div>
+          <div class="feature-title">Great Prices</div>
+          <div class="feature-desc">Quality meals at affordable rates</div>
+        </div>
+        <div class="feature-item" style="--delay: 0.3s;">
+          <div class="feature-icon">👨‍🍳</div>
+          <div class="feature-title">Expert Chefs</div>
+          <div class="feature-desc">Prepared by professional chefs</div>
+        </div>
+      </section>
+    </div>
   </main>
 
+  <!-- Owner Password Modal -->
   <div class="modal-overlay" id="ownerPasswordModal">
     <div class="password-modal">
       <h2>Owner Access</h2>
-      <p>Enter the owner password to open the dashboard.</p>
-      <input id="ownerPasswordInput" class="password-input" type="password" placeholder="Owner password" autocomplete="current-password" />
+      <p>Enter the owner password to access the dashboard.</p>
+      <input id="ownerPasswordInput" class="password-input" type="password" placeholder="Enter password" autocomplete="current-password" />
       <div class="error-message" id="ownerErrorMsg">Incorrect password. Please try again.</div>
       <div class="attempts-warning" id="ownerAttemptsWarn">Too many failed attempts. Please wait 30 seconds.</div>
       <div class="modal-buttons">
@@ -169,26 +527,29 @@
   <script src="fp-fetch-proxy.js"></script>
   <script src="api.js"></script>
   <script>
+    // Shop Status Management
     const SHOP_STATUS_KEY = 'shopStatus';
     const goToLoginBtn = document.getElementById('goToLoginBtn');
     const shopStatusMessage = document.getElementById('shopStatusMessage');
     const shopStatus = localStorage.getItem(SHOP_STATUS_KEY) || 'open';
 
     if (shopStatus === 'closed') {
-      goToLoginBtn.style.pointerEvents = 'none';
-      goToLoginBtn.style.opacity = '0.55';
-      goToLoginBtn.style.cursor = 'not-allowed';
-      goToLoginBtn.style.background = '#a855f7';
+      goToLoginBtn.classList.add('disabled');
       goToLoginBtn.href = '#';
-      shopStatusMessage.textContent = 'Shop is currently closed. Customer login is disabled until the owner opens it again.';
+      shopStatusMessage.textContent = '🔒 Shop is currently closed. Customer login is disabled until the owner opens it again.';
+      shopStatusMessage.style.display = 'block';
       goToLoginBtn.addEventListener('click', function(event) {
         event.preventDefault();
       });
+    } else {
+      shopStatusMessage.style.display = 'none';
     }
 
+    // Owner Password Management
     const OWNER_PASSWORD_KEY = 'ownerPassword';
     const ATTEMPTS_KEY = 'ownerPasswordAttempts';
     const LOCKOUT_KEY = 'ownerPasswordLockout';
+    const LOCKOUT_DURATION = 30000; // 30 seconds
 
     const ownerCornerBtn = document.getElementById('ownerCornerBtn');
     const ownerModal = document.getElementById('ownerPasswordModal');
@@ -208,7 +569,7 @@
       const lockoutUntil = localStorage.getItem(LOCKOUT_KEY);
       if (lockoutUntil && Date.now() < parseInt(lockoutUntil, 10)) {
         const remaining = Math.ceil((parseInt(lockoutUntil, 10) - Date.now()) / 1000);
-        ownerAttemptsWarn.textContent = `Too many failed attempts. Please wait ${remaining} seconds.`;
+        ownerAttemptsWarn.textContent = `⏳ Too many failed attempts. Please wait ${remaining} second${remaining !== 1 ? 's' : ''}.`;
         ownerAttemptsWarn.classList.add('show');
         ownerSubmitBtn.disabled = true;
         return true;
@@ -225,11 +586,11 @@
       attempts += 1;
       localStorage.setItem(ATTEMPTS_KEY, attempts.toString());
       if (attempts >= 3) {
-        const lockoutTime = Date.now() + 30000;
+        const lockoutTime = Date.now() + LOCKOUT_DURATION;
         localStorage.setItem(LOCKOUT_KEY, lockoutTime.toString());
         ownerAttemptsWarn.classList.add('show');
         ownerSubmitBtn.disabled = true;
-        setTimeout(ownerCheckLockout, 30000);
+        setTimeout(ownerCheckLockout, LOCKOUT_DURATION);
       }
     }
 
@@ -274,23 +635,39 @@
       setTimeout(() => ownerPasswordInput.focus(), 50);
     }
 
-    ownerCornerBtn.addEventListener('click', openOwnerModal);
-    ownerCancelBtn.addEventListener('click', () => {
+    function closeOwnerModal() {
       ownerModal.classList.remove('active');
-    });
+      ownerPasswordInput.value = '';
+      ownerPasswordInput.classList.remove('error');
+      ownerErrorMsg.classList.remove('show');
+    }
+
+    // Event Listeners
+    ownerCornerBtn.addEventListener('click', openOwnerModal);
+    ownerCancelBtn.addEventListener('click', closeOwnerModal);
     ownerSubmitBtn.addEventListener('click', verifyOwnerPassword);
+    
     ownerPasswordInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
+      if (e.key === 'Enter' && !ownerSubmitBtn.disabled) {
         verifyOwnerPassword();
       }
     });
+    
     ownerPasswordInput.addEventListener('input', () => {
       ownerPasswordInput.classList.remove('error');
       ownerErrorMsg.classList.remove('show');
     });
+    
     ownerModal.addEventListener('click', (e) => {
       if (e.target === ownerModal) {
-        ownerModal.classList.remove('active');
+        closeOwnerModal();
+      }
+    });
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && ownerModal.classList.contains('active')) {
+        closeOwnerModal();
       }
     });
   </script>
