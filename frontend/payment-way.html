@@ -100,16 +100,32 @@
 
     /* User Bar */
     .user-bar {
-      background: var(--bg-userbar);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--border-subtle);
+      background: linear-gradient(135deg, rgba(13, 13, 18, 0.95) 0%, rgba(21, 23, 30, 0.9) 100%);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(0, 255, 133, 0.1);
       padding: 12px 24px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      position: sticky;
-      top: 0;
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-radius: 50px;
       z-index: 100;
+      max-width: 600px;
+      width: calc(100% - 40px);
+      box-shadow: 0 8px 32px rgba(0, 255, 133, 0.08), 0 0 20px rgba(0, 255, 133, 0.04);
+      animation: floatingBar 3s ease-in-out infinite;
+    }
+
+    @keyframes floatingBar {
+      0%, 100% {
+        transform: translateX(-50%) translateY(0);
+      }
+      50% {
+        transform: translateX(-50%) translateY(-8px);
+      }
     }
 
     .user-info {
@@ -198,7 +214,7 @@
     .pay-container {
       max-width: 500px;
       margin: 0 auto;
-      padding: 100px 20px 60px;
+      padding: 120px 20px 60px;
       position: relative;
       z-index: 1;
       animation: pageEnter 0.8s ease-out backwards;
