@@ -79,6 +79,104 @@
       padding: 20px;
     }
 
+    /* User Bar */
+    .user-bar {
+      background: var(--bg-userbar);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .user-avatar {
+      width: 44px;
+      height: 44px;
+      background: var(--gradient-primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 20px;
+      color: #0A0A0F;
+    }
+
+    .user-text .user-name {
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+    }
+
+    .user-text .user-email {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .logout-btn {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      padding: 8px 20px;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logout-btn:hover {
+      border-color: var(--accent-blue);
+      color: var(--accent-blue);
+      background: rgba(59, 130, 246, 0.05);
+    }
+
+    /* Back Button */
+    .back-btn {
+      position: fixed;
+      top: 80px;
+      left: 24px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      padding: 10px 18px;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'Inter', sans-serif;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 99;
+      backdrop-filter: blur(10px);
+    }
+
+    .back-btn:hover {
+      border-color: var(--accent-green);
+      color: var(--accent-green);
+      background: rgba(0, 255, 133, 0.05);
+      transform: translateX(-2px);
+    }
+
     body::before {
       content: '';
       position: fixed;
@@ -118,6 +216,7 @@
       position: relative;
       z-index: 1;
       animation: fadeInUp 0.4s ease-out;
+      padding-top: 100px;
     }
 
     header {
@@ -477,6 +576,19 @@
   </style>
 </head>
 <body>
+<div class="user-bar">
+  <div class="user-info">
+    <div class="user-avatar">🍔</div>
+    <div class="user-text">
+      <div class="user-name">FOOD POINT</div>
+      <div class="user-email">secure checkout</div>
+    </div>
+  </div>
+  <button class="logout-btn" onclick="location.href='menu.html'"><i class="fas fa-utensils"></i> Menu</button>
+</div>
+
+<button class="back-btn" onclick="history.back()"><i class="fas fa-arrow-left"></i> Back</button>
+
 <div class="container">
   <header>
     <h1>✨ FOOD POINT PAYMENT</h1>
