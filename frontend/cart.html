@@ -66,19 +66,6 @@
       min-height: 100vh;
       position: relative;
       overflow-x: hidden;
-      background-image: 
-        radial-gradient(circle at 20% 50%, rgba(255, 150, 0, 0.08) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(0, 255, 133, 0.08) 0%, transparent 50%);
-      animation: backgroundShift 15s ease-in-out infinite;
-    }
-
-    @keyframes backgroundShift {
-      0%, 100% {
-        background-position: 0% 0%;
-      }
-      50% {
-        background-position: 100% 100%;
-      }
     }
 
     body::before {
@@ -89,20 +76,67 @@
       right: 0;
       bottom: 0;
       background: 
-        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><defs><filter id="blur"><feGaussianBlur in="SourceGraphic" stdDeviation="40"/></filter></defs><g filter="url(%23blur)" opacity="0.08"><circle cx="150" cy="100" r="80" fill="%23FF9C00"/><circle cx="300" cy="200" r="60" fill="%2300FF85"/><circle cx="500" cy="150" r="100" fill="%23F97316"/><circle cx="800" cy="300" r="70" fill="%2300FF85"/><circle cx="1000" cy="100" r="90" fill="%23FF9C00"/><path d="M200 400 Q400 300 600 400 T1000 400" stroke="%2300FF85" stroke-width="3" fill="none"/></g></svg>') center / cover,
-        var(--gradient-glow);
+        radial-gradient(circle at 20% 50%, rgba(0, 255, 133, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(255, 157, 77, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 50% 0%, rgba(255, 100, 50, 0.12) 0%, transparent 60%);
       pointer-events: none;
       z-index: 0;
-      animation: foodBackgroundShift 20s ease-in-out infinite;
+      animation: gradientShift 15s ease-in-out infinite;
     }
 
-    @keyframes foodBackgroundShift {
-      0%, 100% {
-        filter: blur(60px) brightness(1);
-      }
-      50% {
-        filter: blur(70px) brightness(1.1);
-      }
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: 
+        linear-gradient(0deg, transparent 24%, rgba(0, 255, 133, 0.03) 25%, rgba(0, 255, 133, 0.03) 26%, transparent 27%, transparent 74%, rgba(0, 255, 133, 0.03) 75%, rgba(0, 255, 133, 0.03) 76%, transparent 77%, transparent),
+        linear-gradient(90deg, transparent 24%, rgba(0, 255, 133, 0.03) 25%, rgba(0, 255, 133, 0.03) 26%, transparent 27%, transparent 74%, rgba(0, 255, 133, 0.03) 75%, rgba(0, 255, 133, 0.03) 76%, transparent 77%, transparent);
+      background-size: 50px 50px;
+      pointer-events: none;
+      z-index: 0;
+      animation: gridShift 20s linear infinite;
+    }
+
+    /* Floating circles */
+    .bg-circle-1,
+    .bg-circle-2,
+    .bg-circle-3 {
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+      filter: blur(40px);
+    }
+
+    .bg-circle-1 {
+      width: 300px;
+      height: 300px;
+      top: 10%;
+      right: 5%;
+      background: radial-gradient(circle, rgba(0, 255, 133, 0.3) 0%, rgba(0, 255, 133, 0.1) 40%, transparent 70%);
+      animation: floatComplex1 25s ease-in-out infinite;
+    }
+
+    .bg-circle-2 {
+      width: 250px;
+      height: 250px;
+      bottom: 15%;
+      left: 8%;
+      background: radial-gradient(circle, rgba(255, 157, 77, 0.25) 0%, rgba(255, 157, 77, 0.1) 40%, transparent 70%);
+      animation: floatComplex2 30s ease-in-out infinite;
+    }
+
+    .bg-circle-3 {
+      width: 280px;
+      height: 280px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(circle, rgba(255, 100, 50, 0.2) 0%, rgba(255, 100, 50, 0.1) 40%, transparent 70%);
+      animation: floatComplex3 35s ease-in-out infinite;
     }
 
     /* User Bar */
@@ -118,15 +152,17 @@
       top: 0;
       z-index: 100;
       box-shadow: 0 4px 30px rgba(0, 255, 133, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-      animation: userBarGlow 4s ease-in-out infinite;
+      animation: userBarEnter 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
     }
 
-    @keyframes userBarGlow {
-      0%, 100% {
-        box-shadow: 0 4px 30px rgba(0, 255, 133, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    @keyframes userBarEnter {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
       }
-      50% {
-        box-shadow: 0 8px 40px rgba(0, 255, 133, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      to {
+        opacity: 1;
+        transform: translateY(0);
       }
     }
 
@@ -148,24 +184,21 @@
       font-size: 18px;
       color: #0A0A0F;
       box-shadow: 0 0 20px rgba(0, 255, 133, 0.3), 0 0 40px rgba(0, 255, 133, 0.1);
-      animation: avatarGlow 3s ease-in-out infinite, avatarFloat 3s ease-in-out infinite;
+      animation: avatarPulse 2s ease-in-out infinite;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
-    @keyframes avatarGlow {
-      0%, 100% {
-        box-shadow: 0 0 20px rgba(0, 255, 133, 0.3), 0 0 40px rgba(0, 255, 133, 0.1);
-      }
-      50% {
-        box-shadow: 0 0 35px rgba(0, 255, 133, 0.5), 0 0 60px rgba(0, 255, 133, 0.2);
-      }
+    .user-avatar:hover {
+      transform: scale(1.1) rotate(5deg);
+      box-shadow: 0 0 30px rgba(0, 255, 133, 0.5), 0 0 60px rgba(0, 255, 133, 0.3);
     }
 
-    @keyframes avatarFloat {
+    @keyframes avatarPulse {
       0%, 100% {
-        transform: translateY(0px);
+        box-shadow: 0 0 0 0 rgba(0, 255, 133, 0.4);
       }
       50% {
-        transform: translateY(-3px);
+        box-shadow: 0 0 0 8px rgba(0, 255, 133, 0);
       }
     }
 
@@ -189,7 +222,7 @@
       font-size: 13px;
       font-weight: 500;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
       font-family: 'Inter', sans-serif;
       position: relative;
       overflow: hidden;
@@ -213,7 +246,7 @@
       color: var(--accent-blue);
       background: rgba(59, 130, 246, 0.05);
       box-shadow: 0 0 20px rgba(59, 130, 246, 0.3), inset 0 0 20px rgba(59, 130, 246, 0.05);
-      transform: translateY(-2px);
+      transform: translateY(-3px) scale(1.05);
     }
 
     .logout-btn:hover::before {
@@ -227,6 +260,18 @@
       padding: 24px 20px 60px;
       position: relative;
       z-index: 1;
+      animation: pageEnter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+    }
+
+    @keyframes pageEnter {
+      from {
+        opacity: 0;
+        transform: translateY(24px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     /* Cart Card */
@@ -237,7 +282,7 @@
       padding: 28px;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 255, 133, 0.05);
       transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-      animation: cardSlideIn 0.6s ease-out;
+      animation: cardEnter 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
       position: relative;
       overflow: hidden;
     }
@@ -253,16 +298,28 @@
       pointer-events: none;
       opacity: 0;
       transition: opacity 0.4s ease;
+      animation: shimmerPulse 4s ease-in-out infinite;
     }
 
-    @keyframes cardSlideIn {
+    @keyframes cardEnter {
       from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(24px) scale(0.98);
+        filter: blur(10px);
       }
       to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+      }
+    }
+
+    @keyframes shimmerPulse {
+      0%, 100% {
+        opacity: 0.2;
+      }
+      50% {
+        opacity: 0.4;
       }
     }
 
@@ -285,15 +342,27 @@
       color: transparent;
       margin-bottom: 24px;
       letter-spacing: -0.02em;
-      animation: titleShine 3s ease-in-out infinite;
+      filter: drop-shadow(0 0 20px rgba(0, 255, 133, 0.3));
+      animation: titleShimmer 3s ease-in-out infinite, fadeInUp 0.6s ease-out backwards;
     }
 
-    @keyframes titleShine {
+    @keyframes titleShimmer {
       0%, 100% {
-        text-shadow: 0 0 0 rgba(0, 255, 133, 0);
+        filter: drop-shadow(0 0 20px rgba(0, 255, 133, 0.3));
       }
       50% {
-        text-shadow: 0 0 15px rgba(0, 255, 133, 0.3);
+        filter: drop-shadow(0 0 30px rgba(0, 255, 133, 0.5));
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
       }
     }
 
@@ -315,7 +384,7 @@
       transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
       position: relative;
       overflow: hidden;
-      animation: itemFadeIn 0.5s ease-out backwards;
+      animation: fadeInUp 0.6s ease-out backwards;
     }
 
     .cart-item::before {
@@ -326,18 +395,7 @@
       width: 100%;
       height: 100%;
       background: linear-gradient(90deg, transparent, rgba(0, 255, 133, 0.1), transparent);
-      transition: left 0.5s ease;
-    }
-
-    @keyframes itemFadeIn {
-      from {
-        opacity: 0;
-        transform: translateX(-20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
+      transition: left 0.6s ease;
     }
 
     .cart-item:hover {
@@ -377,6 +435,7 @@
       color: var(--accent-green);
       font-size: 14px;
       animation: priceShimmer 2s ease-in-out infinite;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
     @keyframes priceShimmer {
@@ -401,7 +460,7 @@
       font-size: 16px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
       font-family: 'Inter', sans-serif;
       position: relative;
       overflow: hidden;
@@ -424,7 +483,7 @@
       border-color: var(--accent-green);
       color: var(--accent-green);
       box-shadow: 0 0 15px rgba(0, 255, 133, 0.3), inset 0 0 10px rgba(0, 255, 133, 0.1);
-      transform: scale(1.1);
+      transform: scale(1.1) translateY(-2px);
     }
 
     .qty-btn:hover::before {
@@ -433,7 +492,7 @@
     }
 
     .qty-btn:active {
-      transform: scale(0.95);
+      transform: scale(0.98) translateY(0);
     }
 
     .qty-num {
@@ -452,7 +511,7 @@
       border-radius: 50%;
       font-size: 12px;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
       position: relative;
       overflow: hidden;
     }
@@ -475,7 +534,7 @@
       color: var(--accent-red);
       background: rgba(255, 77, 77, 0.08);
       box-shadow: 0 0 20px rgba(255, 77, 77, 0.3), inset 0 0 10px rgba(255, 77, 77, 0.1);
-      transform: scale(1.15);
+      transform: scale(1.15) translateY(-2px);
     }
 
     .remove-btn:hover::after {
@@ -484,7 +543,7 @@
     }
 
     .remove-btn:active {
-      transform: scale(0.9);
+      transform: scale(0.98) translateY(0);
     }
 
     /* Empty State */
@@ -493,7 +552,7 @@
       padding: 48px 20px;
       color: var(--text-muted);
       font-size: 0.9rem;
-      animation: emptyStateFadeIn 0.6s ease-out;
+      animation: fadeInUp 0.6s ease-out backwards;
     }
 
     .empty-text i {
@@ -502,15 +561,7 @@
       opacity: 0.5;
       animation: emptyIconFloat 3s ease-in-out infinite;
       display: inline-block;
-    }
-
-    @keyframes emptyStateFadeIn {
-      from {
-        opacity: 0;
-      }
-      to {
-        opacity: 1;
-      }
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
     @keyframes emptyIconFloat {
@@ -518,7 +569,7 @@
         transform: translateY(0px) scale(1);
       }
       50% {
-        transform: translateY(-10px) scale(1.05);
+        transform: translateY(-12px) scale(1.08);
       }
     }
 
@@ -531,19 +582,15 @@
       border-bottom: 1px solid var(--border-subtle);
       font-size: 14px;
       color: var(--text-secondary);
-      transition: all 0.3s ease;
-      animation: summarySlideIn 0.5s ease-out backwards;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      animation: fadeInUp 0.6s ease-out backwards;
     }
 
-    @keyframes summarySlideIn {
-      from {
-        opacity: 0;
-        transform: translateX(-10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
+    .summary-row:nth-of-type(1) {
+      animation-delay: 0.2s;
+    }
+    .summary-row:nth-of-type(2) {
+      animation-delay: 0.25s;
     }
 
     .summary-row:hover {
@@ -554,7 +601,7 @@
     .summary-row strong {
       color: var(--text-primary);
       font-weight: 600;
-      transition: all 0.3s ease;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
     .summary-row:hover strong {
@@ -569,27 +616,17 @@
       border-radius: var(--radius-md);
       padding: 16px;
       margin: 16px 0;
-      transition: all 0.3s ease;
-      animation: parcelSlideIn 0.6s ease-out 0.2s backwards;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      animation: cardEnter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s backwards;
       position: relative;
       overflow: hidden;
-    }
-
-    @keyframes parcelSlideIn {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
     }
 
     .parcel-section:hover {
       border-color: rgba(0, 255, 133, 0.3);
       background: rgba(17, 17, 22, 0.8);
       box-shadow: 0 0 20px rgba(0, 255, 133, 0.1), inset 0 0 15px rgba(0, 255, 133, 0.03);
+      transform: translateY(-2px) scale(1.01);
     }
 
     .parcel-label {
@@ -632,8 +669,8 @@
       padding: 16px;
       margin: 16px 0;
       border: 1px solid var(--border-card);
-      transition: all 0.3s ease;
-      animation: totalPulse 3s ease-in-out infinite, totalSlideIn 0.6s ease-out 0.3s backwards;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      animation: cardEnter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s backwards;
       position: relative;
       overflow: hidden;
     }
@@ -649,30 +686,13 @@
       opacity: 0;
       transition: opacity 0.3s ease;
       pointer-events: none;
-    }
-
-    @keyframes totalPulse {
-      0%, 100% {
-        box-shadow: 0 0 0 rgba(0, 255, 133, 0.1), inset 0 0 0 rgba(0, 255, 133, 0);
-      }
-      50% {
-        box-shadow: 0 0 25px rgba(0, 255, 133, 0.15), inset 0 0 15px rgba(0, 255, 133, 0.08);
-      }
-    }
-
-    @keyframes totalSlideIn {
-      from {
-        opacity: 0;
-        transform: scale(0.95);
-      }
-      to {
-        opacity: 1;
-        transform: scale(1);
-      }
+      animation: shimmerPulse 3s ease-in-out infinite;
     }
 
     .total-section:hover {
       border-color: rgba(0, 255, 133, 0.3);
+      box-shadow: 0 8px 24px rgba(0, 255, 133, 0.2), inset 0 0 15px rgba(0, 255, 133, 0.08);
+      transform: translateY(-2px) scale(1.01);
     }
 
     .total-section:hover::before {
@@ -705,48 +725,66 @@
       margin-top: 8px;
       position: relative;
       overflow: hidden;
-      box-shadow: 0 0 20px rgba(0, 255, 133, 0.2);
-      animation: payButtonGlow 3s ease-in-out infinite;
+      box-shadow: 0 8px 25px rgba(0, 255, 133, 0.3);
+      animation: buttonEnter 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
     }
 
     .pay-btn::before {
       content: '';
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: radial-gradient(circle at center, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transform: rotate(45deg);
       opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-
-    @keyframes payButtonGlow {
-      0%, 100% {
-        box-shadow: 0 0 20px rgba(0, 255, 133, 0.2), 0 0 40px rgba(0, 255, 133, 0);
-      }
-      50% {
-        box-shadow: 0 0 30px rgba(0, 255, 133, 0.4), 0 0 60px rgba(0, 255, 133, 0.15);
-      }
-    }
-
-    .pay-btn:hover:not(:disabled) {
-      transform: translateY(-4px) scale(1.02);
-      box-shadow: 0 15px 40px rgba(0, 255, 133, 0.4), 0 0 50px rgba(0, 255, 133, 0.2);
+      transition: opacity 0.5s ease;
+      pointer-events: none;
     }
 
     .pay-btn:hover:not(:disabled)::before {
       opacity: 1;
     }
 
+    .pay-btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top left, rgba(0, 255, 133, 0.12), transparent 45%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+
+    .pay-btn:hover:not(:disabled)::after {
+      opacity: 1;
+    }
+
+    .pay-btn:hover:not(:disabled) {
+      transform: translateY(-4px) scale(1.05);
+      box-shadow: 0 16px 40px rgba(0, 255, 133, 0.4), inset 0 0 10px rgba(255, 255, 255, 0.1);
+    }
+
     .pay-btn:active:not(:disabled) {
-      transform: translateY(-2px) scale(0.98);
+      transform: translateY(0) scale(0.98);
     }
 
     .pay-btn:disabled {
       opacity: 0.5;
       cursor: not-allowed;
       box-shadow: 0 0 10px rgba(0, 255, 133, 0.1);
+    }
+
+    @keyframes buttonEnter {
+      from {
+        opacity: 0;
+        transform: scale(0.9) translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
     }
 
     /* Back Button */
@@ -759,13 +797,14 @@
       font-size: 13px;
       font-weight: 500;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
       font-family: 'Inter', sans-serif;
       display: inline-flex;
       align-items: center;
       gap: 8px;
       position: relative;
       overflow: hidden;
+      animation: fadeInUp 0.6s ease-out 0.3s backwards;
     }
 
     .back-to-menu::before {
@@ -776,7 +815,7 @@
       width: 100%;
       height: 100%;
       background: linear-gradient(90deg, transparent, rgba(0, 255, 133, 0.1), transparent);
-      transition: left 0.5s ease;
+      transition: left 0.6s ease;
     }
 
     .back-to-menu:hover {
@@ -784,7 +823,7 @@
       color: var(--accent-green);
       background: rgba(0, 255, 133, 0.05);
       box-shadow: 0 0 20px rgba(0, 255, 133, 0.2), inset 0 0 15px rgba(0, 255, 133, 0.05);
-      transform: translateX(4px);
+      transform: translateX(4px) translateY(-2px) scale(1.05);
     }
 
     .back-to-menu:hover::before {
@@ -839,49 +878,98 @@
 
     /* Additional animation stagger for cart items */
     .cart-item:nth-child(1) {
-      animation-delay: 0s;
+      animation-delay: 0.1s;
     }
     .cart-item:nth-child(2) {
-      animation-delay: 0.1s;
+      animation-delay: 0.15s;
     }
     .cart-item:nth-child(3) {
       animation-delay: 0.2s;
     }
     .cart-item:nth-child(4) {
-      animation-delay: 0.3s;
+      animation-delay: 0.25s;
     }
     .cart-item:nth-child(n+5) {
-      animation-delay: 0.4s;
+      animation-delay: 0.3s;
     }
 
-    /* Food theme accent animations */
-    @keyframes foodPulse {
+    /* Animation system keyframes */
+    @keyframes gradientShift {
       0%, 100% {
-        filter: drop-shadow(0 0 8px rgba(255, 150, 0, 0.2));
+        background: 
+          radial-gradient(circle at 20% 50%, rgba(0, 255, 133, 0.15) 0%, transparent 50%),
+          radial-gradient(circle at 80% 80%, rgba(255, 157, 77, 0.1) 0%, transparent 50%),
+          radial-gradient(circle at 50% 0%, rgba(255, 100, 50, 0.12) 0%, transparent 60%);
       }
       50% {
-        filter: drop-shadow(0 0 15px rgba(255, 150, 0, 0.4));
+        background: 
+          radial-gradient(circle at 80% 20%, rgba(0, 255, 133, 0.15) 0%, transparent 50%),
+          radial-gradient(circle at 20% 80%, rgba(255, 157, 77, 0.1) 0%, transparent 50%),
+          radial-gradient(circle at 50% 100%, rgba(255, 100, 50, 0.12) 0%, transparent 60%);
       }
     }
 
-    /* Smooth page transition */
-    .page {
-      animation: pageSlideIn 0.5s ease-out;
+    @keyframes gridShift {
+      0% {
+        background-position: 0 0, 0 0;
+      }
+      100% {
+        background-position: 50px 50px, 50px 50px;
+      }
     }
 
-    @keyframes pageSlideIn {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
+    @keyframes floatComplex1 {
+      0%, 100% {
+        transform: translate(0, 0) scale(1) rotate(0deg);
       }
-      to {
-        opacity: 1;
-        transform: translateY(0);
+      25% {
+        transform: translate(30px, -40px) scale(1.1) rotate(90deg);
+      }
+      50% {
+        transform: translate(-20px, 30px) scale(0.95) rotate(180deg);
+      }
+      75% {
+        transform: translate(40px, 20px) scale(1.05) rotate(270deg);
+      }
+    }
+
+    @keyframes floatComplex2 {
+      0%, 100% {
+        transform: translate(0, 0) scale(1) rotate(0deg);
+      }
+      25% {
+        transform: translate(-35px, 25px) scale(0.9) rotate(-90deg);
+      }
+      50% {
+        transform: translate(25px, -35px) scale(1.08) rotate(-180deg);
+      }
+      75% {
+        transform: translate(-20px, -15px) scale(0.98) rotate(-270deg);
+      }
+    }
+
+    @keyframes floatComplex3 {
+      0%, 100% {
+        transform: translate(-50%, -50%) scale(1) rotate(0deg);
+      }
+      25% {
+        transform: translate(-50%, -40%) scale(1.08) rotate(45deg);
+      }
+      50% {
+        transform: translate(-60%, -50%) scale(0.95) rotate(90deg);
+      }
+      75% {
+        transform: translate(-40%, -60%) scale(1.05) rotate(135deg);
       }
     }
   </style>
 </head>
 <body>
+
+<!-- Floating circle decorations -->
+<div class="bg-circle-1"></div>
+<div class="bg-circle-2"></div>
+<div class="bg-circle-3"></div>
   <div class="user-bar" aria-hidden="false">
     <div class="user-info">
       <div class="user-avatar">FP</div>

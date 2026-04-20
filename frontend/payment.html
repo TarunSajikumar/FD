@@ -79,6 +79,7 @@
       padding: 20px;
     }
 
+    /* User Bar */
     .user-bar {
       background: linear-gradient(135deg, rgba(13, 13, 18, 0.95) 0%, rgba(21, 23, 30, 0.9) 100%);
       backdrop-filter: blur(20px);
@@ -112,6 +113,15 @@
       to {
         opacity: 1;
         transform: translateX(-50%) translateY(0);
+      }
+    }
+
+    @keyframes floatingBar {
+      0%, 100% {
+        transform: translateX(-50%) translateY(0);
+      }
+      50% {
+        transform: translateX(-50%) translateY(-8px);
       }
     }
 
@@ -176,7 +186,7 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      animation: buttonEnter 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s backwards;
+      animation: buttonEnter 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s backwards;
     }
 
     .logout-btn:hover {
@@ -185,6 +195,45 @@
       background: rgba(59, 130, 246, 0.05);
       transform: translateY(-2px);
       box-shadow: 0 6px 16px rgba(59, 130, 246, 0.25);
+    }
+
+    /* Floating circles */
+    .bg-circle-1,
+    .bg-circle-2,
+    .bg-circle-3 {
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+      filter: blur(40px);
+    }
+
+    .bg-circle-1 {
+      width: 300px;
+      height: 300px;
+      top: 10%;
+      right: 5%;
+      background: radial-gradient(circle, rgba(0, 255, 133, 0.3) 0%, rgba(0, 255, 133, 0.1) 40%, transparent 70%);
+      animation: floatComplex1 25s ease-in-out infinite;
+    }
+
+    .bg-circle-2 {
+      width: 250px;
+      height: 250px;
+      bottom: 15%;
+      left: 8%;
+      background: radial-gradient(circle, rgba(255, 157, 77, 0.25) 0%, rgba(255, 157, 77, 0.08) 40%, transparent 70%);
+      animation: floatComplex2 30s ease-in-out infinite;
+    }
+
+    .bg-circle-3 {
+      width: 280px;
+      height: 280px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(circle, rgba(255, 100, 50, 0.2) 0%, rgba(255, 100, 50, 0.05) 40%, transparent 70%);
+      animation: floatComplex3 35s ease-in-out infinite;
     }
 
     body::before {
@@ -225,24 +274,14 @@
       margin: 0 auto;
       position: relative;
       z-index: 1;
-      animation: containerEnter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+      animation: fadeInUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
       padding-top: 80px;
-    }
-
-    @keyframes containerEnter {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
     }
 
     header {
       text-align: center;
       margin-bottom: 32px;
+      animation: fadeInUp 0.6s ease-out backwards;
     }
 
     header h1 {
@@ -305,6 +344,14 @@
       overflow: hidden;
     }
 
+    .steps .step:nth-child(1) {
+      animation: cardEnter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s backwards;
+    }
+
+    .steps .step:nth-child(2) {
+      animation: cardEnter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s backwards;
+    }
+
     .step::before {
       content: '';
       position: absolute;
@@ -324,13 +371,13 @@
     .step:hover {
       transform: translateY(-3px) scale(1.02);
       border-color: rgba(0, 255, 133, 0.3);
-      box-shadow: 0 12px 28px rgba(0, 255, 133, 0.2);
+      box-shadow: 0 6px 16px rgba(0, 255, 133, 0.2);
     }
 
     .step.active {
       border-color: var(--accent-green);
       background: linear-gradient(180deg, #1A1C23 0%, #111116 100%);
-      box-shadow: 0 0 20px rgba(0, 255, 133, 0.2), inset 0 0 15px rgba(0, 255, 133, 0.08);
+      box-shadow: 0 0 20px rgba(0, 255, 133, 0.15), inset 0 0 15px rgba(0, 255, 133, 0.08);
     }
 
     .step h3 {
@@ -345,6 +392,7 @@
       color: var(--text-muted);
     }
 
+    /* Payment Card */
     .payment-card {
       background: var(--bg-card);
       border: 1px solid var(--border-card);
@@ -352,7 +400,7 @@
       padding: 28px;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 255, 133, 0.05);
       transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-      animation: cardEnter 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s backwards;
+      animation: cardEnter 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s backwards;
       position: relative;
       overflow: hidden;
     }
@@ -367,14 +415,8 @@
       background: radial-gradient(circle, rgba(0, 255, 133, 0.15), transparent 70%);
       border-radius: 50%;
       pointer-events: none;
-      opacity: 0.3;
+      opacity: 0.2;
       animation: shimmerPulse 4s ease-in-out infinite;
-    }
-
-    .payment-card:hover {
-      box-shadow: 0 30px 60px -15px rgba(0, 255, 133, 0.25), inset 0 0 20px rgba(0, 255, 133, 0.08);
-      transform: translateY(-3px);
-      border-color: rgba(0, 255, 133, 0.2);
     }
 
     @keyframes shimmerPulse {
@@ -382,27 +424,41 @@
         opacity: 0.2;
       }
       50% {
-        opacity: 0.5;
+        opacity: 0.4;
       }
+    }
+
+    .payment-card:hover {
+      box-shadow: 0 30px 60px -15px rgba(0, 255, 133, 0.25), 0 0 0 1px rgba(0, 255, 133, 0.15), inset 0 0 20px rgba(0, 255, 133, 0.08);
+      transform: translateY(-3px) scale(1.01);
+    }
+
+    .steps .step {
+      animation: cardEnter 0.8s ease-out backwards;
     }
 
     .btn {
       position: relative;
       overflow: hidden;
-      background: var(--gradient-primary);
-      border: none;
-      padding: 12px 24px;
-      border-radius: 100px;
-      font-weight: 600;
-      font-size: 0.85rem;
-      cursor: pointer;
       transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-      font-family: 'Inter', sans-serif;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      color: #0A0A0F;
-      animation: buttonEnter 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transform: rotate(45deg);
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      pointer-events: none;
+    }
+
+    .btn:hover::before {
+      opacity: 1;
     }
 
     .btn::after {
@@ -419,23 +475,61 @@
       opacity: 1;
     }
 
+    /* Amount Row */
+    .amount-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding-bottom: 20px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border-subtle);
+      animation: fadeInUp 0.6s ease-out 0.2s backwards;
+    }
+
+    .amount-row .label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      animation: fadeInUp 0.6s ease-out 0.15s backwards;
+    }
+
+    .amount-row .value {
+      font-size: 2rem;
+      font-weight: 800;
+      background: var(--gradient-amount);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: fadeInUp 0.6s ease-out 0.25s backwards;
+      filter: drop-shadow(0 0 15px rgba(0, 255, 133, 0.2));
+    }
+
+    /* Buttons */
+    .btn {
+      background: var(--gradient-primary);
+      border: none;
+      padding: 12px 24px;
+      border-radius: 100px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #0A0A0F;
+      animation: buttonEnter 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s backwards;
+    }
+
     .btn:hover {
       transform: translateY(-3px) scale(1.05);
-      box-shadow: 0 12px 28px rgba(0, 255, 133, 0.3);
-      animation: buttonGlow 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+      box-shadow: 0 10px 30px rgba(0, 255, 133, 0.4), inset 0 0 10px rgba(255, 255, 255, 0.1);
     }
 
     .btn:active {
       transform: translateY(0) scale(0.98);
-    }
-
-    @keyframes buttonGlow {
-      0%, 100% {
-        box-shadow: 0 12px 28px rgba(0, 255, 133, 0.3);
-      }
-      50% {
-        box-shadow: 0 16px 36px rgba(0, 255, 133, 0.5);
-      }
     }
 
     @keyframes buttonEnter {
@@ -453,15 +547,15 @@
       background: transparent;
       border: 1px solid var(--border-subtle);
       color: var(--text-secondary);
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      animation: buttonEnter 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.5s backwards;
     }
 
     .btn-ghost:hover {
       border-color: var(--accent-green);
       color: var(--accent-green);
       background: rgba(0, 255, 133, 0.05);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(0, 255, 133, 0.2);
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 6px 16px rgba(0, 255, 133, 0.2);
     }
 
     .pay-intent-btn {
@@ -469,17 +563,18 @@
       color: white;
       width: 100%;
       justify-content: center;
-      animation: buttonEnter 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s backwards;
+      animation: buttonEnter 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.55s backwards;
     }
 
     .pay-intent-btn:hover {
-      box-shadow: 0 12px 28px rgba(59, 130, 246, 0.4);
-      transform: translateY(-3px) scale(1.01);
+      box-shadow: 0 12px 35px rgba(59, 130, 246, 0.4), inset 0 0 10px rgba(255, 255, 255, 0.15);
+      transform: translateY(-3px) scale(1.05);
     }
 
     /* Online UI */
     .online-ui {
       margin-top: 24px;
+      animation: fadeInUp 0.6s ease-out 0.2s backwards;
     }
 
     .upi-box {
@@ -491,31 +586,14 @@
       gap: 20px;
       flex-wrap: wrap;
       margin-bottom: 20px;
-      animation: cardEnter 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s backwards;
       transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .upi-box::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(0, 255, 133, 0.1), transparent);
-      transition: left 0.6s ease;
-      pointer-events: none;
-    }
-
-    .upi-box:hover::before {
-      left: 100%;
+      animation: cardEnter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.25s backwards;
     }
 
     .upi-box:hover {
       border-color: rgba(0, 255, 133, 0.3);
       box-shadow: 0 8px 20px rgba(0, 255, 133, 0.15);
+      transform: translateY(-2px);
     }
 
     .upi-qr {
@@ -537,6 +615,7 @@
       font-size: 0.7rem;
       color: var(--text-muted);
       margin-bottom: 6px;
+      animation: fadeInUp 0.6s ease-out 0.3s backwards;
     }
 
     #upiId {
@@ -545,12 +624,15 @@
       color: var(--accent-green);
       margin-bottom: 12px;
       word-break: break-all;
+      animation: fadeInUp 0.6s ease-out 0.35s backwards;
+      filter: drop-shadow(0 0 8px rgba(0, 255, 133, 0.3));
     }
 
     .copy-row {
       display: flex;
       gap: 10px;
       align-items: center;
+      animation: fadeInUp 0.6s ease-out 0.4s backwards;
     }
 
     .copy-row input {
@@ -562,11 +644,17 @@
       color: var(--text-primary);
       font-size: 0.8rem;
       font-family: monospace;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
     .copy-row input:focus {
       outline: none;
       border-color: var(--accent-green);
+      box-shadow: 0 0 12px rgba(0, 255, 133, 0.2);
+    }
+
+    .copy-row input:hover {
+      border-color: rgba(0, 255, 133, 0.2);
     }
 
     /* Hint */
@@ -581,8 +669,8 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      animation: noteEnter 0.6s ease-out 0.5s backwards;
       transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      animation: noteEnter 0.6s ease-out 0.6s backwards;
       position: relative;
       overflow: hidden;
     }
@@ -605,14 +693,14 @@
 
     .hint:hover {
       border-color: rgba(0, 255, 133, 0.3);
-      box-shadow: 0 6px 16px rgba(0, 255, 133, 0.15);
-      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 255, 133, 0.15);
+      transform: translateY(-1px);
     }
 
     @keyframes noteEnter {
       from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(15px);
       }
       to {
         opacity: 1;
@@ -629,13 +717,26 @@
       border-top: 1px solid var(--border-subtle);
       font-size: 0.7rem;
       color: var(--text-muted);
+      animation: fadeInUp 0.6s ease-out 0.7s backwards;
     }
 
     footer i {
       margin-right: 6px;
+      color: var(--accent-green);
     }
 
     /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
     @keyframes gradientShift {
       0%, 100% {
         background: 
@@ -705,15 +806,6 @@
       }
     }
 
-    @keyframes floatingBar {
-      0%, 100% {
-        transform: translateX(-50%) translateY(0);
-      }
-      50% {
-        transform: translateX(-50%) translateY(-8px);
-      }
-    }
-
     @keyframes cardEnter {
       from {
         opacity: 0;
@@ -727,55 +819,12 @@
       }
     }
 
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    #actionArea {
+      animation: fadeInUp 0.6s ease-out 0.35s backwards !important;
     }
 
-    /* Floating circles */
-    .bg-circle-1,
-    .bg-circle-2,
-    .bg-circle-3 {
-      position: fixed;
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 0;
-      filter: blur(40px);
-    }
-
-    .bg-circle-1 {
-      width: 300px;
-      height: 300px;
-      top: 10%;
-      right: 5%;
-      background: radial-gradient(circle, rgba(0, 255, 133, 0.3) 0%, rgba(0, 255, 133, 0.1) 40%, transparent 70%);
-      animation: floatComplex1 25s ease-in-out infinite;
-    }
-
-    .bg-circle-2 {
-      width: 250px;
-      height: 250px;
-      bottom: 15%;
-      left: 8%;
-      background: radial-gradient(circle, rgba(255, 157, 77, 0.25) 0%, rgba(255, 157, 77, 0.08) 40%, transparent 70%);
-      animation: floatComplex2 30s ease-in-out infinite;
-    }
-
-    .bg-circle-3 {
-      width: 280px;
-      height: 280px;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: radial-gradient(circle, rgba(255, 100, 50, 0.2) 0%, rgba(255, 100, 50, 0.05) 40%, transparent 70%);
-      animation: floatComplex3 35s ease-in-out infinite;
-    }
+    /* Responsive */
+    @media (max-width: 560px) {
       body {
         padding: 16px;
       }
@@ -805,6 +854,12 @@
   </style>
 </head>
 <body>
+
+<!-- Floating circle decorations -->
+<div class="bg-circle-1"></div>
+<div class="bg-circle-2"></div>
+<div class="bg-circle-3"></div>
+
 <div class="user-bar">
   <div class="user-info">
     <div class="user-avatar">🍔</div>
