@@ -908,6 +908,18 @@
       return ORDERS_KEY;
     }
 
+    function getShopStatus() {
+      return localStorage.getItem('shopStatus') || 'open';
+    }
+
+    function enforceOpenStore() {
+      if (getShopStatus() === 'closed') {
+        window.location.replace('index.html');
+        return true;
+      }
+      return false;
+    }
+
     function formatINR(amountRaw) {
       let numeric = 0;
       if (typeof amountRaw === 'number') numeric = amountRaw;
@@ -1009,6 +1021,7 @@
 
     // ----- main execution -----
     const justPaidFlag = localStorage.getItem(getUserSpecificKey("justPaid")) === "1";
+    if (enforceOpenStore()) return;
     const storageKey = getOrdersStorageKey();
     let history = [];
 

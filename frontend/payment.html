@@ -954,6 +954,18 @@
   function safeGet(key) { try { return localStorage.getItem(getUserSpecificKey(key)); } catch(e) { return null; } }
   function safeSet(key, val) { try { localStorage.setItem(getUserSpecificKey(key), String(val)); } catch(e) {} }
 
+  function getShopStatus() {
+    return localStorage.getItem('shopStatus') || 'open';
+  }
+
+  function enforceOpenStore() {
+    if (getShopStatus() === 'closed') {
+      window.location.replace('index.html');
+      return true;
+    }
+    return false;
+  }
+
   function parseAmountRaw(raw) {
     if (!raw) return null;
     const cleaned = String(raw).replace(/[₹, ]+/g, '').trim();
@@ -1219,6 +1231,7 @@
 
   /* INIT */
   (function init() {
+    if (enforceOpenStore()) return;
     fetchUpiSettings();
     initAmount();
     updateUpiDisplay();
