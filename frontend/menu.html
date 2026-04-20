@@ -81,7 +81,7 @@
         }
 
         body::after {
-            content: '🍽️ 🍔 🍕 🍜 🍱 🍛 🍝 🌮 🍤 🥘';
+            content: '🍽️ 🍔 🍕 🍜 🍱 🍛 🍝 🌮 🍤 🥘 🍲 🥘 🥗 🍱 🍜 🫕 🍣 🍴 🍝 🍛 🥗 🍚 🫕 🍲 🥘';
             position: fixed;
             top: 0;
             left: 0;
@@ -261,14 +261,25 @@
             display: flex;
             gap: 10px;
             overflow-x: auto;
-            padding-bottom: 16px;
+            padding: 14px 12px 14px 10px;
             margin-bottom: 24px;
             scrollbar-width: thin;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 24px;
             animation: inputEnter 0.6s ease-out 0.35s backwards;
         }
 
+        .category-tabs::before,
+        .category-tabs::after {
+            content: '';
+            flex: 0 0 8px;
+        }
+
         .category-tabs::-webkit-scrollbar {
-            height: 4px;
+            height: 6px;
         }
 
         .category-tabs::-webkit-scrollbar-track {
@@ -282,10 +293,11 @@
         }
 
         .category-tab {
+            flex: 0 0 auto;
             background: var(--bg-secondary);
             border: 1px solid var(--border-subtle);
             border-radius: 100px;
-            padding: 8px 20px;
+            padding: 10px 22px;
             font-size: 13px;
             font-weight: 500;
             color: var(--text-secondary);
@@ -294,6 +306,7 @@
             transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             position: relative;
             overflow: hidden;
+            scroll-snap-align: start;
         }
 
         .category-tab::before {
@@ -930,7 +943,7 @@
   <div class="container page-with-header">
     <!-- Brand Header -->
     <div class="brand">🍽️ FOOD POINT</div>
-    <div class="tagline">Premium Dining Experience • Crypto Style</div>
+    <div class="tagline">• Food Menu •</div>
 
     <!-- Search Bar -->
     <div class="search-container">
@@ -1082,7 +1095,19 @@
     /* ================
        State / Storage
        ================ */
-    const STORAGE_KEY = "selectedFoods_v1";
+    function getCurrentUser() {
+      try {
+        const raw = localStorage.getItem("fp_current_user");
+        return raw ? JSON.parse(raw) : null;
+      } catch(e) { return null; }
+    }
+
+    function getUserSpecificKey(baseKey) {
+      const user = getCurrentUser();
+      return user && user.id ? baseKey + "_" + user.id : baseKey;
+    }
+
+    const STORAGE_KEY = getUserSpecificKey("selectedFoods_v1");
     const selectedItems = new Map(); // id -> {id,name,price,description,quantity}
     let currentCategory = 0;
 

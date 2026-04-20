@@ -75,6 +75,26 @@
       background: var(--gradient-glow);
       pointer-events: none;
       z-index: 0;
+      animation: foodGradientShift 18s ease-in-out infinite;
+    }
+
+    body::after {
+      content: '🍽️ 🍔 🍕 🍜 🍱 🍛 🍝 🌮 🍤 🥘 🍲 🥘 🥗 🍱 🍜 🫕 🍣 🍴 🍝 🍛 🥗 🍚 🫕 🍲 🥘';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      font-size: 100px;
+      opacity: 0.03;
+      pointer-events: none;
+      z-index: 0;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-around;
+      overflow: hidden;
+      animation: foodFloat 20s linear infinite;
     }
 
     /* User Bar */
@@ -89,6 +109,7 @@
       position: sticky;
       top: 0;
       z-index: 100;
+      animation: cardEnter 0.8s ease-out backwards;
     }
 
     .user-info {
@@ -151,7 +172,7 @@
       padding: 40px 20px 60px;
       position: relative;
       z-index: 1;
-      animation: fadeInUp 0.5s ease-out;
+      animation: pageEnter 0.8s ease-out backwards;
     }
 
     /* Success Circle */
@@ -221,8 +242,13 @@
     }
 
     .order-details:hover {
-      box-shadow: 0 15px 35px -8px rgba(0, 255, 133, 0.15);
+      box-shadow: 0 15px 35px -8px rgba(0, 255, 133, 0.18);
       border-color: rgba(0, 255, 133, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .order-details {
+      animation: cardEnter 0.9s ease-out backwards;
     }
 
     .order-title {
@@ -315,6 +341,25 @@
       transform: translateY(-2px);
     }
 
+    .btn {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top left, rgba(0, 255, 133, 0.12), transparent 45%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+
+    .btn:hover::after {
+      opacity: 1;
+    }
+
     /* Help Text */
     .help-text {
       text-align: center;
@@ -336,6 +381,57 @@
       from {
         opacity: 0;
         transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes foodGradientShift {
+      0%, 100% {
+        background: radial-gradient(circle at 20% 40%, rgba(255, 157, 77, 0.15) 0%, transparent 45%),
+                    radial-gradient(circle at 80% 80%, rgba(0, 255, 133, 0.08) 0%, transparent 45%),
+                    radial-gradient(circle at 55% 10%, rgba(255, 100, 50, 0.1) 0%, transparent 55%);
+      }
+      50% {
+        background: radial-gradient(circle at 80% 30%, rgba(255, 157, 77, 0.15) 0%, transparent 45%),
+                    radial-gradient(circle at 20% 80%, rgba(0, 255, 133, 0.08) 0%, transparent 45%),
+                    radial-gradient(circle at 50% 95%, rgba(255, 100, 50, 0.1) 0%, transparent 55%);
+      }
+    }
+
+    @keyframes foodFloat {
+      0% {
+        transform: translateY(0) translateX(0);
+        opacity: 0.04;
+      }
+      50% {
+        opacity: 0.06;
+      }
+      100% {
+        transform: translateY(-100vh) translateX(60px);
+        opacity: 0.01;
+      }
+    }
+
+    @keyframes cardEnter {
+      from {
+        opacity: 0;
+        transform: translateY(24px) scale(0.98);
+        filter: blur(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+      }
+    }
+
+    @keyframes pageEnter {
+      from {
+        opacity: 0;
+        transform: translateY(24px);
       }
       to {
         opacity: 1;
@@ -457,6 +553,18 @@
     const COUNTER_KEY = "orderCounterDaily";
     const ORDERS_KEY   = "ordersHistory";
 
+    function getCurrentUser() {
+      try {
+        const raw = localStorage.getItem("fp_current_user");
+        return raw ? JSON.parse(raw) : null;
+      } catch(e) { return null; }
+    }
+
+    function getUserSpecificKey(baseKey) {
+      const user = getCurrentUser();
+      return user && user.id ? baseKey + "_" + user.id : baseKey;
+    }
+
     function getOrdersStorageKey() {
       const CURRENT_USER_KEY = "fp_current_user";
       const userRaw = localStorage.getItem(CURRENT_USER_KEY);
@@ -494,14 +602,14 @@
       const timeText = now.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
 
       // get amount from payment page (set by payment-flow)
-      let storedAmount = localStorage.getItem("amountPaid") || localStorage.getItem("amountPaidNumeric") || "₹0.00";
+      let storedAmount = localStorage.getItem(getUserSpecificKey("amountPaid")) || localStorage.getItem(getUserSpecificKey("amountPaidNumeric")) || "₹0.00";
       let numericAmount = 0;
       if (typeof storedAmount === 'string') {
         const parsed = parseFloat(storedAmount.replace(/[₹, ]+/g, ''));
         numericAmount = isNaN(parsed) ? 0 : parsed;
       } else if (typeof storedAmount === 'number') numericAmount = storedAmount;
       
-      const method = localStorage.getItem("paymentMethod") || "Online UPI";
+      const method = localStorage.getItem(getUserSpecificKey("paymentMethod")) || "Online UPI";
       const displayAmount = (numericAmount > 0) ? '₹' + numericAmount.toFixed(2) : storedAmount;
 
       // generate order ID sequential (daily)
@@ -522,7 +630,7 @@
       // build items list (for future orders page, we preserve)
       let items = [];
       try {
-        const cartRaw = localStorage.getItem('cartItems');
+        const cartRaw = localStorage.getItem(getUserSpecificKey('cartItems'));
         if (cartRaw) {
           const parsed = JSON.parse(cartRaw);
           if (Array.isArray(parsed) && parsed.length) {
@@ -532,13 +640,13 @@
       } catch(e) {}
       if (!items.length) {
         try {
-          const v1 = JSON.parse(localStorage.getItem('selectedFoods_v1') || '[]');
+          const v1 = JSON.parse(localStorage.getItem(getUserSpecificKey('selectedFoods_v1')) || '[]');
           if (Array.isArray(v1) && v1.length) items = v1.map(it => typeof it === 'object' ? (it.name || 'Item') : it);
         } catch(e) {}
       }
       if (!items.length) {
         try {
-          const legacy = JSON.parse(localStorage.getItem('selectedFoods') || '[]');
+          const legacy = JSON.parse(localStorage.getItem(getUserSpecificKey('selectedFoods')) || '[]');
           if (Array.isArray(legacy) && legacy.length) items = legacy;
         } catch(e) {}
       }
@@ -561,14 +669,14 @@
         method: method,
         items: items,
         customerName: customerName,
-        status: 'confirmed',
+        status: 'new',
         createdAt: now.toISOString()
       };
       return newOrder;
     }
 
     // ----- main execution -----
-    const justPaidFlag = localStorage.getItem("justPaid") === "1";
+    const justPaidFlag = localStorage.getItem(getUserSpecificKey("justPaid")) === "1";
     const storageKey = getOrdersStorageKey();
     let history = [];
 
@@ -597,9 +705,9 @@
       // clear cart & payment flags after creating order (preserve justPaid reset)
       localStorage.removeItem("selectedFoods");
       localStorage.removeItem("selectedFoods_v1");
-      localStorage.removeItem("cartItems");
-      localStorage.removeItem("parcelSelected");
-      localStorage.setItem("justPaid", "0");
+      localStorage.removeItem(getUserSpecificKey("cartItems"));
+      localStorage.removeItem(getUserSpecificKey("parcelSelected"));
+      localStorage.setItem(getUserSpecificKey("justPaid"), "0");
     } 
     else {
       // No fresh payment — show the most recent order from history (if any)

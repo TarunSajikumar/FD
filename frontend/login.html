@@ -2,9 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Food Point | Crypto-Style Login</title>
+  <title>Food Point | Login</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
   <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
@@ -12,417 +11,242 @@
   <script src="fp-config.js"></script>
   <style>
     * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
-      box-sizing: border-box;
-    }
-
-    :root {
-      /* Backgrounds - Crypto Dark Theme */
-      --bg-primary: #0A0A0F;
-      --bg-secondary: #111116;
-      --bg-card: #15171E;
-      --bg-elevated: #1A1C23;
-      --bg-modal: #1A1C23;
-      
-      /* Text Colors */
-      --text-primary: #FFFFFF;
-      --text-secondary: #8A8F9E;
-      --text-muted: #5A5F73;
-      
-      /* Accent Colors */
-      --accent-green: #00FF85;
-      --accent-blue: #3B82F6;
-      --accent-red: #FF4D4D;
-      --accent-orange: #F97316;
-      
-      /* Borders */
-      --border-subtle: #1E1E2E;
-      --border-card: rgba(255, 255, 255, 0.05);
-      
-      /* Spacing */
-      --spacing-xs: 0.5rem;
-      --spacing-sm: 1rem;
-      --spacing-md: 1.5rem;
-      --spacing-lg: 2rem;
-      --spacing-xl: 3rem;
-      
-      /* Border Radius */
-      --radius-sm: 8px;
-      --radius-md: 12px;
-      --radius-lg: 16px;
-      --radius-xl: 24px;
-      
-      /* Gradients */
-      --gradient-primary: linear-gradient(135deg, #00FF85 0%, #00C96D 100%);
-      --gradient-card-hover: linear-gradient(180deg, #1A1C23 0%, #111116 100%);
-      --gradient-glow: radial-gradient(circle at 50% 0%, rgba(0, 255, 133, 0.08), transparent);
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     }
 
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: var(--bg-primary);
-      color: var(--text-primary);
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: var(--spacing-lg);
+      padding: 16px;
       position: relative;
-      overflow-x: hidden;
+      overflow: hidden;
+      background: #020617;
+      color: #111827;
+      transition: filter 0.3s ease;
     }
 
+    /* Foody blurred background */
     body::before {
-      content: '';
+      content: "";
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: 
-        radial-gradient(circle at 20% 50%, rgba(255, 157, 77, 0.15) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(0, 255, 133, 0.08) 0%, transparent 50%),
-        radial-gradient(circle at 50% 0%, rgba(255, 100, 50, 0.1) 0%, transparent 60%);
-      pointer-events: none;
-      z-index: 0;
-      animation: foodGradientShift 15s ease-in-out infinite;
+      inset: 0;
+      background:
+        linear-gradient(to bottom, rgba(0,0,0,0.55), rgba(0,0,0,0.8)),
+        url("https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?q=80&w=1600&auto=format&fit=crop");
+      background-size: cover;
+      background-position: center;
+      filter: blur(4px);
+      transform: scale(1.05);
+      z-index: -2;
     }
 
+    /* slight vignette */
     body::after {
-      content: '🍽️ 🍔 🍕 🍜 🍱 🍛 🍝 🌮 🍤 🥘';
+      content: "";
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      font-size: 120px;
-      opacity: 0.03;
-      pointer-events: none;
-      z-index: 0;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-around;
-      overflow: hidden;
-      animation: foodFloat 20s linear infinite;
+      inset: 0;
+      background: radial-gradient(circle at top, transparent 0, rgba(0,0,0,0.7) 55%, rgba(0,0,0,0.9) 100%);
+      z-index: -1;
     }
 
-    body.modal-open {
-      overflow: hidden;
+    /* blur body when modal is open */
+    body.modal-open .auth-card {
+      filter: blur(4px);
     }
 
-    /* Auth Card - Premium Crypto Style */
     .auth-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-card);
-      border-radius: var(--radius-xl);
-      padding: var(--spacing-xl);
-      max-width: 480px;
       width: 100%;
+      max-width: 380px;
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: 22px;
+      padding: 26px 26px 22px;
+      box-shadow: 0 24px 70px rgba(0,0,0,0.9);
       position: relative;
       z-index: 1;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 255, 133, 0.05);
-      transition: all 0.3s ease;
-      animation: cardEnter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      color: #e5e7eb;
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
     }
 
-    @keyframes cardEnter {
-      from {
-        opacity: 0;
-        transform: translateY(40px) scale(0.95);
-        filter: blur(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-        filter: blur(0);
-      }
-    }
-
-    .auth-card:hover {
-      box-shadow: 0 30px 60px -15px rgba(0, 255, 133, 0.15), 0 0 0 1px rgba(0, 255, 133, 0.15);
-      transform: translateY(-2px);
-    }
-
-    /* Top Links */
-    .top-links {
-      display: flex;
-      justify-content: flex-end;
-      margin-bottom: var(--spacing-lg);
-    }
-
-    .top-links button {
-      background: transparent;
-      border: 1px solid var(--border-subtle);
-      color: var(--text-secondary);
-      padding: 8px 20px;
-      font-size: 0.85rem;
-      font-weight: 500;
-      border-radius: 100px;
-      cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-      font-family: 'Inter', sans-serif;
-      animation: topLinkEnter 0.6s ease-out backwards;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .top-links button::before {
-      content: '';
+    .auth-card::before {
+      content: "";
       position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle, rgba(0, 255, 133, 0.1) 0%, transparent 70%);
-      opacity: 0;
-      transition: opacity 0.3s ease;
+      inset: 0;
+      border-radius: inherit;
+      background:
+        radial-gradient(circle at top left, rgba(248, 113, 113, 0.15), transparent 55%),
+        radial-gradient(circle at bottom right, rgba(52, 211, 153, 0.18), transparent 55%);
+      opacity: 0.9;
+      pointer-events: none;
+      z-index: -1;
     }
 
-    .top-links button:hover::before {
-      opacity: 1;
-    }
-
-    .top-links button:hover {
-      border-color: var(--accent-green);
-      color: var(--accent-green);
-      background: rgba(0, 255, 133, 0.05);
-      box-shadow: 0 0 20px rgba(0, 255, 133, 0.2);
-      transform: translateY(-2px);
-    }
-
-    @keyframes topLinkEnter {
-      from {
-        opacity: 0;
-        transform: translateY(-10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* Brand */
     .brand {
-      font-size: 2rem;
-      font-weight: 800;
-      background: var(--gradient-primary);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
       text-align: center;
-      letter-spacing: -0.02em;
-      margin-bottom: var(--spacing-xs);
-      animation: brandEnter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+      font-weight: 800;
+      letter-spacing: 4px;
+      font-size: 20px;
+      color: #fef3c7;
+      margin-bottom: 4px;
+      text-transform: uppercase;
     }
 
     .subtitle {
       text-align: center;
-      color: var(--text-secondary);
-      font-size: 0.9rem;
-      margin-bottom: var(--spacing-lg);
-      animation: subtitleEnter 0.8s ease-out 0.2s backwards;
+      font-size: 13px;
+      color: #9ca3af;
+      margin-bottom: 18px;
     }
 
     h2 {
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin-bottom: var(--spacing-md);
-      color: var(--text-primary);
-      animation: titleEnter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s backwards;
+      font-size: 18px;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #f9fafb;
     }
 
-    /* Input Groups */
     .input-group {
-      margin-bottom: var(--spacing-md);
-      animation: inputEnter 0.6s ease-out 0.3s backwards;
+      margin-bottom: 12px;
     }
 
-    .input-group label {
+    label {
       display: block;
-      margin-bottom: var(--spacing-xs);
-      color: var(--text-secondary);
-      font-size: 0.85rem;
-      font-weight: 500;
+      font-size: 13px;
+      margin-bottom: 4px;
+      color: #e5e7eb;
     }
 
-    .input-group input {
+    input {
       width: 100%;
-      padding: 14px 18px;
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-md);
-      color: var(--text-primary);
-      font-size: 0.95rem;
-      font-family: 'Inter', sans-serif;
-      transition: all 0.2s ease;
-    }
-
-    .input-group input:focus {
+      padding: 10px 11px;
+      border-radius: 10px;
+      border: 1px solid #4b5563;
+      font-size: 14px;
+      background: #020617;
       outline: none;
-      border-color: var(--accent-green);
-      box-shadow: 0 0 0 3px rgba(0, 255, 133, 0.1);
+      transition: all 0.2s ease;
+      color: #f9fafb;
     }
 
-    .input-group input::placeholder {
-      color: var(--text-muted);
+    input::placeholder {
+      color: #6b7280;
     }
 
-    /* Messages */
-    .error,
-    .success {
-      display: none;
+    input:focus {
+      border-color: #4f46e5;
+      background: #020617;
+      box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.35);
     }
 
-    .error:not(:empty),
-    .success:not(:empty) {
-      display: block;
-    }
-
-    .error {
-      background: rgba(255, 77, 77, 0.1);
-      border: 1px solid rgba(255, 77, 77, 0.2);
-      border-radius: var(--radius-md);
-      padding: var(--spacing-sm);
-      color: #FF6B6B;
-      font-size: 0.85rem;
-      margin-bottom: var(--spacing-md);
-      text-align: center;
-    }
-
-    .success {
-      background: rgba(0, 255, 133, 0.1);
-      border: 1px solid rgba(0, 255, 133, 0.2);
-      border-radius: var(--radius-md);
-      padding: var(--spacing-sm);
-      color: var(--accent-green);
-      font-size: 0.85rem;
-      margin-bottom: var(--spacing-md);
-      text-align: center;
-    }
-
-    /* Button */
     .btn {
       width: 100%;
-      padding: 14px 28px;
-      background: var(--gradient-primary);
-      color: #0A0A0F;
-      font-size: 1rem;
-      font-weight: 700;
+      margin-top: 10px;
+      border-radius: 999px;
       border: none;
-      border-radius: 100px;
+      padding: 11px 0;
+      font-size: 14px;
+      font-weight: 600;
       cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-      font-family: 'Inter', sans-serif;
-      display: flex;
+      background: linear-gradient(135deg, #fb923c, #facc15);
+      color: #111827;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      margin-bottom: var(--spacing-md);
-      animation: buttonEnter 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.5s backwards;
-      position: relative;
-      overflow: hidden;
+      gap: 6px;
+      transition: all 0.2s ease;
+      box-shadow: 0 14px 30px rgba(248, 181, 75, 0.7);
     }
 
-    .btn::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-      transform: rotate(45deg);
-      opacity: 0;
-      transition: opacity 0.5s ease;
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 18px 38px rgba(248, 181, 75, 0.9);
     }
 
-    .btn:hover:not(:disabled)::before {
-      opacity: 1;
-      animation: shimmer 0.6s ease-in-out;
-    }
-
-    .btn:hover:not(:disabled) {
-      transform: translateY(-3px) scale(1.02);
-      box-shadow: 0 10px 30px rgba(0, 255, 133, 0.4), inset 0 0 10px rgba(255, 255, 255, 0.1);
-      animation: buttonGlow 1.5s ease-in-out infinite;
-    }
-
-    .btn:active:not(:disabled) {
-      transform: translateY(0) scale(0.98);
-    }
-
-    .btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    /* Switch Text */
     .switch-text {
       text-align: center;
-      color: var(--text-secondary);
-      font-size: 0.9rem;
-      animation: switchTextEnter 0.8s ease-out 0.6s backwards;
+      margin-top: 14px;
+      font-size: 13px;
+      color: #9ca3af;
     }
 
     .switch-text button {
-      background: none;
       border: none;
-      color: var(--accent-blue);
+      background: transparent;
+      color: #38bdf8;
+      text-decoration: underline;
       cursor: pointer;
-      font-weight: 600;
-      font-family: 'Inter', sans-serif;
-      margin-left: var(--spacing-xs);
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-      position: relative;
-    }
-
-    .switch-text button::after {
-      content: '';
-      position: absolute;
-      bottom: -2px;
-      left: 0;
-      width: 0;
-      height: 2px;
-      background: var(--accent-green);
-      transition: width 0.3s ease;
+      font-size: 13px;
+      padding: 0;
+      margin-left: 4px;
     }
 
     .switch-text button:hover {
-      color: var(--accent-green);
+      color: #7dd3fc;
     }
 
-    .switch-text button:hover::after {
-      width: 100%;
+    .error {
+      min-height: 16px;
+      margin-top: 4px;
+      font-size: 12px;
+      color: #fecaca;
     }
 
-    @keyframes switchTextEnter {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    .success {
+      min-height: 16px;
+      margin-top: 4px;
+      font-size: 12px;
+      color: #bbf7d0;
     }
 
-    /* Modal Overlay - Crypto Style */
+    .top-links {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 6px;
+      font-size: 12px;
+      gap: 6px;
+    }
+
+    .top-links button {
+      border: none;
+      background: transparent;
+      color: #e5e7eb;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background-color: rgba(15,23,42,0.6);
+      border: 1px solid rgba(148,163,184,0.6);
+      transition: all 0.2s ease;
+    }
+
+    .top-links button:hover {
+      background-color: rgba(30,64,175,0.8);
+      border-color: rgba(191,219,254,0.9);
+    }
+
+    /* === OWNER PASSWORD MODAL === */
+
     .modal-overlay {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(10, 10, 15, 0.95);
-      backdrop-filter: blur(12px);
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 1000;
       opacity: 0;
       visibility: hidden;
-      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transition: all 0.25s ease;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
     }
 
     .modal-overlay.active {
@@ -430,556 +254,128 @@
       visibility: visible;
     }
 
-    .modal-overlay::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: radial-gradient(circle at center, rgba(0, 255, 133, 0.1) 0%, transparent 70%);
-      opacity: 0;
-      transition: opacity 0.5s ease;
-      animation: glowPulse 3s ease-in-out infinite;
-      pointer-events: none;
-    }
-
-    @keyframes glowPulse {
-      0%, 100% {
-        opacity: 0;
-        transform: scale(0.8);
-      }
-      50% {
-        opacity: 0.5;
-        transform: scale(1.1);
-      }
-    }
-
-    .modal-overlay.active::before {
-      opacity: 1;
-    }
-
-    /* Password Modal */
     .password-modal {
-      background: var(--bg-modal);
-      border: 1px solid var(--border-card);
-      border-radius: var(--radius-xl);
-      padding: var(--spacing-xl);
-      max-width: 420px;
+      background: #f9fafb;
+      border-radius: 18px;
+      padding: 26px 22px 20px;
       width: 90%;
-      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 255, 133, 0.1);
-      transform: scale(0.8) translateY(20px);
-      opacity: 0;
-      transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-      position: relative;
-      overflow: hidden;
-      animation: modalEnter 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
-    }
-
-    .password-modal::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle, rgba(0, 255, 133, 0.1) 0%, transparent 70%);
-      opacity: 0;
-      transition: opacity 0.6s ease;
-      pointer-events: none;
+      max-width: 360px;
+      box-shadow: 0 24px 50px rgba(0,0,0,0.55);
+      transform: translateY(10px);
+      transition: transform 0.25s ease;
     }
 
     .modal-overlay.active .password-modal {
-      transform: scale(1) translateY(0);
-      opacity: 1;
-    }
-
-    .modal-overlay.active .password-modal::before {
-      opacity: 1;
+      transform: translateY(0);
     }
 
     .modal-header {
       text-align: center;
-      margin-bottom: var(--spacing-lg);
+      margin-bottom: 16px;
+    }
+
+    .modal-header h2 {
+      font-size: 18px;
+      margin-bottom: 4px;
+      color: #111827;
+    }
+
+    .modal-header p {
+      font-size: 13px;
+      color: #6b7280;
     }
 
     .lock-icon {
-      width: 60px;
-      height: 60px;
-      background: rgba(0, 255, 133, 0.1);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto var(--spacing-md);
-      box-shadow: 0 0 20px rgba(0, 255, 133, 0.3), inset 0 0 20px rgba(0, 255, 133, 0.1);
-      animation: lockIconGlow 2s ease-in-out infinite, lockIconBounce 0.6s ease-out 0.3s backwards, lockPulse 2.5s ease-in-out infinite 0.5s;
-      position: relative;
-    }
-
-    @keyframes lockPulse {
-      0%, 100% {
-        transform: scale(1);
-      }
-      50% {
-        transform: scale(1.08);
-      }
-    }
-
-    .lock-icon::after {
-      content: '';
-      position: absolute;
-      top: -10px;
-      left: -10px;
-      right: -10px;
-      bottom: -10px;
-      border: 2px solid rgba(0, 255, 133, 0.3);
-      border-radius: 50%;
-      opacity: 0;
-      animation: lockRingPulse 2s ease-in-out infinite 0.5s;
-    }
-
-    @keyframes lockIconGlow {
-      0%, 100% {
-        box-shadow: 0 0 20px rgba(0, 255, 133, 0.3), inset 0 0 20px rgba(0, 255, 133, 0.1);
-      }
-      50% {
-        box-shadow: 0 0 35px rgba(0, 255, 133, 0.5), inset 0 0 30px rgba(0, 255, 133, 0.2);
-      }
-    }
-
-    @keyframes lockIconBounce {
-      from {
-        transform: scale(0.8) translateY(10px);
-        opacity: 0;
-      }
-      to {
-        transform: scale(1) translateY(0);
-        opacity: 1;
-      }
-    }
-
-    @keyframes lockRingPulse {
-      0%, 100% {
-        transform: scale(1);
-        opacity: 0.3;
-      }
-      50% {
-        transform: scale(1.2);
-        opacity: 0.6;
-      }
-    }
-
-    .lock-icon i {
-      font-size: 28px;
-      color: var(--accent-green);
-      animation: lockIconShake 2s ease-in-out infinite 1s;
-    }
-
-    @keyframes lockIconShake {
-      0%, 100% {
-        transform: rotate(0deg);
-      }
-      25% {
-        transform: rotate(-5deg);
-      }
-      75% {
-        transform: rotate(5deg);
-      }
-    }
-
-    .password-modal h2 {
-      font-size: 1.75rem;
-      font-weight: 700;
-      background: var(--gradient-primary);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      margin-bottom: var(--spacing-sm);
-      animation: titleGlow 2s ease-in-out infinite, titleSlideIn 0.6s ease-out 0.2s backwards, titlePulseScale 2s ease-in-out infinite 0.8s;
-    }
-
-    @keyframes titlePulseScale {
-      0%, 100% {
-        letter-spacing: -0.02em;
-      }
-      50% {
-        letter-spacing: 0.02em;
-      }
-    }
-
-    @keyframes titleGlow {
-      0%, 100% {
-        text-shadow: 0 0 0 rgba(0, 255, 133, 0);
-      }
-      50% {
-        text-shadow: 0 0 15px rgba(0, 255, 133, 0.3);
-      }
-    }
-
-    @keyframes titleSlideIn {
-      from {
-        opacity: 0;
-        transform: translateY(-10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .password-modal p {
-      color: var(--text-secondary);
-      font-size: 0.9rem;
+      font-size: 40px;
+      color: #22c55e;
+      margin-bottom: 8px;
     }
 
     .password-input {
       width: 100%;
-      padding: 14px 18px;
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-md);
-      color: var(--text-primary);
-      font-size: 1rem;
-      font-family: 'Inter', monospace;
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-      margin-bottom: var(--spacing-sm);
-      animation: inputSlideIn 0.5s ease-out 0.3s backwards;
-      position: relative;
-    }
-
-    .password-input::placeholder {
-      color: var(--text-muted);
+      padding: 11px;
+      border-radius: 10px;
+      border: 2px solid #e5e7eb;
+      background: #f9fafb;
+      font-size: 14px;
+      color: #111827; /* ensure masked dots/text are visible on light background */
+      outline: none;
+      transition: all 0.2s ease;
     }
 
     .password-input:focus {
-      outline: none;
-      border-color: var(--accent-green);
-      box-shadow: 0 0 0 3px rgba(0, 255, 133, 0.2), 0 0 15px rgba(0, 255, 133, 0.2);
-      transform: translateY(-2px);
+      border-color: #22c55e;
+      background: #ffffff;
+      box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
     }
 
     .password-input.error {
-      border-color: var(--accent-red);
-      box-shadow: 0 0 0 3px rgba(255, 77, 77, 0.2), 0 0 15px rgba(255, 77, 77, 0.2);
-      animation: shake 0.4s ease-in-out;
-    }
-
-    @keyframes inputSlideIn {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes shake {
-      0%, 100% {
-        transform: translateX(0);
-      }
-      25% {
-        transform: translateX(-5px);
-      }
-      75% {
-        transform: translateX(5px);
-      }
+      border-color: #ef4444;
+      background: #fee2e2;
     }
 
     .error-message {
-      color: var(--accent-red);
-      font-size: 0.8rem;
-      margin-bottom: var(--spacing-sm);
+      color: #ef4444;
+      font-size: 12px;
+      margin-top: 6px;
       display: none;
     }
 
     .error-message.show {
       display: block;
-      animation: messageSlideDown 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
     .attempts-warning {
-      color: var(--accent-orange);
-      font-size: 0.8rem;
-      margin-bottom: var(--spacing-sm);
+      margin-top: 10px;
+      font-size: 12px;
+      color: #b91c1c;
+      text-align: center;
       display: none;
     }
 
     .attempts-warning.show {
       display: block;
-      animation: messageSlideDown 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-
-    @keyframes messageSlideDown {
-      from {
-        opacity: 0;
-        transform: translateY(-10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
     }
 
     .modal-buttons {
       display: flex;
-      gap: var(--spacing-sm);
-      margin-top: var(--spacing-md);
+      gap: 10px;
+      margin-top: 16px;
     }
 
     .modal-btn {
       flex: 1;
-      padding: 12px 20px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      border-radius: 100px;
-      cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-      font-family: 'Inter', sans-serif;
+      border-radius: 10px;
+      padding: 11px 0;
       border: none;
-      position: relative;
-      overflow: hidden;
-      animation: buttonSlideIn 0.5s ease-out 0.4s backwards;
-    }
-
-    .modal-btn::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-      transform: rotate(45deg);
-      opacity: 0;
-      transition: opacity 0.5s ease;
-    }
-
-    .modal-btn:hover::before {
-      opacity: 1;
-      animation: shimmer 0.5s ease-in-out;
-    }
-
-    @keyframes buttonSlideIn {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
     }
 
     .modal-btn-primary {
-      background: var(--gradient-primary);
-      color: #0A0A0F;
-      box-shadow: 0 0 15px rgba(0, 255, 133, 0.2);
+      background: #22c55e;
+      color: #ffffff;
     }
 
     .modal-btn-primary:hover {
-      transform: translateY(-3px) scale(1.05);
-      box-shadow: 0 8px 25px rgba(0, 255, 133, 0.4), inset 0 0 15px rgba(255, 255, 255, 0.1);
-      animation: buttonGlow 1s ease-in-out infinite;
-    }
-
-    .modal-btn-primary:hover::before {
-      left: 100%;
+      background: #16a34a;
+      transform: translateY(-1px);
     }
 
     .modal-btn-secondary {
-      background: transparent;
-      border: 1px solid var(--border-subtle);
-      color: var(--text-secondary);
+      background: #f3f4f6;
+      color: #374151;
     }
 
     .modal-btn-secondary:hover {
-      border-color: var(--accent-blue);
-      color: var(--accent-blue);
-      background: rgba(59, 130, 246, 0.1);
-      box-shadow: 0 0 25px rgba(59, 130, 246, 0.4), inset 0 0 10px rgba(59, 130, 246, 0.1);
-      transform: translateY(-2px);
-      animation: buttonSecondaryGlow 1s ease-in-out infinite;
+      background: #e5e7eb;
     }
 
-    @keyframes buttonSecondaryGlow {
-      0%, 100% {
-        box-shadow: 0 0 25px rgba(59, 130, 246, 0.4), inset 0 0 10px rgba(59, 130, 246, 0.1);
-      }
-      50% {
-        box-shadow: 0 0 40px rgba(59, 130, 246, 0.6), inset 0 0 15px rgba(59, 130, 246, 0.2);
-      }
-    }
-
-    /* Animation Keyframes */
-    @keyframes foodGradientShift {
-      0%, 100% {
-        background: 
-          radial-gradient(circle at 20% 50%, rgba(255, 157, 77, 0.15) 0%, transparent 50%),
-          radial-gradient(circle at 80% 80%, rgba(0, 255, 133, 0.08) 0%, transparent 50%),
-          radial-gradient(circle at 50% 0%, rgba(255, 100, 50, 0.1) 0%, transparent 60%);
-      }
-      50% {
-        background: 
-          radial-gradient(circle at 80% 20%, rgba(255, 157, 77, 0.15) 0%, transparent 50%),
-          radial-gradient(circle at 20% 80%, rgba(0, 255, 133, 0.08) 0%, transparent 50%),
-          radial-gradient(circle at 50% 100%, rgba(255, 100, 50, 0.1) 0%, transparent 60%);
-      }
-    }
-
-    @keyframes foodFloat {
-      0% {
-        transform: translateY(0) translateX(0);
-        opacity: 0.03;
-      }
-      50% {
-        opacity: 0.06;
-      }
-      100% {
-        transform: translateY(-100vh) translateX(50px);
-        opacity: 0.01;
-      }
-    }
-
-    @keyframes brandEnter {
-      from {
-        opacity: 0;
-        transform: scale(0.8) translateY(-20px);
-      }
-      to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-      }
-    }
-
-    @keyframes titleEnter {
-      from {
-        opacity: 0;
-        transform: translateY(-15px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes subtitleEnter {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes inputEnter {
-      from {
-        opacity: 0;
-        transform: translateX(-20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
-    }
-
-    @keyframes buttonEnter {
-      from {
-        opacity: 0;
-        transform: scale(0.8) translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-      }
-    }
-
-    @keyframes buttonGlow {
-      0%, 100% {
-        box-shadow: 0 10px 30px rgba(0, 255, 133, 0.4), inset 0 0 10px rgba(255, 255, 255, 0.1);
-      }
-      50% {
-        box-shadow: 0 15px 40px rgba(0, 255, 133, 0.6), inset 0 0 15px rgba(255, 255, 255, 0.2);
-      }
-    }
-
-    @keyframes shimmer {
-      0% {
-        background-position: -1000px 0;
-      }
-      100% {
-        background-position: 1000px 0;
-      }
-    }
-
-    @keyframes modalEnter {
-      from {
-        opacity: 0;
-        transform: scale(0.9) translateY(30px);
-        filter: blur(10px);
-      }
-      to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-        filter: blur(0);
-      }
-    }
-
-    /* Responsive */
-    @media (max-width: 560px) {
-      body {
-        padding: var(--spacing-md);
-      }
-
+    @media (max-width: 480px) {
       .auth-card {
-        padding: var(--spacing-lg);
-      }
-
-      .brand {
-        font-size: 1.5rem;
-      }
-
-      /* Disable heavy animations on mobile for performance */
-      .modal-overlay {
-        transition: all 0.2s ease;
-      }
-
-      .modal-overlay::before {
-        display: none;
-      }
-
-      .password-modal {
-        animation: none;
-        transition: all 0.2s ease;
-      }
-
-      .password-modal::before {
-        display: none;
-      }
-
-      .lock-icon {
-        animation: none;
-      }
-
-      .lock-icon::after {
-        display: none;
-      }
-
-      .modal-btn {
-        animation: none;
-        transition: all 0.2s ease;
-      }
-
-      .modal-btn::before {
-        display: none;
-      }
-
-      .password-modal h2 {
-        animation: none;
+        padding: 22px 20px 18px;
       }
     }
   </style>
@@ -993,26 +389,30 @@
 
   <div class="auth-card">
     <div class="top-links">
+      <!-- Owner button with popup -->
       <button id="ownerBtnTop">
-        <i class="fas fa-lock"></i> Owner Access
+        <i class="fas fa-lock"></i> Owner
       </button>
     </div>
 
-    <div class="brand">🍽️ FOOD POINT</div>
+    <div class="brand">FOOD POINT</div>
     <div class="subtitle">Sign in to continue or create an account</div>
 
     <h2 id="formTitle">Log in</h2>
 
+    <!-- LOGIN: email or name -->
     <div class="input-group" id="loginIdGroup">
       <label for="loginIdInput">Email or name</label>
       <input type="text" id="loginIdInput" placeholder="you@example.com or your name">
     </div>
 
+    <!-- SIGNUP ONLY: full name -->
     <div id="nameGroup" class="input-group" style="display:none;">
       <label for="nameInput">Full name</label>
       <input type="text" id="nameInput" placeholder="Your name" autocomplete="name">
     </div>
 
+    <!-- SIGNUP ONLY: email -->
     <div id="emailGroup" class="input-group" style="display:none;">
       <label for="emailInput">Email</label>
       <input type="email" id="emailInput" placeholder="you@example.com" autocomplete="email">
@@ -1042,6 +442,7 @@
     </div>
   </div>
 
+  <!-- OWNER PASSWORD MODAL -->
   <div class="modal-overlay" id="ownerPasswordModal">
     <div class="password-modal">
       <div class="modal-header">
@@ -1096,7 +497,7 @@
     const message       = document.getElementById("message");
     const successMsg    = document.getElementById("successMsg");
 
-    let mode = "login";
+    let mode = "login"; // or "signup"
 
     function loadUsers() {
       try {
@@ -1110,8 +511,23 @@
       localStorage.setItem(USERS_KEY, JSON.stringify(users));
     }
 
+    function getCurrentUser() {
+      try {
+        const raw = localStorage.getItem("fp_current_user");
+        return raw ? JSON.parse(raw) : null;
+      } catch(e) { return null; }
+    }
+
+    function getUserSpecificKey(baseKey) {
+      const user = getCurrentUser();
+      return user && user.id ? baseKey + "_" + user.id : baseKey;
+    }
+
     function setCurrentUser(user) {
       localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
+      // Refresh cart on login: clear user's previous cart
+      localStorage.removeItem(getUserSpecificKey("selectedFoods_v1"));
+      localStorage.removeItem(getUserSpecificKey("cartItems"));
     }
 
     function switchMode() {
@@ -1189,6 +605,7 @@
             return;
           }
 
+          // Try backend login first; fallback to local users
           try {
             const data = await FPAPI.post('/auth/login', { identifier, password });
             if (data && data.token) localStorage.setItem('fp_token', data.token);
@@ -1197,21 +614,17 @@
             setTimeout(() => window.location.href = 'menu.html', 700);
             return;
           } catch (e) {
-            // fallback
+            // network error or non-2xx — fall through to local fallback
           }
 
+          // Fallback: local users
           const user = users.find(u =>
             (u.email && u.email.toLowerCase() === identifier) ||
             (u.name && u.name.toLowerCase() === identifier)
           );
 
-          if (!user) {
-            message.textContent = "Email is not found.";
-            return;
-          }
-
-          if (user.password !== password) {
-            message.textContent = "Password is wrong.";
+          if (!user || user.password !== password) {
+            message.textContent = "Invalid details. Try again.";
             return;
           }
 
@@ -1247,6 +660,7 @@
           return;
         }
 
+        // Try to create user on backend first; fallback to local storage
         try {
           const data = await FPAPI.post('/auth/signup', { name, email, password });
           if (data && data.token) localStorage.setItem('fp_token', data.token);
@@ -1255,7 +669,7 @@
           setTimeout(() => window.location.href = 'menu.html', 800);
           return;
         } catch (e) {
-          // fallback
+          // network error -> fallback to local storage
         }
 
         const newUser = {
@@ -1285,12 +699,15 @@
 
     refreshShopStatusUI();
 
+    // No automatic login redirect. Users must sign in manually.
+
     // ---------- OWNER PASSWORD POPUP (same connection as index) ----------
     const OWNER_PASSWORD_KEY = "ownerPassword";
     const ATTEMPTS_KEY = "passwordAttempts";
     const LOCKOUT_KEY = "passwordLockout";
 
     function getOwnerPassword() {
+      // default password if not set by owner page
       try {
         const p = localStorage.getItem(OWNER_PASSWORD_KEY);
         if (!p || !p.toString().trim()) return "1515";
@@ -1324,7 +741,7 @@
       attempts++;
       localStorage.setItem(ATTEMPTS_KEY, attempts.toString());
       if (attempts >= 3) {
-        const lockoutTime = Date.now() + 30000;
+        const lockoutTime = Date.now() + 30000; // 30s
         localStorage.setItem(LOCKOUT_KEY, lockoutTime.toString());
         document.getElementById("ownerAttemptsWarn").classList.add("show");
         document.getElementById("ownerSubmitBtn").disabled = true;
@@ -1340,6 +757,7 @@
       const entered = (input.value || '').toString().trim();
       const correct = (getOwnerPassword() || '1515').toString().trim();
 
+      // Try backend owner login first (graceful fallback to local password)
       (async () => {
         try {
           const data = await FPAPI.post('/auth/login', { identifier: 'Owner', password: entered });
@@ -1351,9 +769,10 @@
           window.location.href = 'owner-dashboard.html';
           return;
         } catch (e) {
-          // fallback
+          // network error — ignore and fallback
         }
 
+        // Fallback: local password check
         if (entered === correct) {
           localStorage.removeItem(ATTEMPTS_KEY);
           localStorage.removeItem(LOCKOUT_KEY);

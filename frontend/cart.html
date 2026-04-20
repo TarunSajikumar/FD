@@ -946,7 +946,20 @@
 */
 
 /* ---------- Helpers ---------- */
-const KEYS_TO_TRY = ['selectedFoods_v1', 'selectedFoods'];
+/* ---------- User-specific storage ---------- */
+function getCurrentUser() {
+  try {
+    const raw = localStorage.getItem("fp_current_user");
+    return raw ? JSON.parse(raw) : null;
+  } catch(e) { return null; }
+}
+
+function getUserSpecificKey(baseKey) {
+  const user = getCurrentUser();
+  return user && user.id ? baseKey + "_" + user.id : baseKey;
+}
+
+const KEYS_TO_TRY = ['selectedFoods_v1', 'selectedFoods'].map(k => getUserSpecificKey(k));
 function readCartStorageKey() {
   // prefer v1 if present
   for (const k of KEYS_TO_TRY) {
@@ -1168,11 +1181,11 @@ payBtn.addEventListener('click', () => {
   const totalAmount = amount + parcelCharge;
   
   // Persist for payment page
-  localStorage.setItem('amountPaid', String(totalAmount));
-  localStorage.setItem('cartItems', JSON.stringify(normalizedCart));
-  localStorage.setItem('parcelSelected', String(parcelCheckbox.checked));
-  localStorage.setItem('parcelCharge', String(parcelCharge));
-  localStorage.setItem('amountPaidDisplay', formatCurrency(totalAmount));
+  localStorage.setItem(getUserSpecificKey('amountPaid'), String(totalAmount));
+  localStorage.setItem(getUserSpecificKey('cartItems'), JSON.stringify(normalizedCart));
+  localStorage.setItem(getUserSpecificKey('parcelSelected'), String(parcelCheckbox.checked));
+  localStorage.setItem(getUserSpecificKey('parcelCharge'), String(parcelCharge));
+  localStorage.setItem(getUserSpecificKey('amountPaidDisplay'), formatCurrency(totalAmount));
   
   // Navigate to payment page
   window.location.href = 'payment-way.html';

@@ -81,7 +81,7 @@
     }
 
     body::after {
-      content: '🍽️ 🍔 🍕 🍜 🍱 🍛 🍝 🌮 🍤 🥘';
+      content: '🍽️ 🍔 🍕 🍜 🍱 🍛 🍝 🌮 🍤 🥘 🍲 🥘 🥗 🍱 🍜 🫕 🍣 🍴 🍝 🍛 🥗 🍚 🫕 🍲 🥘';
       position: fixed;
       top: 0;
       left: 0;
@@ -201,8 +201,6 @@
     .card:hover {
       box-shadow: 0 30px 60px -15px rgba(0, 255, 133, 0.15), 0 0 0 1px rgba(0, 255, 133, 0.15);
       transform: translateY(-2px);
-    }
-      box-shadow: 0 30px 60px -15px rgba(0, 255, 133, 0.15), 0 0 0 1px rgba(0, 255, 133, 0.15);
     }
 
     /* Home Card / Brand */
@@ -617,12 +615,6 @@
         <div class="brand">🍽️ FOOD POINT</div>
         <div class="tagline">Fresh, fast & tasty bites • Crypto Style</div>
       </div>
-      <!-- go to menu button -->
-      <button class="back-btn" onclick="location.href='menu.html'">
-        <i class="fas fa-arrow-left"></i>
-        Go to Menu
-      </button>
-
       <div class="title">📋 Your Orders</div>
 
       <!-- table header: item | parcel | payment (with details inline) -->
@@ -670,6 +662,14 @@
     function renderOrders() {
       const container = document.getElementById("ordersContainer");
       const emptyState = document.getElementById("emptyState");
+
+      // Check if user is logged in
+      const userRaw = localStorage.getItem("fp_current_user");
+      if (!userRaw) {
+        // Not logged in, redirect to login
+        window.location.href = 'login.html';
+        return;
+      }
 
       let orders = [];
       try {

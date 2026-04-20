@@ -76,6 +76,26 @@
       background: var(--gradient-glow);
       pointer-events: none;
       z-index: 0;
+      animation: foodGradientShift 18s ease-in-out infinite;
+    }
+
+    body::after {
+      content: '🍽️ 🍔 🍕 🍜 🍱 🍛 🍝 🌮 🍤 🥘 🍲 🥘 🥗 🍱 🍜 🫕 🍣 🍴 🍝 🍛 🥗 🍚 🫕 🍲 🥘';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      font-size: 110px;
+      opacity: 0.03;
+      pointer-events: none;
+      z-index: 0;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-around;
+      overflow: hidden;
+      animation: foodFloat 20s linear infinite;
     }
 
     /* User Bar */
@@ -181,6 +201,7 @@
       padding: 100px 20px 60px;
       position: relative;
       z-index: 1;
+      animation: pageEnter 0.8s ease-out backwards;
     }
 
     .pay-container h3 {
@@ -215,8 +236,13 @@
     }
 
     .amount-box:hover {
-      box-shadow: 0 15px 35px -8px rgba(0, 255, 133, 0.15);
-      border-color: rgba(0, 255, 133, 0.2);
+      box-shadow: 0 18px 45px -12px rgba(0, 255, 133, 0.18);
+      border-color: rgba(0, 255, 133, 0.22);
+      transform: translateY(-2px);
+    }
+
+    .amount-box {
+      animation: cardEnter 0.85s ease-out backwards;
     }
 
     .amount-label {
@@ -261,7 +287,11 @@
     .pay-option:hover {
       transform: translateX(6px);
       border-color: var(--accent-green);
-      box-shadow: 0 4px 20px rgba(0, 255, 133, 0.1);
+      box-shadow: 0 12px 28px rgba(0, 255, 133, 0.18);
+    }
+
+    .pay-option {
+      animation: cardEnter 0.9s ease-out backwards;
     }
 
     .pay-option-left {
@@ -323,6 +353,88 @@
 
     .note i {
       color: var(--accent-green);
+    }
+
+    .user-bar,
+    .back-btn,
+    .logout-btn {
+      animation: buttonPop 0.7s ease-out backwards;
+    }
+
+    .back-btn:hover,
+    .logout-btn:hover {
+      animation: buttonGlow 1.5s ease-in-out infinite;
+    }
+
+    @keyframes foodGradientShift {
+      0%, 100% {
+        background: radial-gradient(circle at 20% 30%, rgba(255, 157, 77, 0.15) 0%, transparent 45%),
+                    radial-gradient(circle at 80% 80%, rgba(0, 255, 133, 0.08) 0%, transparent 45%),
+                    radial-gradient(circle at 55% 5%, rgba(255, 100, 50, 0.1) 0%, transparent 55%);
+      }
+      50% {
+        background: radial-gradient(circle at 80% 20%, rgba(255, 157, 77, 0.15) 0%, transparent 45%),
+                    radial-gradient(circle at 20% 80%, rgba(0, 255, 133, 0.08) 0%, transparent 45%),
+                    radial-gradient(circle at 55% 100%, rgba(255, 100, 50, 0.1) 0%, transparent 55%);
+      }
+    }
+
+    @keyframes foodFloat {
+      0% {
+        transform: translateY(0) translateX(0);
+        opacity: 0.03;
+      }
+      50% {
+        opacity: 0.06;
+      }
+      100% {
+        transform: translateY(-100vh) translateX(50px);
+        opacity: 0.01;
+      }
+    }
+
+    @keyframes pageEnter {
+      from {
+        opacity: 0;
+        transform: translateY(24px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes cardEnter {
+      from {
+        opacity: 0;
+        transform: translateY(24px) scale(0.98);
+        filter: blur(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+      }
+    }
+
+    @keyframes buttonGlow {
+      0%, 100% {
+        box-shadow: 0 0 14px rgba(0, 255, 133, 0.16);
+      }
+      50% {
+        box-shadow: 0 0 28px rgba(0, 255, 133, 0.28);
+      }
+    }
+
+    @keyframes buttonPop {
+      from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.98);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
     }
 
     /* Responsive */
@@ -437,8 +549,20 @@
 
 <script>
   // ------------------- Helper functions (consistent with payment flow) -------------------
-  function safeGet(key) { try { return localStorage.getItem(key); } catch(e) { return null; } }
-  function safeSet(key, val) { try { localStorage.setItem(key, String(val)); } catch(e) {} }
+  function getCurrentUser() {
+    try {
+      const raw = localStorage.getItem("fp_current_user");
+      return raw ? JSON.parse(raw) : null;
+    } catch(e) { return null; }
+  }
+
+  function getUserSpecificKey(baseKey) {
+    const user = getCurrentUser();
+    return user && user.id ? baseKey + "_" + user.id : baseKey;
+  }
+
+  function safeGet(key) { try { return localStorage.getItem(getUserSpecificKey(key)); } catch(e) { return null; } }
+  function safeSet(key, val) { try { localStorage.setItem(getUserSpecificKey(key), String(val)); } catch(e) {} }
 
   // Get current amount from storage (priority: amountPaidNumeric, amountPaid, cartItems calculation)
   function getCurrentAmount() {

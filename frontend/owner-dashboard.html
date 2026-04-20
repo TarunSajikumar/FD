@@ -84,7 +84,7 @@
     }
 
     body::after {
-      content: '🍽️ 🍔 🍕 🍜 🍱 🍛 🍝 🌮 🍤 🥘';
+      content: '🍽️ 🍔 🍕 🍜 🍱 🍛 🍝 🌮 🍤 🥘 🍲 🥘 🥗 🍱 🍜 🫕 🍣 🍴 🍝 🍛 🥗 🍚 🫕 🍲 🥘'; 🥘 🥗 🍱 🍜 🫕 🍣 🍴 🍝 🍛 🥗 🍚 🫕 🍲 🥘';
       position: fixed;
       top: 0;
       left: 0;
@@ -1752,11 +1752,11 @@
             socket.on('newOrder', (o) => {
               showNotification('New Order', `New order ${o.id || ''}`, 'success');
               // refresh orders list if modal open
-              try { loadOrders(); } catch(e){}
+              try { loadOrdersForOwner(); } catch(e){}
             });
             socket.on('orderUpdated', (o) => {
               showNotification('Order Updated', `Order ${o.id || ''} updated`, 'info');
-              try { loadOrders(); } catch(e){}
+              try { loadOrdersForOwner(); } catch(e){}
             });
             socket.on('shopStatus', (s) => {
               updateOwnerStatusUI(s.status || s);
@@ -2514,7 +2514,7 @@
       // Clear existing interval
       if (orderCheckInterval) clearInterval(orderCheckInterval);
       
-      // Check for new orders every 5 seconds
+      // Check for new orders every 1 second
       orderCheckInterval = setInterval(() => {
         const prevCount = newOrdersCount;
         updateNewOrdersBadge();
@@ -2532,7 +2532,7 @@
           }
           updateAnalytics();
         }
-      }, 5000);
+      }, 1000);
     }
 
     function setupStorageListener() {

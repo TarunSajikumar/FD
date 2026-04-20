@@ -89,6 +89,26 @@
       background: var(--gradient-glow);
       pointer-events: none;
       z-index: 0;
+      animation: foodGradientShift 18s ease-in-out infinite;
+    }
+
+    body::after {
+      content: '🍽️ 🍔 🍕 🍜 🍱 🍛 🍝 🌮 🍤 🥘 🍲 🥘 🥗 🍱 🍜 🫕 🍣 🍴 🍝 🍛 🥗 🍚 🫕 🍲 🥘';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      font-size: 100px;
+      opacity: 0.03;
+      pointer-events: none;
+      z-index: 0;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-around;
+      overflow: hidden;
+      animation: foodFloat 20s linear infinite;
     }
 
     .container {
@@ -173,7 +193,35 @@
     }
 
     .payment-card:hover {
-      box-shadow: 0 30px 60px -15px rgba(0, 255, 133, 0.15), 0 0 0 1px rgba(0, 255, 133, 0.15);
+      box-shadow: 0 30px 60px -15px rgba(0, 255, 133, 0.18), 0 0 0 1px rgba(0, 255, 133, 0.15);
+      transform: translateY(-2px);
+    }
+
+    .payment-card {
+      animation: cardEnter 0.9s ease-out backwards;
+    }
+
+    .steps .step {
+      animation: cardEnter 0.8s ease-out backwards;
+    }
+
+    .btn {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top left, rgba(0, 255, 133, 0.12), transparent 45%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+
+    .btn:hover::after {
+      opacity: 1;
     }
 
     /* Amount Row */
@@ -358,6 +406,46 @@
       }
     }
 
+    @keyframes foodGradientShift {
+      0%, 100% {
+        background: radial-gradient(circle at 20% 40%, rgba(255, 157, 77, 0.15) 0%, transparent 45%),
+                    radial-gradient(circle at 80% 80%, rgba(0, 255, 133, 0.08) 0%, transparent 45%),
+                    radial-gradient(circle at 55% 10%, rgba(255, 100, 50, 0.1) 0%, transparent 55%);
+      }
+      50% {
+        background: radial-gradient(circle at 80% 30%, rgba(255, 157, 77, 0.15) 0%, transparent 45%),
+                    radial-gradient(circle at 20% 80%, rgba(0, 255, 133, 0.08) 0%, transparent 45%),
+                    radial-gradient(circle at 50% 95%, rgba(255, 100, 50, 0.1) 0%, transparent 55%);
+      }
+    }
+
+    @keyframes foodFloat {
+      0% {
+        transform: translateY(0) translateX(0);
+        opacity: 0.04;
+      }
+      50% {
+        opacity: 0.06;
+      }
+      100% {
+        transform: translateY(-100vh) translateX(60px);
+        opacity: 0.01;
+      }
+    }
+
+    @keyframes cardEnter {
+      from {
+        opacity: 0;
+        transform: translateY(24px) scale(0.98);
+        filter: blur(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+      }
+    }
+
     /* Responsive */
     @media (max-width: 560px) {
       body {
@@ -457,8 +545,20 @@
 
 <script>
   /* ---------- secure storage helpers ---------- */
-  function safeGet(key) { try { return localStorage.getItem(key); } catch(e) { return null; } }
-  function safeSet(key, val) { try { localStorage.setItem(key, String(val)); } catch(e) {} }
+  function getCurrentUser() {
+    try {
+      const raw = localStorage.getItem("fp_current_user");
+      return raw ? JSON.parse(raw) : null;
+    } catch(e) { return null; }
+  }
+
+  function getUserSpecificKey(baseKey) {
+    const user = getCurrentUser();
+    return user && user.id ? baseKey + "_" + user.id : baseKey;
+  }
+
+  function safeGet(key) { try { return localStorage.getItem(getUserSpecificKey(key)); } catch(e) { return null; } }
+  function safeSet(key, val) { try { localStorage.setItem(getUserSpecificKey(key), String(val)); } catch(e) {} }
 
   function parseAmountRaw(raw) {
     if (!raw) return null;
