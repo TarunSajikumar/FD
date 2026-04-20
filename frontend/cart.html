@@ -912,7 +912,7 @@
       <div class="parcel-section">
         <label class="parcel-label">
           <input type="checkbox" id="parcelCheckbox">
-          <span>📦 Add Parcel Protection (+₹5)</span>
+          <span id="parcelLabel">📦 Add Parcel Protection</span>
         </label>
         <div class="parcel-charge" id="parcelChargeDisplay">Parcel charge: ₹0.00</div>
       </div>
@@ -1056,7 +1056,23 @@ const parcelChargeDisplay = document.getElementById('parcelChargeDisplay');
 const payBtn = document.getElementById('payBtn');
 
 let normalizedCart = []; // in-memory
-const PARCEL_CHARGE = 5;
+
+// Get dynamic parcel charge from owner settings
+function getParcelCharge() {
+  try {
+    const settings = localStorage.getItem('restaurantSettings');
+    if (settings) {
+      const parsed = JSON.parse(settings);
+      const charge = parsed.parcelCharge;
+      if (charge != null) {
+        return parsePriceToNumber(charge);
+      }
+    }
+  } catch (e) {
+    console.warn('Failed to read parcel charge from settings', e);
+  }
+  return 5; // fallback to 5 if not set
+}
 
 function renderCart() {
   normalizedCart = normalizedCartFromStorage();
@@ -1159,7 +1175,7 @@ function persistNormalizedCart() {
 function updateSummary() {
   const count = normalizedCart.reduce((s,i) => s + (i.quantity || 1), 0);
   const amount = normalizedCart.reduce((s,i) => s + (i.numericPrice || 0) * (i.quantity || 1), 0);
-  const parcelCharge = parcelCheckbox.checked ? PARCEL_CHARGE : 0;
+  const parcelCharge = parcelCheckbox.checked ? getParcelCharge() : 0;
   const total = amount + parcelCharge;
   
   itemCountEl.textContent = String(count);
@@ -1177,7 +1193,7 @@ payBtn.addEventListener('click', () => {
   if (!normalizedCart.length) return;
   
   const amount = normalizedCart.reduce((s,i) => s + (i.numericPrice || 0) * (i.quantity || 1), 0);
-  const parcelCharge = parcelCheckbox.checked ? PARCEL_CHARGE : 0;
+  const parcelCharge = parcelCheckbox.checked ? getParcelCharge() : 0;
   const totalAmount = amount + parcelCharge;
   
   // Persist for payment page
@@ -1198,6 +1214,11 @@ parcelCheckbox.addEventListener('change', updateSummary);
 (function boot(){
   // choose correct storageKey (re-evaluate at boot)
   storageKey = readCartStorageKey();
+  
+  // update parcel label with dynamic charge
+  const parcelLabel = document.getElementById('parcelLabel');
+  const charge = getParcelCharge();
+  parcelLabel.textContent = `📦 Add Parcel Protection (+${formatCurrency(charge)})`;
   
   // restore parcel checkbox state if previously selected
   try {
