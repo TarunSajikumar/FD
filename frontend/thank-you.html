@@ -3,899 +3,465 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-  <title>FOOD POINT · Payment Confirmed • Crypto Style</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+  <title>Payment Successful | Thank You</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      -webkit-tap-highlight-color: transparent;
     }
 
-    :root {
-      /* Backgrounds - Crypto Dark Theme */
-      --bg-primary: #0A0A0F;
-      --bg-secondary: #111116;
-      --bg-card: #15171E;
-      --bg-elevated: #1A1C23;
-      --bg-userbar: #0D0D12;
-      
-      /* Text Colors */
-      --text-primary: #FFFFFF;
-      --text-secondary: #8A8F9E;
-      --text-muted: #5A5F73;
-      
-      /* Accent Colors */
-      --accent-green: #00FF85;
-      --accent-blue: #3B82F6;
-      --accent-red: #FF4D4D;
-      --accent-orange: #F97316;
-      
-      /* Borders */
-      --border-subtle: #1E1E2E;
-      --border-card: rgba(255, 255, 255, 0.05);
-      
-      /* Spacing */
-      --spacing-xs: 0.5rem;
-      --spacing-sm: 1rem;
-      --spacing-md: 1.5rem;
-      --spacing-lg: 2rem;
-      --spacing-xl: 3rem;
-      
-      /* Border Radius */
-      --radius-sm: 8px;
-      --radius-md: 12px;
-      --radius-lg: 16px;
-      --radius-xl: 24px;
-      
-      /* Gradients */
-      --gradient-primary: linear-gradient(135deg, #00FF85 0%, #00C96D 100%);
-      --gradient-card-hover: linear-gradient(180deg, #1A1C23 0%, #111116 100%);
-      --gradient-glow: radial-gradient(circle at 50% 0%, rgba(0, 255, 133, 0.08), transparent);
-      --gradient-success: linear-gradient(135deg, #00FF85 0%, #3B82F6 100%);
+    html {
+      -webkit-user-select: none;
+      -webkit-text-size-adjust: 100%;
     }
 
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: var(--bg-primary);
-      color: var(--text-primary);
+      background: #0a0e1a url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><defs><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" result="noise"/></filter></defs><rect width="100" height="100" fill="%23000" filter="url(%23noise)" opacity="0.03"/></svg>');
+      background-attachment: fixed;
       min-height: 100vh;
-      position: relative;
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      color: #e8e9ed;
       overflow-x: hidden;
+      position: relative;
     }
 
     body::before {
       content: '';
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: 
-        radial-gradient(circle at 20% 50%, rgba(0, 255, 133, 0.15) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(255, 157, 77, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 50% 0%, rgba(255, 100, 50, 0.12) 0%, transparent 60%);
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(circle at 20% 50%, rgba(255,140,0,0.15), transparent 50%), radial-gradient(circle at 80% 80%, rgba(0,200,150,0.1), transparent 50%);
       pointer-events: none;
       z-index: 0;
-      animation: gradientShift 15s ease-in-out infinite;
     }
 
-    body::after {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-image: 
-        linear-gradient(90deg, transparent 1px, rgba(0, 255, 133, 0.03) 1px),
-        linear-gradient(transparent 1px, rgba(0, 255, 133, 0.03) 1px);
-      background-size: 50px 50px;
-      pointer-events: none;
-      z-index: 0;
-      animation: gridShift 20s linear infinite;
-    }
+    body > * { position: relative; z-index: 1; }
 
-    /* User Bar */
-    .user-bar {
-      background: var(--bg-userbar);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--border-subtle);
-      padding: 12px 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      animation: userBarEnter 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-
-    .user-bar:hover {
-      box-shadow: 0 4px 12px rgba(0, 255, 133, 0.1), inset 0 0 10px rgba(0, 255, 133, 0.05);
-      border-color: rgba(0, 255, 133, 0.15);
-    }
-
-    @keyframes userBarEnter {
-      from {
-        opacity: 0;
-        transform: translateY(-20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* Floating circles */
-    .bg-circle-1,
-    .bg-circle-2,
-    .bg-circle-3 {
-      position: fixed;
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 0;
-      filter: blur(40px);
-    }
-
-    .bg-circle-1 {
-      width: 300px;
-      height: 300px;
-      top: 10%;
-      right: 5%;
-      background: radial-gradient(circle, rgba(0, 255, 133, 0.3) 0%, rgba(0, 255, 133, 0.1) 40%, transparent 70%);
-      animation: floatComplex1 25s ease-in-out infinite;
-    }
-
-    .bg-circle-2 {
-      width: 250px;
-      height: 250px;
-      bottom: 15%;
-      left: 8%;
-      background: radial-gradient(circle, rgba(255, 157, 77, 0.25) 0%, rgba(255, 157, 77, 0.08) 40%, transparent 70%);
-      animation: floatComplex2 30s ease-in-out infinite;
-    }
-
-    .bg-circle-3 {
-      width: 280px;
-      height: 280px;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: radial-gradient(circle, rgba(255, 100, 50, 0.2) 0%, rgba(255, 100, 50, 0.05) 40%, transparent 70%);
-      animation: floatComplex3 35s ease-in-out infinite;
-    }
-
-    .user-info {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .user-avatar {
-      width: 44px;
-      height: 44px;
-      background: var(--gradient-primary);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 20px;
-      color: #0A0A0F;
-      animation: avatarPulse 2s ease-in-out infinite;
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-
-    .user-avatar:hover {
-      transform: scale(1.1) rotate(5deg);
-      box-shadow: 0 0 20px rgba(0, 255, 133, 0.4);
-    }
-
-    @keyframes avatarPulse {
-      0%, 100% {
-        box-shadow: 0 0 0 0 rgba(0, 255, 133, 0.4);
-      }
-      50% {
-        box-shadow: 0 0 0 8px rgba(0, 255, 133, 0);
-      }
-    }
-
-    .user-text .user-name {
-      font-weight: 700;
-      font-size: 15px;
-      color: var(--text-primary);
-      letter-spacing: -0.02em;
-    }
-
-    .user-text .user-email {
-      font-size: 11px;
-      color: var(--text-muted);
-    }
-
-    .logout-btn {
-      background: transparent;
-      border: 1px solid var(--border-subtle);
-      color: var(--text-secondary);
-      padding: 8px 20px;
-      border-radius: 100px;
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-      font-family: 'Inter', sans-serif;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      animation: buttonEnter 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s backwards;
-    }
-
-    .logout-btn:hover {
-      border-color: var(--accent-blue);
-      color: var(--accent-blue);
-      background: rgba(59, 130, 246, 0.05);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(59, 130, 246, 0.25);
-    }
-
-    @keyframes buttonEnter {
-      from {
-        opacity: 0;
-        transform: scale(0.9) translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-      }
-    }
-
-    /* Floating circles */
-    .bg-circle-1,
-    .bg-circle-2,
-    .bg-circle-3 {
-      position: fixed;
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 0;
-      filter: blur(40px);
-    }
-
-    .bg-circle-1 {
-      width: 300px;
-      height: 300px;
-      top: 10%;
-      right: 5%;
-      background: radial-gradient(circle, rgba(0, 255, 133, 0.3) 0%, rgba(0, 255, 133, 0.1) 40%, transparent 70%);
-      animation: floatComplex1 25s ease-in-out infinite;
-    }
-
-    .bg-circle-2 {
-      width: 250px;
-      height: 250px;
-      bottom: 15%;
-      left: 8%;
-      background: radial-gradient(circle, rgba(255, 157, 77, 0.25) 0%, rgba(255, 157, 77, 0.08) 40%, transparent 70%);
-      animation: floatComplex2 30s ease-in-out infinite;
-    }
-
-    .bg-circle-3 {
-      width: 280px;
-      height: 280px;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: radial-gradient(circle, rgba(255, 100, 50, 0.2) 0%, rgba(255, 100, 50, 0.05) 40%, transparent 70%);
-      animation: floatComplex3 35s ease-in-out infinite;
-    }
-
-    /* Container */
     .container {
-      max-width: 550px;
-      margin: 0 auto;
-      padding: 40px 20px 60px;
-      position: relative;
-      z-index: 1;
-      animation: pageEnter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+      background: linear-gradient(135deg, rgba(30,35,50,0.78), rgba(25,30,45,0.73));
+      border-radius: 28px;
+      padding: 40px 30px;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.08);
+      backdrop-filter: blur(12px) saturate(140%);
     }
 
-    @keyframes pageEnter {
-      from {
-        opacity: 0;
-        transform: translateY(24px);
+    @media (max-width: 480px) {
+      body {
+        padding: 10px;
+        padding-top: 60px;
       }
-      to {
-        opacity: 1;
-        transform: translateY(0);
+
+      .container {
+        border-radius: 16px;
+        padding: 24px 16px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
       }
     }
 
-    /* Success Circle */
     .success-circle {
-      width: 80px;
-      height: 80px;
-      background: linear-gradient(135deg, rgba(0, 255, 133, 0.15), rgba(0, 255, 133, 0.05));
-      border: 2px solid var(--accent-green);
+      width: 110px;
+      height: 110px;
       border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #00d9a3, #00c890);
+      margin: 0 auto 20px;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 0 auto 24px;
-      animation: successPulse 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards, pulse 2s ease-in-out 0.8s infinite;
-      box-shadow: 0 0 0 0 rgba(0, 255, 133, 0.4);
+      box-shadow: 0 0 30px rgba(0,220,170,0.5);
+      border: 2px solid rgba(0,220,170,0.3);
+    }
+
+    @media (max-width: 480px) {
+      .success-circle {
+        width: 90px;
+        height: 90px;
+        margin-bottom: 16px;
+      }
     }
 
     .success-circle i {
-      font-size: 40px;
-      color: var(--accent-green);
-      animation: iconScale 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s backwards;
+      color: #fff;
+      font-size: 52px;
     }
 
-    @keyframes successPulse {
-      0% {
-        transform: scale(0.3);
-        opacity: 0;
-      }
-      100% {
-        transform: scale(1);
-        opacity: 1;
-      }
-    }
-
-    @keyframes iconScale {
-      from {
-        transform: scale(0);
-      }
-      to {
-        transform: scale(1);
+    @media (max-width: 480px) {
+      .success-circle i {
+        font-size: 42px;
       }
     }
 
     h1 {
-      font-size: 1.8rem;
-      font-weight: 800;
-      background: var(--gradient-primary);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
+      font-size: 26px;
       text-align: center;
-      letter-spacing: -0.02em;
       margin-bottom: 8px;
-      filter: drop-shadow(0 0 20px rgba(0, 255, 133, 0.3));
-      animation: titleShimmer 3s ease-in-out infinite, fadeInUp 0.6s ease-out backwards;
+      color: #f5e6d3;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      text-shadow: 0 0 12px rgba(255,140,0,0.2);
     }
 
-    @keyframes titleShimmer {
-      0%, 100% {
-        filter: drop-shadow(0 0 20px rgba(0, 255, 133, 0.3));
-      }
-      50% {
-        filter: drop-shadow(0 0 30px rgba(0, 255, 133, 0.5));
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 22px;
       }
     }
 
     .sub-text {
       text-align: center;
-      color: var(--text-secondary);
-      font-size: 0.9rem;
-      margin-bottom: 32px;
-      animation: subtitleEnter 0.8s ease-out 0.15s backwards;
+      font-size: 16px;
+      color: #aeb5c4;
+      margin-bottom: 18px;
+      letter-spacing: 0.02em;
     }
 
-    @keyframes subtitleEnter {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
+    @media (max-width: 480px) {
+      .sub-text {
+        font-size: 14px;
+        margin-bottom: 14px;
       }
     }
 
-    /* Info Box */
     .info-box {
-      background: rgba(0, 255, 133, 0.08);
-      border: 1px solid rgba(0, 255, 133, 0.2);
-      border-radius: var(--radius-lg);
-      padding: 16px 20px;
+      border-radius: 12px;
+      border: 1px solid rgba(0,220,170,0.3);
+      background: linear-gradient(135deg, rgba(0,200,150,0.15), rgba(0,180,140,0.1));
+      padding: 15px 18px;
+      font-size: 15px;
+      color: #00d9a3;
+      margin-bottom: 25px;
       text-align: center;
-      margin-bottom: 28px;
-      color: var(--text-secondary);
-      font-size: 0.85rem;
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-      animation: fadeInUp 0.6s ease-out 0.2s backwards;
-      position: relative;
-      overflow: hidden;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 0 16px rgba(0,220,170,0.15), inset 0 1px 0 rgba(0,220,170,0.1);
     }
 
-    .info-box::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(0, 255, 133, 0.1), transparent);
-      transition: left 0.6s ease;
-      pointer-events: none;
-    }
-
-    .info-box:hover::before {
-      left: 100%;
-    }
-
-    .info-box:hover {
-      border-color: rgba(0, 255, 133, 0.4);
-      background: rgba(0, 255, 133, 0.12);
-      box-shadow: 0 4px 12px rgba(0, 255, 133, 0.15);
-    }
-
-    .info-box i {
-      color: var(--accent-green);
-      margin-right: 8px;
-    }
-
-    /* Order Details */
-    .order-details {
-      background: var(--bg-card);
-      border: 1px solid var(--border-card);
-      border-radius: var(--radius-xl);
-      padding: 24px;
-      margin-bottom: 28px;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-      animation: cardEnter 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 0.25s backwards;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .order-details::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      right: -50%;
-      width: 200px;
-      height: 200px;
-      background: radial-gradient(circle, rgba(0, 255, 133, 0.15), transparent 70%);
-      border-radius: 50%;
-      pointer-events: none;
-      opacity: 0.2;
-      animation: shimmerPulse 4s ease-in-out infinite;
-    }
-
-    @keyframes shimmerPulse {
-      0%, 100% {
-        opacity: 0.2;
+    @media (max-width: 480px) {
+      .info-box {
+        padding: 12px 14px;
+        font-size: 13px;
+        margin-bottom: 20px;
       }
-      50% {
-        opacity: 0.4;
-      }
-    }
-
-    .order-details:hover {
-      box-shadow: 0 18px 45px -12px rgba(0, 255, 133, 0.25), inset 0 0 20px rgba(0, 255, 133, 0.08);
-      border-color: rgba(0, 255, 133, 0.3);
-      transform: translateY(-3px) scale(1.01);
     }
 
     .order-title {
-      font-size: 0.8rem;
       font-weight: 700;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      color: #f5e6d3;
+      font-size: 15px;
+      letter-spacing: 0.04em;
       text-transform: uppercase;
-      letter-spacing: 1.5px;
-      color: var(--accent-green);
-      margin-bottom: 20px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid var(--border-subtle);
-      animation: fadeInUp 0.6s ease-out 0.3s backwards;
-      filter: drop-shadow(0 0 8px rgba(0, 255, 133, 0.2));
+    }
+
+    @media (max-width: 480px) {
+      .order-title {
+        font-size: 14px;
+        margin-top: 8px;
+        margin-bottom: 8px;
+      }
+    }
+
+    .order-details {
+      border-top: 1px solid rgba(255,255,255,0.08);
+      margin-top: 10px;
+      padding-top: 15px;
+      font-size: 14px;
+    }
+
+    @media (max-width: 480px) {
+      .order-details {
+        padding-top: 12px;
+        font-size: 13px;
+      }
     }
 
     .detail-row {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      padding: 12px 0;
-      border-bottom: 1px solid var(--border-subtle);
-      animation: fadeInUp 0.6s ease-out backwards;
+      padding: 6px 0;
     }
 
-    .detail-row:nth-child(2) {
-      animation-delay: 0.35s;
-    }
-    .detail-row:nth-child(3) {
-      animation-delay: 0.4s;
-    }
-    .detail-row:nth-child(4) {
-      animation-delay: 0.45s;
-    }
-    .detail-row:nth-child(5) {
-      animation-delay: 0.5s;
+    @media (max-width: 480px) {
+      .detail-row {
+        padding: 5px 0;
+      }
     }
 
     .detail-label {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-
-    .detail-row:hover .detail-label {
-      color: var(--accent-green);
-    }
-
-    .detail-label i {
-      width: 20px;
-      color: var(--text-muted);
-      transition: color 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-
-    .detail-row:hover .detail-label i {
-      color: var(--accent-green);
+      color: #aeb5c4;
     }
 
     .detail-value {
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: var(--text-primary);
+      color: #f5e6d3;
+      font-weight: 700;
     }
 
-    /* Button Row */
     .btn-row {
       display: flex;
-      gap: 16px;
-      margin-bottom: 28px;
+      margin-top: 25px;
+      gap: 12px;
       flex-wrap: wrap;
-      animation: fadeInUp 0.6s ease-out 0.55s backwards;
+    }
+
+    @media (max-width: 480px) {
+      .btn-row {
+        flex-direction: column;
+        margin-top: 20px;
+        gap: 10px;
+      }
     }
 
     .btn {
       flex: 1;
-      padding: 14px 20px;
-      border-radius: 100px;
-      font-size: 0.85rem;
-      font-weight: 600;
+      border-radius: 12px;
+      border: none;
+      padding: 14px 18px;
+      font-size: 15px;
+      font-weight: 700;
       cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-      font-family: 'Inter', sans-serif;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      border: none;
-      text-decoration: none;
-      position: relative;
-      overflow: hidden;
+      gap: 10px;
+      transition: all 200ms ease;
+      min-height: 44px;
+      touch-action: manipulation;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
     }
 
-    .btn::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-      transform: rotate(45deg);
-      opacity: 0;
-      transition: opacity 0.5s ease;
-      pointer-events: none;
-    }
-
-    .btn:hover::before {
-      opacity: 1;
-    }
-
-    .btn::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at top left, rgba(0, 255, 133, 0.12), transparent 45%);
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      pointer-events: none;
-    }
-
-    .btn:hover::after {
-      opacity: 1;
+    .btn:active:not(:disabled) {
+      transform: scale(0.98);
     }
 
     .btn-primary {
-      background: var(--gradient-primary);
-      color: #0A0A0F;
+      background: linear-gradient(135deg, #00d9a3, #00c890);
+      color: #0a0e1a;
+      box-shadow: 0 0 20px rgba(0,220,170,0.4);
     }
 
     .btn-primary:hover {
-      transform: translateY(-3px) scale(1.05);
-      box-shadow: 0 12px 30px rgba(0, 255, 133, 0.4), inset 0 0 10px rgba(255, 255, 255, 0.1);
-    }
-
-    .btn-primary:active {
-      transform: translateY(0) scale(0.98);
+      transform: translateY(-2px);
+      box-shadow: 0 0 28px rgba(0,220,170,0.6), 0 10px 22px rgba(0,0,0,0.3);
     }
 
     .btn-outline {
-      background: transparent;
-      border: 1px solid var(--border-subtle);
-      color: var(--text-secondary);
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      background: linear-gradient(135deg, rgba(40,50,70,0.3), rgba(35,45,65,0.25));
+      color: #00d9a3;
+      border: 1.5px solid rgba(0,220,170,0.4);
+      box-shadow: 0 0 16px rgba(0,220,170,0.2);
+      backdrop-filter: blur(8px);
     }
 
     .btn-outline:hover {
-      border-color: var(--accent-blue);
-      color: var(--accent-blue);
-      background: rgba(59, 130, 246, 0.05);
-      transform: translateY(-3px) scale(1.05);
-      box-shadow: 0 8px 20px rgba(59, 130, 246, 0.25);
+      background: linear-gradient(135deg, rgba(40,50,70,0.4), rgba(35,45,65,0.35));
+      border-color: rgba(0,220,170,0.6);
+      box-shadow: 0 0 24px rgba(0,220,170,0.35);
+      color: #f5e6d3;
+      transform: translateY(-2px);
     }
 
-    .btn-outline:active {
-      transform: translateY(0) scale(0.98);
-    }
-
-    /* Help Text */
     .help-text {
       text-align: center;
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      animation: fadeInUp 0.6s ease-out 0.65s backwards;
+      margin-top: 18px;
+      font-size: 13px;
+      color: #aeb5c4;
+      letter-spacing: 0.02em;
     }
 
     .help-text a {
-      color: var(--accent-green);
+      color: #00d9a3;
       text-decoration: none;
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
       font-weight: 600;
+      transition: all 200ms ease;
     }
 
     .help-text a:hover {
       text-decoration: underline;
-      text-shadow: 0 0 8px rgba(0, 255, 133, 0.4);
+      text-shadow: 0 0 8px rgba(0,220,170,0.3);
     }
 
-    /* Animations */
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes gradientShift {
-      0%, 100% {
-        background: 
-          radial-gradient(circle at 20% 50%, rgba(0, 255, 133, 0.15) 0%, transparent 50%),
-          radial-gradient(circle at 80% 80%, rgba(255, 157, 77, 0.1) 0%, transparent 50%),
-          radial-gradient(circle at 50% 0%, rgba(255, 100, 50, 0.12) 0%, transparent 60%);
-      }
-      50% {
-        background: 
-          radial-gradient(circle at 80% 20%, rgba(0, 255, 133, 0.15) 0%, transparent 50%),
-          radial-gradient(circle at 20% 80%, rgba(255, 157, 77, 0.1) 0%, transparent 50%),
-          radial-gradient(circle at 50% 100%, rgba(255, 100, 50, 0.12) 0%, transparent 60%);
-      }
-    }
-
-    @keyframes gridShift {
-      0% {
-        background-position: 0 0, 0 0;
-      }
-      100% {
-        background-position: 50px 50px, 50px 50px;
-      }
-    }
-
-    @keyframes floatComplex1 {
-      0%, 100% {
-        transform: translate(0, 0) scale(1) rotate(0deg);
-      }
-      25% {
-        transform: translate(30px, -40px) scale(1.1) rotate(90deg);
-      }
-      50% {
-        transform: translate(-20px, 30px) scale(0.95) rotate(180deg);
-      }
-      75% {
-        transform: translate(40px, 20px) scale(1.05) rotate(270deg);
-      }
-    }
-
-    @keyframes floatComplex2 {
-      0%, 100% {
-        transform: translate(0, 0) scale(1) rotate(0deg);
-      }
-      25% {
-        transform: translate(-35px, 25px) scale(0.9) rotate(-90deg);
-      }
-      50% {
-        transform: translate(25px, -35px) scale(1.08) rotate(-180deg);
-      }
-      75% {
-        transform: translate(-20px, -15px) scale(0.98) rotate(-270deg);
-      }
-    }
-
-    @keyframes floatComplex3 {
-      0%, 100% {
-        transform: translate(-50%, -50%) scale(1) rotate(0deg);
-      }
-      25% {
-        transform: translate(-50%, -40%) scale(1.08) rotate(45deg);
-      }
-      50% {
-        transform: translate(-60%, -50%) scale(0.95) rotate(90deg);
-      }
-      75% {
-        transform: translate(-40%, -60%) scale(1.05) rotate(135deg);
-      }
-    }
-
-    @keyframes cardEnter {
-      from {
-        opacity: 0;
-        transform: translateY(24px) scale(0.98);
-        filter: blur(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-        filter: blur(0);
-      }
-    }
-
-    @keyframes pageEnter {
-      from {
-        opacity: 0;
-        transform: translateY(24px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes pulse {
-      0%, 100% {
-        transform: scale(1);
-        box-shadow: 0 0 0 0 rgba(0, 255, 133, 0.4);
-      }
-      50% {
-        transform: scale(1.05);
-        box-shadow: 0 0 0 10px rgba(0, 255, 133, 0);
-      }
-    }
-
-    .detail-row:last-child {
-      border-bottom: none;
-    }
-
-    /* Responsive */
-    @media (max-width: 560px) {
-      .user-bar {
-        padding: 10px 16px;
-      }
+    @media (max-width: 480px) {
       .container {
-        padding: 30px 16px 40px;
+        padding: 30px 20px;
       }
+
       h1 {
-        font-size: 1.4rem;
+        font-size: 22px;
       }
-      .success-circle {
-        width: 60px;
-        height: 60px;
-      }
-      .success-circle i {
-        font-size: 28px;
-      }
+
       .btn-row {
         flex-direction: column;
       }
-      .order-details {
-        padding: 18px;
-      }
-      .detail-row {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 4px;
-      }
+    }
+
+    /* PREMIUM GLASSMORPHIC USER-BAR */
+    .user-bar {
+      position: fixed !important;
+      top: 14px !important;
+      left: 50% !important;
+      transform: translateX(-50%) !important;
+      max-width: 720px !important;
+      width: calc(100% - 28px) !important;
+      background: linear-gradient(135deg, rgba(30,35,50,0.8), rgba(25,30,45,0.77)) !important;
+      backdrop-filter: blur(16px) saturate(160%) !important;
+      border-radius: 20px !important;
+      padding: 12px 20px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      z-index: 999 !important;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.12) !important;
+      border: 1px solid rgba(255,255,255,0.08) !important;
+    }
+
+    .user-info {
+      display: flex !important;
+      align-items: center !important;
+      gap: 10px !important;
+    }
+
+    .user-avatar {
+      width: 48px !important;
+      height: 48px !important;
+      border-radius: 12px !important;
+      background: linear-gradient(135deg, rgba(255,140,0,0.5), rgba(255,160,20,0.45)) !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      color: #f5e6d3 !important;
+      font-weight: 800 !important;
+      font-size: 18px !important;
+      box-shadow: 0 0 20px rgba(255,160,0,0.4) !important;
+      border: 1px solid rgba(255,255,255,0.1) !important;
+    }
+
+    .user-text {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 2px !important;
+    }
+
+    .user-name {
+      color: #f5e6d3 !important;
+      font-weight: 700 !important;
+      font-size: 13px !important;
+      letter-spacing: 0.04em !important;
+    }
+
+    .user-email {
+      color: #aeb5c4 !important;
+      font-size: 11px !important;
+      letter-spacing: 0.02em !important;
+    }
+
+    .logout-btn {
+      background: linear-gradient(135deg, rgba(0,200,150,0.3), rgba(0,180,140,0.25)) !important;
+      border: 1px solid rgba(0,220,170,0.3) !important;
+      color: #00d9a3 !important;
+      padding: 8px 16px !important;
+      border-radius: 10px !important;
+      font-size: 12px !important;
+      font-weight: 700 !important;
+      cursor: pointer !important;
+      transition: all 200ms ease !important;
+      box-shadow: 0 0 16px rgba(0,220,170,0.35) !important;
+      letter-spacing: 0.04em !important;
+      text-transform: uppercase !important;
+    }
+
+    .logout-btn:hover {
+      background: linear-gradient(135deg, rgba(0,220,170,0.4), rgba(0,200,150,0.35)) !important;
+      box-shadow: 0 0 24px rgba(0,220,170,0.5) !important;
+      transform: translateY(-1px) !important;
+    }
+
+    .logout-btn:active {
+      transform: scale(0.98) !important;
+    }
+
+    /* Adjust container for fixed header */
+    .page-with-header {
+      margin-top: 82px !important;
     }
   </style>
 </head>
 <body>
 
-<!-- Floating circle decorations -->
-<div class="bg-circle-1"></div>
-<div class="bg-circle-2"></div>
-<div class="bg-circle-3"></div>
-
-<div class="user-bar">
-  <div class="user-info">
-    <div class="user-avatar">🍔</div>
-    <div class="user-text">
-      <div class="user-name">FOOD POINT</div>
-      <div class="user-email">premium taste</div>
+  <div class="user-bar">
+    <div class="user-info">
+      <div class="user-avatar">FP</div>
+      <div class="user-text">
+        <div class="user-name">Food Point</div>
+        <div class="user-email">Thank you</div>
+      </div>
     </div>
-  </div>
-  <button class="logout-btn" onclick="location.href='menu.html'"><i class="fas fa-utensils"></i> Home</button>
-</div>
-
-<div class="container page-with-header">
-  <div class="success-circle">
-    <i class="fas fa-check"></i>
-  </div>
-  <h1>Payment Successful!</h1>
-  <p class="sub-text">Thank you for your order</p>
-
-  <div class="info-box">
-    <i class="fas fa-receipt"></i> Your payment has been confirmed. Get ready to enjoy!
-  </div>
-
-  <div class="order-details">
-    <div class="order-title">
-      <i class="fas fa-tag"></i> ORDER SUMMARY
+      <button class="logout-btn" onclick="location.href='menu.html'">Home</button>
     </div>
 
-    <div class="detail-row">
-      <span class="detail-label"><i class="far fa-hashtag"></i> Order ID:</span>
-      <span class="detail-value" id="orderId">#FP-001</span>
+    <div class="container page-with-header">
+      <div class="success-circle">
+        <i class="fas fa-check"></i>
+      </div>
+      <h1>Payment Successful!</h1>
+      <p class="sub-text">Thank you for your purchase.</p>
+
+      <div class="info-box">
+        Your payment has been successfully processed.
+      </div>
+
+      <div class="order-details">
+        <div class="order-title">Order Details</div>
+
+        <div class="detail-row">
+          <span class="detail-label">Order ID:</span>
+          <span class="detail-value" id="orderId">#001</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="detail-label">Date:</span>
+          <span class="detail-value" id="orderDate">1 December 2025</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="detail-label">Amount Paid:</span>
+          <span class="detail-value" id="amountPaid">₹175</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="detail-label">Payment Method:</span>
+          <span class="detail-value" id="paymentMethod">online / cash</span>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="location.href='menu.html'">
+          <i class="fas fa-home"></i> GO HOME
+        </button>
+
+        <button class="btn btn-outline" onclick="location.href='orders.html'">
+          <i class="fas fa-lock"></i> VIEW ORDERS
+        </button>
+      </div>
+
+      <p class="help-text">
+        Need help? <a href="tel:+918095248273">Call us </a>
+      </p>
     </div>
 
-    <div class="detail-row">
-      <span class="detail-label"><i class="far fa-calendar-alt"></i> Date:</span>
-      <span class="detail-value" id="orderDate">December 18, 2025</span>
-    </div>
-
-    <div class="detail-row">
-      <span class="detail-label"><i class="fas fa-rupee-sign"></i> Amount Paid:</span>
-      <span class="detail-value" id="amountPaid">₹0.00</span>
-    </div>
-
-    <div class="detail-row">
-      <span class="detail-label"><i class="fas fa-credit-card"></i> Payment Method:</span>
-      <span class="detail-value" id="paymentMethod">UPI / Cash</span>
-    </div>
-  </div>
-
-  <div class="btn-row">
-    <button class="btn btn-primary" onclick="location.href='menu.html'">
-      <i class="fas fa-home"></i> Back to Menu
-    </button>
-
-    <button class="btn btn-outline" onclick="location.href='orders.html'">
-      <i class="fas fa-clipboard-list"></i> My Orders
-    </button>
-  </div>
-
-  <p class="help-text">
-    <i class="fas fa-headset"></i> Need assistance? <a href="tel:+918095248273">Call Support</a>
-  </p>
-</div>
-
-<script>
-  (function() {
-    // ------ KEYS (compatible with payment page flow) ------
+  <script>
     const COUNTER_KEY = "orderCounterDaily";
-    const ORDERS_KEY   = "ordersHistory";
-
-    function getCurrentUser() {
-      try {
-        const raw = localStorage.getItem("fp_current_user");
-        return raw ? JSON.parse(raw) : null;
-      } catch(e) { return null; }
-    }
-
-    function getUserSpecificKey(baseKey) {
-      const user = getCurrentUser();
-      return user && user.id ? baseKey + "_" + user.id : baseKey;
-    }
+    const ORDERS_KEY  = "ordersHistory";
 
     function getOrdersStorageKey() {
       const CURRENT_USER_KEY = "fp_current_user";
@@ -908,199 +474,148 @@
       return ORDERS_KEY;
     }
 
-    function getShopStatus() {
-      return localStorage.getItem('shopStatus') || 'open';
-    }
-
-    function enforceOpenStore() {
-      if (getShopStatus() === 'closed') {
-        window.location.replace('index.html');
-        return true;
-      }
-      return false;
-    }
-
-    function formatINR(amountRaw) {
-      let numeric = 0;
-      if (typeof amountRaw === 'number') numeric = amountRaw;
-      else if (typeof amountRaw === 'string') {
-        const cleaned = amountRaw.replace(/[₹, ]+/g, '');
-        numeric = parseFloat(cleaned);
-        if (isNaN(numeric)) numeric = 0;
-      } else numeric = 0;
-      return '₹' + numeric.toFixed(2);
-    }
-
     function applyOrderToUI(order) {
-      if (order.id) document.getElementById("orderId").innerText = order.id;
-      if (order.date) document.getElementById("orderDate").innerText = order.date;
-      if (order.amount) document.getElementById("amountPaid").innerHTML = formatINR(order.amount);
-      if (order.method) document.getElementById("paymentMethod").innerText = order.method;
+      document.getElementById("orderId").textContent      = order.id || "#001";
+      document.getElementById("orderDate").textContent    = order.date || "";
+      document.getElementById("amountPaid").textContent   = order.amount || "₹0.00";
+      document.getElementById("paymentMethod").textContent = order.method || "";
     }
 
-    // ------ create fresh order from justPaid flag or retrieve latest ------
-    function buildNewOrderFromStorage() {
-      const now = new Date();
-      const dateOptions = { year: "numeric", month: "long", day: "numeric" };
-      const dateText = now.toLocaleDateString("en-IN", dateOptions);
-      const timeText = now.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
-
-      // get amount from payment page (set by payment-flow)
-      let storedAmount = localStorage.getItem(getUserSpecificKey("amountPaid")) || localStorage.getItem(getUserSpecificKey("amountPaidNumeric")) || "₹0.00";
-      let numericAmount = 0;
-      if (typeof storedAmount === 'string') {
-        const parsed = parseFloat(storedAmount.replace(/[₹, ]+/g, ''));
-        numericAmount = isNaN(parsed) ? 0 : parsed;
-      } else if (typeof storedAmount === 'number') numericAmount = storedAmount;
-      
-      const method = localStorage.getItem(getUserSpecificKey("paymentMethod")) || "Online UPI";
-      const displayAmount = (numericAmount > 0) ? '₹' + numericAmount.toFixed(2) : storedAmount;
-
-      // generate order ID sequential (daily)
-      const todayKey = now.toISOString().slice(0, 10);
-      let counterData = { date: todayKey, last: 0 };
+    document.addEventListener("DOMContentLoaded", () => {
+      const storageKey = getOrdersStorageKey();
+      let history = [];
       try {
-        const storedCounter = localStorage.getItem(COUNTER_KEY);
-        if (storedCounter) {
-          const parsed = JSON.parse(storedCounter);
-          if (parsed.date === todayKey) counterData = parsed;
+        history = JSON.parse(localStorage.getItem(storageKey) || "[]");
+      } catch (e) {
+        history = [];
+      }
+
+      const justPaid = localStorage.getItem("justPaid") === "1";
+
+      if (justPaid) {
+        // New payment → create a new order
+        const now = new Date();
+        const todayKey = now.toISOString().slice(0, 10);
+
+        let counterData = { date: todayKey, last: 0 };
+        try {
+          const stored = localStorage.getItem(COUNTER_KEY);
+          if (stored) {
+            const parsed = JSON.parse(stored);
+            if (parsed.date === todayKey) {
+              counterData = parsed;
+            }
+          }
+        } catch (e) {}
+
+        counterData.last = (counterData.last || 0) + 1;
+        localStorage.setItem(COUNTER_KEY, JSON.stringify(counterData));
+
+        const orderNumber = counterData.last;
+        const orderId = "#" + String(orderNumber).padStart(3, "0") + "-" + String(Date.now()).slice(-6);
+        const timeText = now.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
+
+        const dateOptions = { year: "numeric", month: "long", day: "numeric" };
+        const dateText = now.toLocaleDateString("en-IN", dateOptions);
+
+        const amountPaid = localStorage.getItem("amountPaid") || "₹149.99";
+        const method     = localStorage.getItem("paymentMethod") || "online";
+
+        // Build items array by preferring modern keys (cartItems, selectedFoods_v1)
+        let items = [];
+        try {
+          const rawCart = localStorage.getItem('cartItems');
+          if (rawCart) {
+            const parsed = JSON.parse(rawCart);
+            if (Array.isArray(parsed) && parsed.length) {
+              items = parsed.map(it => (typeof it === 'string') ? it : (it.name || it.title || String(it)));
+            }
+          }
+        } catch (e) { items = []; }
+
+        if (!items.length) {
+          try {
+            const v1 = JSON.parse(localStorage.getItem('selectedFoods_v1') || '[]');
+            if (Array.isArray(v1) && v1.length) {
+              items = v1.map(it => (typeof it === 'string') ? it : (it.name || it.title || String(it)));
+            }
+          } catch (e) { /* ignore */ }
         }
-      } catch(e) {}
-      counterData.last = (counterData.last || 0) + 1;
-      localStorage.setItem(COUNTER_KEY, JSON.stringify(counterData));
-      const orderNumber = counterData.last;
-      const orderId = "#FP" + String(orderNumber).padStart(4, "0") + "-" + String(Date.now()).slice(-4);
 
-      // build items list (for future orders page, we preserve)
-      let items = [];
-      try {
-        const cartRaw = localStorage.getItem(getUserSpecificKey('cartItems'));
-        if (cartRaw) {
-          const parsed = JSON.parse(cartRaw);
-          if (Array.isArray(parsed) && parsed.length) {
-            items = parsed.map(it => (typeof it === 'object' ? (it.name || it.title || 'Item') : String(it)));
+        if (!items.length) {
+          try {
+            const legacy = JSON.parse(localStorage.getItem('selectedFoods') || '[]');
+            if (Array.isArray(legacy) && legacy.length) items = legacy;
+          } catch (e) { /* ignore */ }
+        }
+
+        const parcelSelected = localStorage.getItem("parcelSelected") === "true";
+
+        // Get current user for customer name
+        let customerName = 'Walk-in';
+        try {
+          const userRaw = localStorage.getItem("fp_current_user");
+          if (userRaw) {
+            const user = JSON.parse(userRaw);
+            if (user && user.name) {
+              customerName = user.name;
+            }
+          }
+        } catch (e) { /* ignore */ }
+
+        const newOrder = {
+          id: orderId,
+          date: dateText,
+          time: timeText,
+          amount: amountPaid,
+          method,
+          items,
+          parcelSelected,
+          customerName,
+          status: 'new',
+          createdAt: now.toISOString(),
+          updatedAt: now.toISOString()
+        };
+
+        history.push(newOrder);
+        localStorage.setItem(storageKey, JSON.stringify(history));
+
+        if (storageKey !== ORDERS_KEY) {
+          try {
+            const globalHistory = JSON.parse(localStorage.getItem(ORDERS_KEY) || "[]");
+            globalHistory.push(newOrder);
+            localStorage.setItem(ORDERS_KEY, JSON.stringify(globalHistory));
+          } catch (e) {
+            // ignore if global history cannot be persisted
           }
         }
-      } catch(e) {}
-      if (!items.length) {
-        try {
-          const v1 = JSON.parse(localStorage.getItem(getUserSpecificKey('selectedFoods_v1')) || '[]');
-          if (Array.isArray(v1) && v1.length) items = v1.map(it => typeof it === 'object' ? (it.name || 'Item') : it);
-        } catch(e) {}
-      }
-      if (!items.length) {
-        try {
-          const legacy = JSON.parse(localStorage.getItem(getUserSpecificKey('selectedFoods')) || '[]');
-          if (Array.isArray(legacy) && legacy.length) items = legacy;
-        } catch(e) {}
-      }
-      
-      let customerName = 'Guest';
-      try {
-        const userRaw = localStorage.getItem("fp_current_user");
-        if (userRaw) {
-          const user = JSON.parse(userRaw);
-          if (user && user.name) customerName = user.name;
-        }
-      } catch(e) {}
 
-      const newOrder = {
-        id: orderId,
-        date: dateText,
-        time: timeText,
-        amount: displayAmount,
-        amountNumeric: numericAmount,
-        method: method,
-        items: items,
-        customerName: customerName,
-        status: 'new',
-        createdAt: now.toISOString()
-      };
-      return newOrder;
-    }
+        // show this order
+        applyOrderToUI(newOrder);
 
-    // ----- main execution -----
-    const justPaidFlag = localStorage.getItem(getUserSpecificKey("justPaid")) === "1";
-    if (enforceOpenStore()) return;
-    const storageKey = getOrdersStorageKey();
-    let history = [];
-
-    try {
-      const rawHistory = localStorage.getItem(storageKey);
-      history = rawHistory ? JSON.parse(rawHistory) : [];
-    } catch(e) { history = []; }
-
-    if (justPaidFlag) {
-      // fresh order created after successful payment
-      const freshOrder = buildNewOrderFromStorage();
-      // add to user-specific history
-      history.push(freshOrder);
-      localStorage.setItem(storageKey, JSON.stringify(history));
-      
-      // also sync to global ordersHistory (for admin/fallback)
-      try {
-        const globalHistory = JSON.parse(localStorage.getItem(ORDERS_KEY) || "[]");
-        globalHistory.push(freshOrder);
-        localStorage.setItem(ORDERS_KEY, JSON.stringify(globalHistory));
-      } catch(e) {}
-
-      // display fresh order
-      applyOrderToUI(freshOrder);
-
-      // clear cart & payment flags after creating order (preserve justPaid reset)
-      localStorage.removeItem("selectedFoods");
-      localStorage.removeItem("selectedFoods_v1");
-      localStorage.removeItem(getUserSpecificKey("cartItems"));
-      localStorage.removeItem(getUserSpecificKey("parcelSelected"));
-      localStorage.setItem(getUserSpecificKey("justPaid"), "0");
-    } 
-    else {
-      // No fresh payment — show the most recent order from history (if any)
-      if (history.length > 0) {
-        const lastOrder = history[history.length - 1];
-        applyOrderToUI(lastOrder);
-      } 
-      else {
-        // fallback: attempt to pull from localStorage fields set by payment page
-        let fallbackAmount = localStorage.getItem("amountPaid") || "₹149.00";
-        let fallbackMethod = localStorage.getItem("paymentMethod") || "Cash / UPI";
-        let fallbackDate = new Date().toLocaleDateString("en-IN", { year: "numeric", month: "long", day: "numeric" });
-        let fallbackId = "#FP" + Math.floor(Math.random() * 1000);
-        applyOrderToUI({
-          id: fallbackId,
-          date: fallbackDate,
-          amount: fallbackAmount,
-          method: fallbackMethod
-        });
-      }
-    }
-
-    // Additional polish: if amount displays as ₹0.00 due to missing numeric, try to recover from amountPaidNumeric
-    const amountEl = document.getElementById("amountPaid");
-    if (amountEl && (amountEl.innerText === "₹0.00" || amountEl.innerText === "₹0.0")) {
-      const numericFallback = localStorage.getItem("amountPaidNumeric");
-      if (numericFallback && !isNaN(parseFloat(numericFallback))) {
-        const val = parseFloat(numericFallback);
-        if (val > 0) amountEl.innerText = '₹' + val.toFixed(2);
+        // clear cart for next order (clean up both legacy and modern keys)
+        localStorage.removeItem("selectedFoods");
+        localStorage.removeItem("selectedFoods_v1");
+        localStorage.removeItem("cartItems");
+        localStorage.setItem("justPaid", "0");
       } else {
-        const rawAmount = localStorage.getItem("amountPaid");
-        if (rawAmount && rawAmount !== "₹0.00") {
-          const cleaned = rawAmount.replace(/[₹, ]+/g, '');
-          const num = parseFloat(cleaned);
-          if (!isNaN(num) && num > 0) amountEl.innerText = '₹' + num.toFixed(2);
+        // Not coming directly from payment page → show latest order (if any)
+        if (history.length) {
+          const lastOrder = history[history.length - 1];
+          applyOrderToUI(lastOrder);
+        } else {
+          // nothing in history, best-effort from storage
+          const amountPaid = localStorage.getItem("amountPaid") || "₹149.99";
+          const method     = localStorage.getItem("paymentMethod") || "online";
+          applyOrderToUI({
+            id: "#001",
+            date: new Date().toLocaleDateString("en-IN", { year: "numeric", month: "long", day: "numeric" }),
+            amount: amountPaid,
+            method
+          });
         }
       }
-    }
-
-    // final clean: sync method display if needed
-    const methodEl = document.getElementById("paymentMethod");
-    const rawMethod = localStorage.getItem("paymentMethod");
-    if (rawMethod && methodEl && (methodEl.innerText === "UPI / Cash" || methodEl.innerText === "online / cash")) {
-      if (rawMethod === "online") methodEl.innerText = "Online UPI";
-      else if (rawMethod === "cash") methodEl.innerText = "Cash on Delivery";
-      else methodEl.innerText = rawMethod;
-    }
-  })();
-</script>
+    });
+  </script>
 </body>
 </html>

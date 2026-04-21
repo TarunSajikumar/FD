@@ -1525,20 +1525,7 @@
       });
     }
 
-    function getShopStatus() {
-      return localStorage.getItem('shopStatus') || 'open';
-    }
-
-    function enforceOpenStore() {
-      if (getShopStatus() === 'closed') {
-        window.location.replace('index.html');
-        return true;
-      }
-      return false;
-    }
-
     function init(){
-      if (enforceOpenStore()) return;
       loadSelected();
       renderCategories();
       renderFoodItems();

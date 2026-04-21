@@ -858,18 +858,6 @@
   function safeGet(key) { try { return localStorage.getItem(getUserSpecificKey(key)); } catch(e) { return null; } }
   function safeSet(key, val) { try { localStorage.setItem(getUserSpecificKey(key), String(val)); } catch(e) {} }
 
-  function getShopStatus() {
-    return localStorage.getItem('shopStatus') || 'open';
-  }
-
-  function enforceOpenStore() {
-    if (getShopStatus() === 'closed') {
-      window.location.replace('index.html');
-      return true;
-    }
-    return false;
-  }
-
   // Get current amount from storage (priority: amountPaidNumeric, amountPaid, cartItems calculation)
   function getCurrentAmount() {
     // first check numeric amount stored by cart
@@ -941,7 +929,6 @@
 
   // ----- UI initialization & event binding -----
   document.addEventListener('DOMContentLoaded', () => {
-    if (enforceOpenStore()) return;
     // display the correct amount from cart or saved data
     const amountSpan = document.getElementById('amountValue');
     if (amountSpan) {

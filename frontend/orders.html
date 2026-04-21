@@ -799,18 +799,6 @@
   <script>
     const ORDERS_KEY = "ordersHistory";
 
-    function getShopStatus() {
-      return localStorage.getItem('shopStatus') || 'open';
-    }
-
-    function enforceOpenStore() {
-      if (getShopStatus() === 'closed') {
-        window.location.replace('index.html');
-        return true;
-      }
-      return false;
-    }
-
     function getOrdersStorageKey() {
       const CURRENT_USER_KEY = "fp_current_user";
       const userRaw = localStorage.getItem(CURRENT_USER_KEY);
@@ -1044,7 +1032,6 @@
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-      if (enforceOpenStore()) return;
       populateSampleOrdersIfEmpty();
       updateUserDisplay();
       renderOrders();

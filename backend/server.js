@@ -27,6 +27,7 @@ const DATA_DIR = path.join(__dirname, 'data');
 const USERS_FILE = path.join(DATA_DIR, 'users.json');
 const MENU_FILE = path.join(DATA_DIR, 'menu.json');
 const ORDERS_FILE = path.join(DATA_DIR, 'orders.json');
+const SHOP_STATUS_FILE = path.join(DATA_DIR, 'shop-status.json');
 
 // MongoDB Schemas (only used when not using local storage)
 let User, MenuItem, Order;
@@ -549,6 +550,44 @@ app.post(`${API_BASE}/auth/signup`, async (req, res) => {
   }
 });
 
+// Shop status endpoints
+app.get(`${API_BASE}/shop/status`, async (req, res) => {
+  try {
+    if (USE_LOCAL_STORAGE) {
+      const statusData = await loadJson(SHOP_STATUS_FILE);
+      res.json(statusData);
+    } else {
+      // For MongoDB, you could store this in a settings collection
+      // For now, return a default value
+      res.json({ status: 'open' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch shop status' });
+  }
+});
+
+app.put(`${API_BASE}/shop/status`, requireAuth, requireOwner, async (req, res) => {
+  try {
+    const { status } = req.body;
+    if (!['open', 'closed'].includes(status)) {
+      return res.status(400).json({ error: 'Invalid status. Must be open or closed' });
+    }
+
+    if (USE_LOCAL_STORAGE) {
+      const statusData = { status };
+      await saveJson(SHOP_STATUS_FILE, statusData);
+      res.json(statusData);
+      io.emit('shopStatusChanged', statusData);
+    } else {
+      // For MongoDB, you could store this in a settings collection
+      res.json({ status });
+      io.emit('shopStatusChanged', { status });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update shop status' });
+  }
+});
+
 // Socket.IO setup
 io.use((socket, next) => {
   const token = socket.handshake.auth?.token;
@@ -639,6 +678,7 @@ async function start() {
         }
       ]);
       await ensureFile(ORDERS_FILE, []);
+      await ensureFile(SHOP_STATUS_FILE, { status: 'open' });
       console.log('Local storage files initialized');
     }
 

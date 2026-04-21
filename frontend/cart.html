@@ -1067,18 +1067,6 @@ function formatCurrency(n) {
   return '₹' + Number(n).toFixed(2);
 }
 
-function getShopStatus() {
-  return localStorage.getItem('shopStatus') || 'open';
-}
-
-function enforceOpenStore() {
-  if (getShopStatus() === 'closed') {
-    window.location.replace('index.html');
-    return true;
-  }
-  return false;
-}
-
 /* ---------- Read / Write ---------- */
 let storageKey = readCartStorageKey();
 
@@ -1314,7 +1302,6 @@ parcelCheckbox.addEventListener('change', updateSummary);
 (function boot(){
   // choose correct storageKey (re-evaluate at boot)
   storageKey = readCartStorageKey();
-  if (enforceOpenStore()) return;
   
   // update parcel label with dynamic charge
   const parcelLabel = document.getElementById('parcelLabel');

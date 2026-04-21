@@ -1,3 +1,4 @@
-// Placeholder frontend helper for legacy page script references.
-// Actual API requests are handled through fp-fetch-proxy.js.
-console.log('frontend api.js stub loaded');
+// Re-export from actual implementation
+import api from './fp-fetch-proxy.js';
+window.api = api;
+console.log('frontend api.js loaded (proxy to fp-fetch-proxy.js)');
