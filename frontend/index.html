@@ -4,9 +4,24 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Food Point</title>
-  <meta http-equiv="refresh" content="0;url=login.html" />
 </head>
-<body>
-  <p>Redirecting to <a href="login.html">login</a>…</p>
+<body style="font-family:Segoe UI, Tahoma, Geneva, Verdana, sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#020617;color:#f8fafc;margin:0;">
+  <main style="text-align:center;padding:24px;max-width:420px;">
+    <h1 style="font-size:2rem;margin-bottom:1rem;color:#fbbf24;">Food Point</h1>
+    <p style="margin-bottom:1.5rem;color:#cbd5e1;">Welcome to Food Point. Use the button below to sign in or create an account.</p>
+    <a href="login.html" style="display:inline-block;padding:12px 24px;border-radius:999px;background:#f59e0b;color:#111827;text-decoration:none;font-weight:700;">Go to Login</a>
+  </main>
+  <script>
+    const shopStatus = localStorage.getItem('shopStatus') || 'open';
+    if (shopStatus === 'closed') {
+      const main = document.querySelector('main');
+      if (main) {
+        const closedMessage = document.createElement('p');
+        closedMessage.textContent = 'Shop is currently closed. Please visit again once the owner reopens it.';
+        closedMessage.style.cssText = 'margin-bottom:1rem;color:#f87171;font-weight:700;';
+        main.insertBefore(closedMessage, main.firstChild);
+      }
+    }
+  </script>
 </body>
 </html>

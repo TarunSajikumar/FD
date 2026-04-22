@@ -1421,8 +1421,6 @@
       cursor: not-allowed;
       transform: none !important;
     }
-      display: block;
-    }
 
     /* Menu Item in Manage Modal */
     .menu-item {
@@ -1779,6 +1777,133 @@
       }
     }
   </style>
+
+  <style>
+    /* Toast notification enhancements */
+    .notification-toast {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: var(--bg-elevated);
+      border-left: 4px solid var(--accent-green);
+      border-radius: var(--radius-lg);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      z-index: 1100;
+      transform: translateX(400px);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+    }
+
+    .notification-toast:hover {
+      transform: translateX(0) scale(1.02);
+      box-shadow: 0 15px 40px rgba(0, 255, 133, 0.2);
+    }
+
+    /* Sound toggle button */
+    .sound-toggle {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      padding: 8px 12px;
+      border-radius: 100px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .sound-toggle.active {
+      border-color: var(--accent-green);
+      color: var(--accent-green);
+    }
+  </style>
+
+  <style>
+    /* Orders controls enhancements */
+    .orders-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .date-range-filter {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .date-range-filter label {
+      font-size: 13px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .date-input {
+      padding: 6px 10px;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      font-size: 13px;
+    }
+
+    .search-filter {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .search-input {
+      flex: 1;
+      min-width: 200px;
+      padding: 8px 12px;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      font-size: 14px;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+    }
+
+    .action-btn.small {
+      padding: 6px 12px;
+      font-size: 12px;
+      height: auto;
+    }
+
+    @media (max-width: 768px) {
+      .orders-controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .date-range-filter {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+      }
+      
+      .search-filter {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .search-input {
+        min-width: auto;
+      }
+    }
+  </style>
 </head>
 <body>
   <!-- Floating circle decorations -->
@@ -1810,6 +1935,9 @@
           </button>
           <button class="action-btn danger" id="clearDataBtn">
             <i class="fas fa-trash"></i> Clear Data
+          </button>
+          <button class="action-btn" id="soundToggleBtn">
+            <i class="fas fa-volume-up"></i> <span id="soundStatus">🔔 On</span>
           </button>
           <div id="ownerAuthStatus" style="display:flex;align-items:center;gap:8px;margin-left:8px;">
             <div id="ownerAuthLabel" style="font-size:13px;color:var(--text-muted)">Not connected</div>
@@ -1889,6 +2017,26 @@
               <button class="filter-btn" data-filter="completed">
                 <i class="fas fa-check"></i> Completed
               </button>
+            </div>
+            <div class="orders-controls">
+              <div class="date-range-filter">
+                <label for="startDate">From:</label>
+                <input type="date" id="startDate" class="date-input">
+                <label for="endDate">To:</label>
+                <input type="date" id="endDate" class="date-input">
+                <button class="action-btn small" id="applyDateFilter">
+                  <i class="fas fa-filter"></i> Filter
+                </button>
+                <button class="action-btn small secondary" id="clearDateFilter">
+                  <i class="fas fa-times"></i> Clear
+                </button>
+              </div>
+              <div class="search-filter">
+                <input type="text" id="orderSearch" placeholder="Search orders..." class="search-input">
+                <button class="action-btn small" id="searchBtn">
+                  <i class="fas fa-search"></i>
+                </button>
+              </div>
             </div>
           </div>
           
@@ -2498,6 +2646,18 @@
       newOrdersCount = parseInt(localStorage.getItem(NEW_ORDERS_COUNT_KEY) || "0");
       updateNewOrdersBadge();
 
+      // Initialize sound toggle
+      updateSoundToggleUI();
+
+      // Initialize date and search filters
+      const startDate = localStorage.getItem('fp_order_start_date') || '';
+      const endDate = localStorage.getItem('fp_order_end_date') || '';
+      const searchTerm = localStorage.getItem('fp_order_search') || '';
+      
+      document.getElementById("startDate").value = startDate;
+      document.getElementById("endDate").value = endDate;
+      document.getElementById("orderSearch").value = searchTerm;
+
       // Load orders
       loadOrdersForOwner();
 
@@ -2566,6 +2726,9 @@
       // Clear data button
       document.getElementById("clearDataBtn").addEventListener("click", clearAllData);
 
+      // Sound toggle button
+      document.getElementById("soundToggleBtn").addEventListener("click", toggleSoundNotifications);
+
       // Manage menu button
       document.getElementById("manageMenuBtn").addEventListener("click", openManageMenuModal);
 
@@ -2597,6 +2760,19 @@
           this.classList.add("active");
           filterOrders(this.dataset.filter);
         });
+      });
+
+      // Date filter buttons
+      document.getElementById("applyDateFilter").addEventListener("click", applyDateFilter);
+      document.getElementById("clearDateFilter").addEventListener("click", clearDateFilter);
+
+      // Search functionality
+      document.getElementById("searchBtn").addEventListener("click", performOrderSearch);
+      document.getElementById("orderSearch").addEventListener("input", debounce(performOrderSearch, 300));
+      document.getElementById("orderSearch").addEventListener("keypress", function(e) {
+        if (e.key === 'Enter') {
+          performOrderSearch();
+        }
       });
 
       // Analytics tab buttons
@@ -2860,6 +3036,7 @@
       
       let filteredOrders = orders;
       
+      // Apply status filter
       switch(filter) {
         case 'new':
           filteredOrders = orders.filter(order => 
@@ -2877,7 +3054,117 @@
         // 'all' shows all orders
       }
       
+      // Apply date filter if set
+      const startDateStr = localStorage.getItem('fp_order_start_date');
+      const endDateStr = localStorage.getItem('fp_order_end_date');
+      
+      if (startDateStr || endDateStr) {
+        filteredOrders = filteredOrders.filter(order => {
+          if (!order.date) return false;
+          
+          const orderDate = new Date(order.date);
+          const startDate = startDateStr ? new Date(startDateStr) : null;
+          const endDate = endDateStr ? new Date(endDateStr) : null;
+          
+          // Set end date to end of day
+          if (endDate) {
+            endDate.setHours(23, 59, 59, 999);
+          }
+          
+          if (startDate && endDate) {
+            return orderDate >= startDate && orderDate <= endDate;
+          } else if (startDate) {
+            return orderDate >= startDate;
+          } else if (endDate) {
+            return orderDate <= endDate;
+          }
+          
+          return true;
+        });
+      }
+      
+      // Apply search filter if set
+      const searchTerm = localStorage.getItem('fp_order_search');
+      if (searchTerm) {
+        filteredOrders = filteredOrders.filter(order => {
+          const searchFields = [
+            order.id?.toString(),
+            order.customerName,
+            order.items?.map(item => typeof item === 'string' ? item : item.name).join(' '),
+            order.method,
+            order.provider,
+            order.amount?.toString(),
+            order.date
+          ].filter(Boolean).join(' ').toLowerCase();
+          
+          return searchFields.includes(searchTerm);
+        });
+      }
+      
       renderOrders(filteredOrders);
+    }
+
+    // Date filtering functions
+    function applyDateFilter() {
+      const startDate = document.getElementById("startDate").value;
+      const endDate = document.getElementById("endDate").value;
+      
+      if (!startDate && !endDate) {
+        showNotification("Date Filter", "Please select at least one date.", "warning");
+        return;
+      }
+      
+      // Store filter dates
+      localStorage.setItem('fp_order_start_date', startDate);
+      localStorage.setItem('fp_order_end_date', endDate);
+      
+      // Apply current filter with date constraints
+      const activeFilter = document.querySelector(".filter-btn.active").dataset.filter;
+      filterOrders(activeFilter);
+      
+      showNotification("Date Filter Applied", "Orders filtered by selected date range.", "success");
+    }
+
+    function clearDateFilter() {
+      document.getElementById("startDate").value = "";
+      document.getElementById("endDate").value = "";
+      localStorage.removeItem('fp_order_start_date');
+      localStorage.removeItem('fp_order_end_date');
+      
+      // Re-apply current filter without date constraints
+      const activeFilter = document.querySelector(".filter-btn.active").dataset.filter;
+      filterOrders(activeFilter);
+      
+      showNotification("Date Filter Cleared", "Showing all orders in current filter.", "info");
+    }
+
+    // Search functionality
+    function performOrderSearch() {
+      const searchTerm = document.getElementById("orderSearch").value.toLowerCase().trim();
+      
+      // Store search term
+      localStorage.setItem('fp_order_search', searchTerm);
+      
+      // Apply current filter with search
+      const activeFilter = document.querySelector(".filter-btn.active").dataset.filter;
+      filterOrders(activeFilter);
+      
+      if (searchTerm) {
+        showNotification("Search Applied", `Searching for: "${searchTerm}"`, "info");
+      }
+    }
+
+    // Utility function for debouncing
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
     }
 
     function completeOrder(orderId) {
@@ -3266,6 +3553,51 @@
       }
     }
 
+    // Sound notification toggle
+    function toggleSoundNotifications() {
+      const soundEnabled = localStorage.getItem('fp_sound_enabled') !== 'false';
+      const newState = !soundEnabled;
+      localStorage.setItem('fp_sound_enabled', newState.toString());
+      updateSoundToggleUI();
+      showNotification("Sound Notifications", newState ? "Enabled" : "Disabled", "info");
+    }
+
+    function updateSoundToggleUI() {
+      const soundEnabled = localStorage.getItem('fp_sound_enabled') !== 'false';
+      const btn = document.getElementById('soundToggleBtn');
+      const status = document.getElementById('soundStatus');
+      if (btn && status) {
+        btn.classList.toggle('active', soundEnabled);
+        status.textContent = soundEnabled ? '🔔 On' : '🔕 Off';
+      }
+    }
+
+    function playNotificationSound() {
+      if (localStorage.getItem('fp_sound_enabled') !== 'false') {
+        try {
+          // Create a simple beep sound using Web Audio API
+          const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          const oscillator = audioContext.createOscillator();
+          const gainNode = audioContext.createGain();
+          
+          oscillator.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+          
+          oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+          oscillator.frequency.setValueAtTime(600, audioContext.currentTime + 0.1);
+          
+          gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+          
+          oscillator.start(audioContext.currentTime);
+          oscillator.stop(audioContext.currentTime + 0.3);
+        } catch (e) {
+          // Fallback: try to play a system beep or just log
+          console.log('Notification sound played');
+        }
+      }
+    }
+
     function startOrderChecker() {
       // Clear existing interval
       if (orderCheckInterval) clearInterval(orderCheckInterval);
@@ -3279,6 +3611,7 @@
         if (newOrdersCount > prevCount) {
           if (document.getElementById("autoNotificationsInput")?.checked) {
             showNotification("New Order Received!", `${newOrdersCount - prevCount} new order(s) waiting.`, "info");
+            playNotificationSound();
           }
           const activeFilter = document.querySelector(".filter-btn.active");
           if (activeFilter) {
@@ -3305,6 +3638,48 @@
           updateAnalytics();
         }
       });
+    }
+
+    // Notification toast functions
+    function showNotification(title, message, type = 'info') {
+      const toast = document.getElementById('notificationToast');
+      const titleEl = document.getElementById('notificationTitle');
+      const messageEl = document.getElementById('notificationMessage');
+      
+      if (!toast || !titleEl || !messageEl) return;
+      
+      titleEl.textContent = title;
+      messageEl.textContent = message;
+      
+      // Update styling based on type
+      toast.className = 'notification-toast';
+      if (type === 'success') {
+        toast.style.borderLeftColor = 'var(--accent-green)';
+      } else if (type === 'error') {
+        toast.style.borderLeftColor = 'var(--accent-red)';
+      } else if (type === 'warning') {
+        toast.style.borderLeftColor = 'var(--accent-orange)';
+      } else {
+        toast.style.borderLeftColor = 'var(--accent-blue)';
+      }
+      
+      toast.style.display = 'flex';
+      toast.style.transform = 'translateX(0)';
+      
+      // Auto-hide after 5 seconds
+      setTimeout(() => {
+        hideNotification();
+      }, 5000);
+    }
+
+    function hideNotification() {
+      const toast = document.getElementById('notificationToast');
+      if (toast) {
+        toast.style.transform = 'translateX(400px)';
+        setTimeout(() => {
+          toast.style.display = 'none';
+        }, 300);
+      }
     }
 
     function startTimeUpdater() {
@@ -4252,5 +4627,19 @@
       });
     });
   </script>
+
+  <!-- Notification Toast -->
+  <div id="notificationToast" class="notification-toast" style="display: none;">
+    <div class="notification-icon">
+      <i class="fas fa-bell"></i>
+    </div>
+    <div class="notification-content">
+      <div class="notification-title" id="notificationTitle"></div>
+      <div class="notification-message" id="notificationMessage"></div>
+    </div>
+    <button class="notification-close" onclick="hideNotification()">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
 </body>
 </html>
