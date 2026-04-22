@@ -463,6 +463,13 @@
       box-shadow: 0 12px 28px rgba(0, 255, 133, 0.25), inset 0 0 15px rgba(0, 255, 133, 0.08);
     }
 
+    .pay-option.selected {
+      border-color: var(--accent-green);
+      background: linear-gradient(135deg, rgba(0, 255, 133, 0.1), rgba(0, 255, 133, 0.05));
+      box-shadow: 0 12px 28px rgba(0, 255, 133, 0.25), inset 0 0 15px rgba(0, 255, 133, 0.08);
+      transform: translateX(6px) scale(1.02);
+    }
+
     .pay-option-left {
       display: flex;
       align-items: center;
@@ -835,6 +842,42 @@
   <h3>💳 PAYMENT</h3>
   <p class="pay-sub">Choose your preferred method</p>
 
+  <!-- Payment Methods -->
+  <div class="pay-methods" id="payMethods">
+    <div class="pay-option" onclick="selectPaymentMethod('cash')">
+      <div class="pay-option-left">
+        <i class="fas fa-money-bill-wave"></i>
+        <div>
+          <div class="pay-option-title">Cash on Delivery</div>
+          <div class="pay-option-desc">Pay when your order arrives</div>
+        </div>
+      </div>
+      <i class="fas fa-chevron-right pay-option-arrow"></i>
+    </div>
+
+    <div class="pay-option" onclick="selectPaymentMethod('upi')">
+      <div class="pay-option-left">
+        <i class="fas fa-qrcode"></i>
+        <div>
+          <div class="pay-option-title">UPI Payment</div>
+          <div class="pay-option-desc">Google Pay, PhonePe, Paytm</div>
+        </div>
+      </div>
+      <i class="fas fa-chevron-right pay-option-arrow"></i>
+    </div>
+
+    <div class="pay-option" onclick="selectPaymentMethod('card')">
+      <div class="pay-option-left">
+        <i class="fas fa-credit-card"></i>
+        <div>
+          <div class="pay-option-title">Credit/Debit Card</div>
+          <div class="pay-option-desc">Visa, Mastercard, RuPay</div>
+        </div>
+      </div>
+      <i class="fas fa-chevron-right pay-option-arrow"></i>
+    </div>
+  </div>
+
   <div class="amount-box">
     <div class="amount-label">TOTAL AMOUNT</div>
     <div id="amountValue" class="amount-value">₹0.00</div>
@@ -922,6 +965,29 @@
     }
   }
 
+  // ----- Payment method selection -----
+  let selectedPaymentMethod = 'cash'; // default
+  
+  function selectPaymentMethod(method) {
+    selectedPaymentMethod = method;
+    
+    // Update UI - highlight selected option
+    const options = document.querySelectorAll('.pay-option');
+    options.forEach(opt => opt.classList.remove('selected'));
+    
+    // Find and highlight the clicked option
+    const payMethods = document.getElementById('payMethods');
+    if (payMethods) {
+      const methodIndex = method === 'cash' ? 0 : (method === 'upi' ? 1 : 2);
+      if (payMethods.children[methodIndex]) {
+        payMethods.children[methodIndex].classList.add('selected');
+      }
+    }
+    
+    // Store selection
+    safeSet('paymentMethod', method);
+  }
+
   // ----- Payment method handler (single button to payment.html) -----
   function proceedToPayment() {
     // get latest amount and store
@@ -954,6 +1020,10 @@
         safeSet('amountPaid', displayAmount);
       }
     }
+
+    // Initialize payment methods
+    const storedMethod = safeGet('paymentMethod') || 'cash';
+    selectPaymentMethod(storedMethod);
 
     // bind click events for payment button
     const proceedBtn = document.querySelector('.proceed-btn');
