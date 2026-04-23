@@ -4,807 +4,428 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Food Point — Order Fresh, Eat Happy</title>
-  <meta name="description" content="Food Point is your go-to campus food ordering platform. Browse the menu, order in seconds, and track your food — all in one place." />
+  <meta name="description" content="Food Point campus food ordering. Browse menu, order in seconds." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <script src="fp-config.js"></script>
   <style>
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --amber:     #f59e0b;
-      --amber-l:   #fbbf24;
-      --amber-d:   #d97706;
-      --green:     #22c55e;
-      --blue:      #3b82f6;
-      --red:       #ef4444;
-      --bg:        #020617;
-      --bg2:       #0f172a;
-      --bg3:       #111827;
-      --surface:   rgba(15, 23, 42, 0.85);
-      --border:    rgba(255, 255, 255, 0.10);
-      --text:      #f9fafb;
-      --muted:     #9ca3af;
-      --radius-lg: 28px;
-      --radius-md: 16px;
-      --radius-sm: 10px;
+      --amber: #f59e0b; --amber-l: #fbbf24; --amber-d: #d97706;
+      --green: #22c55e; --red: #ef4444; --blue: #3b82f6;
+      --bg: #020617; --bg2: #0f172a;
+      --surface: rgba(15,23,42,0.85);
+      --border: rgba(255,255,255,0.10);
+      --text: #f9fafb; --muted: #9ca3af;
     }
-
     html { scroll-behavior: smooth; }
+    body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; }
 
-    body {
-      font-family: 'Inter', system-ui, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    /* ── Animated Background ── */
-    .bg-canvas {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-    }
-
+    /* ── Background ── */
+    .bg-canvas { position:fixed; inset:0; z-index:0; pointer-events:none; }
     .bg-canvas::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(ellipse 80% 60% at 20% 40%, rgba(245,158,11,.14) 0%, transparent 60%),
-        radial-gradient(ellipse 60% 50% at 80% 70%, rgba(34,197,94,.09) 0%, transparent 55%),
-        radial-gradient(ellipse 50% 40% at 60% 10%, rgba(59,130,246,.09) 0%, transparent 50%);
+      content:''; position:absolute; inset:0;
+      background: radial-gradient(ellipse 80% 60% at 20% 40%, rgba(245,158,11,.13) 0%, transparent 60%),
+                  radial-gradient(ellipse 60% 50% at 80% 70%, rgba(34,197,94,.08) 0%, transparent 55%),
+                  radial-gradient(ellipse 50% 40% at 60% 10%, rgba(59,130,246,.08) 0%, transparent 50%);
       animation: bgPulse 18s ease-in-out infinite;
     }
-
-    @keyframes bgPulse {
-      0%, 100% { opacity: 1; }
-      50%       { opacity: .7; }
-    }
-
+    @keyframes bgPulse { 0%,100%{opacity:1} 50%{opacity:.7} }
     .bg-canvas::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-image:
-        linear-gradient(0deg,  rgba(255,255,255,.018) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
-      background-size: 52px 52px;
+      content:''; position:absolute; inset:0;
+      background-image: linear-gradient(0deg,rgba(255,255,255,.018) 1px,transparent 1px),
+                        linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);
+      background-size:52px 52px;
       animation: gridDrift 25s linear infinite;
     }
-
-    @keyframes gridDrift {
-      0%   { transform: translateY(0); }
-      100% { transform: translateY(52px); }
-    }
-
-    /* Floating orbs */
-    .orb {
-      position: fixed;
-      border-radius: 50%;
-      filter: blur(70px);
-      pointer-events: none;
-      z-index: 0;
-    }
-    .orb-1 { width: 500px; height: 500px; background: radial-gradient(circle, var(--amber) 0%, transparent 70%); top: -160px; right: -120px; opacity: .055; animation: orb1 28s ease-in-out infinite; }
-    .orb-2 { width: 420px; height: 420px; background: radial-gradient(circle, var(--green) 0%, transparent 70%); bottom: -80px; left: -80px; opacity: .04;  animation: orb2 33s ease-in-out infinite reverse; }
-    .orb-3 { width: 320px; height: 320px; background: radial-gradient(circle, var(--blue) 0%, transparent 70%);  top: 55%; left: 5%; opacity: .038; animation: orb3 40s ease-in-out infinite; }
-
-    @keyframes orb1 { 0%,100%{transform:translate(0,0) scale(1)} 25%{transform:translate(-40px,-50px) scale(1.06)} 75%{transform:translate(30px,30px) scale(.96)} }
-    @keyframes orb2 { 0%,100%{transform:translate(0,0) scale(1)} 33%{transform:translate(60px,-40px) scale(1.08)} 66%{transform:translate(-30px,50px) scale(.98)} }
-    @keyframes orb3 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-70px)} }
+    @keyframes gridDrift { 0%{transform:translateY(0)} 100%{transform:translateY(52px)} }
+    .orb { position:fixed; border-radius:50%; filter:blur(70px); pointer-events:none; z-index:0; }
+    .orb-1 { width:500px;height:500px;background:radial-gradient(circle,var(--amber) 0%,transparent 70%);top:-160px;right:-120px;opacity:.055;animation:orb1 28s ease-in-out infinite; }
+    .orb-2 { width:420px;height:420px;background:radial-gradient(circle,var(--green) 0%,transparent 70%);bottom:-80px;left:-80px;opacity:.04;animation:orb2 33s ease-in-out infinite reverse; }
+    @keyframes orb1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-40px,-60px)} }
+    @keyframes orb2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(50px,-40px)} }
 
     /* ── Nav ── */
     nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 18px 32px;
-      background: rgba(2, 6, 23, .6);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border);
-      animation: navSlide .6s ease-out both;
+      position:fixed; top:0;left:0;right:0; z-index:100;
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      padding:16px 28px;
+      background:rgba(2,6,23,.65); backdrop-filter:blur(20px);
+      border-bottom:1px solid var(--border);
+      animation:navSlide .6s ease-out both; flex-wrap:wrap;
     }
-
-    @keyframes navSlide {
-      from { opacity: 0; transform: translateY(-20px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    .nav-brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      text-decoration: none;
-    }
-
+    @keyframes navSlide { from{opacity:0;transform:translateY(-20px)} to{opacity:1;transform:translateY(0)} }
+    .nav-brand { display:flex;align-items:center;gap:10px;text-decoration:none; }
     .nav-logo {
-      width: 36px; height: 36px;
-      background: linear-gradient(135deg, var(--amber), var(--amber-d));
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px;
-      box-shadow: 0 4px 16px rgba(245,158,11,.35);
-      animation: logoPulse 3s ease-in-out infinite;
+      width:36px;height:36px;background:linear-gradient(135deg,var(--amber),var(--amber-d));
+      border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;
+      box-shadow:0 4px 16px rgba(245,158,11,.35);animation:logoPulse 3s ease-in-out infinite;
     }
-
-    @keyframes logoPulse {
-      0%,100% { box-shadow: 0 4px 16px rgba(245,158,11,.35); }
-      50%      { box-shadow: 0 4px 28px rgba(245,158,11,.6);  }
-    }
-
+    @keyframes logoPulse { 0%,100%{box-shadow:0 4px 16px rgba(245,158,11,.35)} 50%{box-shadow:0 4px 28px rgba(245,158,11,.6)} }
     .nav-wordmark {
-      font-size: 18px;
-      font-weight: 800;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      background: linear-gradient(135deg, var(--amber-l), var(--amber-d));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      font-size:17px;font-weight:800;letter-spacing:2px;text-transform:uppercase;
+      background:linear-gradient(135deg,var(--amber-l),var(--amber-d));
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
     }
-
+    .nav-right { display:flex;align-items:center;gap:10px;flex-wrap:wrap; }
     .nav-status {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 13px;
-      font-weight: 600;
-      padding: 6px 14px;
-      border-radius: 999px;
-      border: 1.5px solid;
-      transition: all .3s ease;
+      display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;
+      padding:6px 14px;border-radius:999px;border:1.5px solid;transition:all .3s ease;
     }
+    .nav-status.open   { color:var(--green);border-color:rgba(34,197,94,.3);background:rgba(34,197,94,.08); }
+    .nav-status.closed { color:var(--red);border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.08); }
+    .nav-status.loading{ color:var(--muted);border-color:rgba(156,163,175,.2);background:rgba(156,163,175,.06); }
+    .status-dot { width:7px;height:7px;border-radius:50%;flex-shrink:0; }
+    .open .status-dot   { background:var(--green);animation:blink 1.6s ease-in-out infinite; }
+    .closed .status-dot { background:var(--red); }
+    .loading .status-dot{ background:var(--muted);animation:blink 1s ease-in-out infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.25} }
 
-    .nav-status.open   { color: var(--green); border-color: rgba(34,197,94,.3); background: rgba(34,197,94,.08); }
-    .nav-status.closed { color: var(--red);   border-color: rgba(239,68,68,.3);  background: rgba(239,68,68,.08);  }
-    .nav-status.loading{ color: var(--muted); border-color: rgba(156,163,175,.2); background: rgba(156,163,175,.06); }
-
-    .status-dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      flex-shrink: 0;
+    .nav-owner-btn {
+      display:inline-flex;align-items:center;gap:7px;
+      padding:7px 16px;border-radius:999px;font-size:12px;font-weight:700;
+      background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.14);
+      color:var(--muted);text-decoration:none;cursor:pointer;
+      transition:all .3s cubic-bezier(.34,1.56,.64,1);
     }
-    .open   .status-dot { background: var(--green); animation: blink 1.6s ease-in-out infinite; }
-    .closed .status-dot { background: var(--red); }
-    .loading .status-dot { background: var(--muted); animation: blink 1s ease-in-out infinite; }
-
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+    .nav-owner-btn:hover {
+      background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.4);
+      color:var(--amber-l);transform:translateY(-2px);
+    }
 
     /* ── Hero ── */
     .hero {
-      position: relative;
-      z-index: 1;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 120px 24px 80px;
-      gap: 0;
+      position:relative;z-index:1;min-height:100vh;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      text-align:center;padding:120px 24px 100px;
     }
-
     .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 18px;
-      border-radius: 999px;
-      background: rgba(245,158,11,.1);
-      border: 1.5px solid rgba(245,158,11,.25);
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--amber-l);
-      margin-bottom: 28px;
-      animation: fadeUp .7s ease-out .1s both;
+      display:inline-flex;align-items:center;gap:8px;padding:8px 18px;
+      border-radius:999px;background:rgba(245,158,11,.1);border:1.5px solid rgba(245,158,11,.25);
+      font-size:13px;font-weight:600;color:var(--amber-l);margin-bottom:28px;
+      animation:fadeUp .7s ease-out .1s both;
     }
-
-    .hero-badge i { font-size: 11px; }
-
     .hero-title {
-      font-size: clamp(2.6rem, 7vw, 5rem);
-      font-weight: 900;
-      line-height: 1.08;
-      letter-spacing: -1.5px;
-      margin-bottom: 22px;
-      animation: fadeUp .7s ease-out .2s both;
+      font-size:clamp(2.4rem,7vw,4.8rem);font-weight:900;line-height:1.08;
+      letter-spacing:-1.5px;margin-bottom:22px;animation:fadeUp .7s ease-out .2s both;
     }
-
     .hero-title .accent {
-      background: linear-gradient(135deg, var(--amber-l) 0%, var(--amber-d) 50%, #fde68a 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      display: inline-block;
-      animation: gradientShift 4s ease-in-out infinite alternate;
-      filter: drop-shadow(0 0 28px rgba(245,158,11,.4));
+      background:linear-gradient(135deg,var(--amber-l) 0%,var(--amber-d) 50%,#fde68a 100%);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+      filter:drop-shadow(0 0 28px rgba(245,158,11,.4));
     }
-
-    @keyframes gradientShift {
-      from { filter: drop-shadow(0 0 20px rgba(245,158,11,.35)); }
-      to   { filter: drop-shadow(0 0 40px rgba(245,158,11,.65)); }
-    }
-
     .hero-sub {
-      max-width: 520px;
-      font-size: clamp(1rem, 2.5vw, 1.15rem);
-      line-height: 1.7;
-      color: #cbd5e1;
-      margin-bottom: 44px;
-      animation: fadeUp .7s ease-out .3s both;
+      max-width:500px;font-size:clamp(1rem,2.5vw,1.12rem);line-height:1.7;
+      color:#cbd5e1;margin-bottom:44px;animation:fadeUp .7s ease-out .3s both;
     }
 
-    .cta-group {
-      display: flex;
-      gap: 16px;
-      flex-wrap: wrap;
-      justify-content: center;
-      animation: fadeUp .7s ease-out .45s both;
+    /* Closed notice inline */
+    .closed-notice {
+      display:none;align-items:center;gap:12px;
+      padding:14px 22px;border-radius:14px;margin-bottom:28px;
+      background:rgba(239,68,68,.1);border:1.5px solid rgba(239,68,68,.3);
+      color:#fca5a5;font-size:14px;font-weight:600;max-width:480px;
+      animation:fadeUp .5s ease-out both;
     }
+    .closed-notice.show { display:flex; }
+    .closed-notice i { font-size:20px;color:var(--red);flex-shrink:0; }
+
+    /* CTA group */
+    .cta-group { display:flex;gap:14px;flex-wrap:wrap;justify-content:center;animation:fadeUp .7s ease-out .45s both; }
 
     .btn-primary {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 16px 34px;
-      border-radius: 999px;
-      background: linear-gradient(135deg, var(--amber) 0%, var(--amber-d) 100%);
-      color: #111;
-      font-size: 15px;
-      font-weight: 800;
-      text-decoration: none;
-      cursor: pointer;
-      border: none;
-      position: relative;
-      overflow: hidden;
-      transition: all .35s cubic-bezier(.34,1.56,.64,1);
-      box-shadow: 0 16px 48px rgba(245,158,11,.45), 0 0 30px rgba(245,158,11,.2);
+      display:inline-flex;align-items:center;gap:10px;padding:16px 34px;
+      border-radius:999px;background:linear-gradient(135deg,var(--amber) 0%,var(--amber-d) 100%);
+      color:#111;font-size:15px;font-weight:800;text-decoration:none;cursor:pointer;border:none;
+      position:relative;overflow:hidden;
+      transition:all .35s cubic-bezier(.34,1.56,.64,1);
+      box-shadow:0 16px 48px rgba(245,158,11,.45),0 0 30px rgba(245,158,11,.2);
     }
-
     .btn-primary::before {
-      content: '';
-      position: absolute;
-      top: 0; left: -100%;
-      width: 100%; height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,.28), transparent);
-      transition: left .55s ease;
+      content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;
+      background:linear-gradient(90deg,transparent,rgba(255,255,255,.28),transparent);
+      transition:left .55s ease;
     }
-
-    .btn-primary:hover::before { left: 100%; }
-    .btn-primary:hover {
-      transform: translateY(-5px) scale(1.04);
-      box-shadow: 0 24px 60px rgba(245,158,11,.55), 0 0 40px rgba(245,158,11,.3);
+    .btn-primary:hover::before { left:100%; }
+    .btn-primary:hover { transform:translateY(-5px) scale(1.04);box-shadow:0 24px 60px rgba(245,158,11,.55); }
+    .btn-primary:active { transform:translateY(-2px) scale(1.01); }
+    .btn-primary.disabled {
+      opacity:.45;cursor:not-allowed;pointer-events:none;
+      box-shadow:0 8px 24px rgba(245,158,11,.15);
     }
-    .btn-primary:active { transform: translateY(-2px) scale(1.01); }
 
     .btn-secondary {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 16px 30px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.05);
-      color: var(--text);
-      font-size: 15px;
-      font-weight: 700;
-      text-decoration: none;
-      border: 1.5px solid rgba(255,255,255,.15);
-      transition: all .3s cubic-bezier(.34,1.56,.64,1);
-      backdrop-filter: blur(8px);
+      display:inline-flex;align-items:center;gap:10px;padding:16px 30px;
+      border-radius:999px;background:rgba(255,255,255,.05);color:var(--text);
+      font-size:15px;font-weight:700;text-decoration:none;
+      border:1.5px solid rgba(255,255,255,.15);
+      transition:all .3s cubic-bezier(.34,1.56,.64,1);backdrop-filter:blur(8px);
     }
-
     .btn-secondary:hover {
-      background: rgba(255,255,255,.09);
-      border-color: rgba(245,158,11,.4);
-      color: var(--amber-l);
-      transform: translateY(-4px);
-      box-shadow: 0 12px 30px rgba(0,0,0,.3);
+      background:rgba(255,255,255,.09);border-color:rgba(245,158,11,.4);
+      color:var(--amber-l);transform:translateY(-4px);
     }
 
-    /* ── Scroll indicator ── */
-    .scroll-hint {
-      position: absolute;
-      bottom: 36px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      color: var(--muted);
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      animation: fadeUp .7s ease-out .8s both;
-      cursor: default;
-    }
-
-    .scroll-hint i { animation: bounce 2s ease-in-out infinite; }
-
-    @keyframes bounce {
-      0%,100% { transform: translateY(0); }
-      50%      { transform: translateY(6px); }
-    }
-
-    /* ── Hero Visual — floating food cards ── */
+    /* Floating food cards */
     .hero-visual {
-      position: relative;
-      width: min(420px, 90vw);
-      height: 260px;
-      margin: 44px auto 0;
-      animation: fadeUp .7s ease-out .55s both;
+      position:relative;width:min(420px,90vw);height:260px;
+      margin:44px auto 0;animation:fadeUp .7s ease-out .55s both;
     }
-
     .food-card {
-      position: absolute;
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-md);
-      backdrop-filter: blur(16px);
-      padding: 14px 18px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      box-shadow: 0 20px 56px rgba(0,0,0,.5);
-      transition: transform .3s ease;
-      white-space: nowrap;
+      position:absolute;background:var(--surface);border:1.5px solid var(--border);
+      border-radius:16px;backdrop-filter:blur(16px);padding:14px 18px;
+      display:flex;align-items:center;gap:12px;
+      box-shadow:0 20px 56px rgba(0,0,0,.5);white-space:nowrap;
+      transition:transform .3s ease;
     }
-
-    .food-card:hover { transform: translateY(-4px) !important; }
-
-    .food-card-1 { top: 0;    left: 0;   animation: floatCard1 6s ease-in-out infinite; }
-    .food-card-2 { top: 30px; right: 0;  animation: floatCard2 7s ease-in-out infinite .5s; }
-    .food-card-3 { bottom: 0; left: 50%; transform: translateX(-50%); animation: floatCard3 8s ease-in-out infinite 1s; }
-
-    @keyframes floatCard1 { 0%,100%{transform:translateY(0)}   50%{transform:translateY(-12px)} }
-    @keyframes floatCard2 { 0%,100%{transform:translateY(0)}   50%{transform:translateY(-16px)} }
-    @keyframes floatCard3 { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(-10px)} }
-
-    .food-emoji { font-size: 28px; }
-
-    .food-info { display: flex; flex-direction: column; }
-    .food-name  { font-size: 13px; font-weight: 700; }
-    .food-price { font-size: 12px; color: var(--amber-l); font-weight: 600; }
-
+    .food-card:hover { transform:translateY(-4px) !important; }
+    .food-card-1 { top:0;left:0;animation:fc1 6s ease-in-out infinite; }
+    .food-card-2 { top:30px;right:0;animation:fc2 7s ease-in-out infinite .5s; }
+    .food-card-3 { bottom:0;left:50%;transform:translateX(-50%);animation:fc3 8s ease-in-out infinite 1s; }
+    @keyframes fc1 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+    @keyframes fc2 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-16px)} }
+    @keyframes fc3 { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(-10px)} }
+    .food-emoji { font-size:28px; }
+    .food-info { display:flex;flex-direction:column; }
+    .food-name  { font-size:13px;font-weight:700; }
+    .food-price { font-size:12px;color:var(--amber-l);font-weight:600; }
     .food-badge {
-      margin-left: auto;
-      padding: 4px 10px;
-      border-radius: 999px;
-      background: rgba(34,197,94,.15);
-      border: 1px solid rgba(34,197,94,.25);
-      color: var(--green);
-      font-size: 10px;
-      font-weight: 700;
+      margin-left:auto;padding:4px 10px;border-radius:999px;
+      background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.25);
+      color:var(--green);font-size:10px;font-weight:700;
     }
 
-    /* ── Divider ── */
-    .section-divider {
-      position: relative;
-      z-index: 1;
-      text-align: center;
-      padding: 0 24px 80px;
-    }
-
-    .divider-line {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      max-width: 600px;
-      margin: 0 auto 60px;
-      color: var(--muted);
-      font-size: 12px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-    }
-    .divider-line::before, .divider-line::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,.12), transparent);
-    }
-
-    /* ── Features ── */
-    .features {
-      position: relative;
-      z-index: 1;
-      padding: 0 24px 100px;
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-
-    .section-label {
-      text-align: center;
-      margin-bottom: 12px;
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: var(--amber);
-      animation: fadeUp .6s ease-out both;
-    }
-
-    .section-title {
-      text-align: center;
-      font-size: clamp(1.6rem, 4vw, 2.4rem);
-      font-weight: 800;
-      margin-bottom: 16px;
-      letter-spacing: -.5px;
-      animation: fadeUp .6s ease-out .1s both;
-    }
-
-    .section-sub {
-      text-align: center;
-      color: var(--muted);
-      font-size: 15px;
-      max-width: 480px;
-      margin: 0 auto 52px;
-      line-height: 1.7;
-      animation: fadeUp .6s ease-out .2s both;
-    }
-
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 20px;
-    }
-
+    /* Features */
+    .features { position:relative;z-index:1;padding:40px 24px 100px;max-width:1100px;margin:0 auto; }
+    .section-label { text-align:center;margin-bottom:10px;font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--amber); }
+    .section-title { text-align:center;font-size:clamp(1.5rem,4vw,2.3rem);font-weight:800;margin-bottom:14px;letter-spacing:-.5px; }
+    .section-sub { text-align:center;color:var(--muted);font-size:15px;max-width:460px;margin:0 auto 48px;line-height:1.7; }
+    .features-grid { display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px; }
     .feature-card {
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 32px 28px;
-      backdrop-filter: blur(16px);
-      position: relative;
-      overflow: hidden;
-      transition: all .35s cubic-bezier(.34,1.56,.64,1);
-      animation: fadeUp .6s ease-out both;
+      background:var(--surface);border:1.5px solid var(--border);border-radius:24px;
+      padding:28px 24px;backdrop-filter:blur(16px);position:relative;overflow:hidden;
+      transition:all .35s cubic-bezier(.34,1.56,.64,1);animation:fadeUp .6s ease-out both;
     }
-
-    .feature-card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at top left, var(--card-color, rgba(245,158,11,.08)), transparent 55%);
-      opacity: 0;
-      transition: opacity .35s ease;
-    }
-
-    .feature-card:hover { transform: translateY(-8px); border-color: rgba(255,255,255,.2); box-shadow: 0 24px 64px rgba(0,0,0,.45); }
-    .feature-card:hover::before { opacity: 1; }
-
+    .feature-card:hover { transform:translateY(-8px);border-color:rgba(255,255,255,.2);box-shadow:0 24px 64px rgba(0,0,0,.45); }
     .feature-icon {
-      width: 52px; height: 52px;
-      border-radius: 14px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 22px;
-      margin-bottom: 20px;
-      position: relative;
-      z-index: 1;
+      width:50px;height:50px;border-radius:13px;display:flex;align-items:center;justify-content:center;
+      font-size:20px;margin-bottom:18px;
+    }
+    .fi-amber { background:rgba(245,158,11,.15);color:var(--amber);border:1.5px solid rgba(245,158,11,.2); }
+    .fi-green { background:rgba(34,197,94,.12);color:var(--green);border:1.5px solid rgba(34,197,94,.2); }
+    .fi-blue  { background:rgba(59,130,246,.12);color:var(--blue);border:1.5px solid rgba(59,130,246,.2); }
+    .feature-title { font-size:16px;font-weight:700;margin-bottom:7px; }
+    .feature-desc  { font-size:13px;color:var(--muted);line-height:1.65; }
+
+    /* Bottom CTA */
+    .bottom-cta { position:relative;z-index:1;text-align:center;padding:0 24px 80px; }
+    .divider-line {
+      display:flex;align-items:center;gap:16px;max-width:500px;margin:0 auto 48px;
+      color:var(--muted);font-size:12px;letter-spacing:2px;text-transform:uppercase;
+    }
+    .divider-line::before,.divider-line::after {
+      content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent);
     }
 
-    .feature-icon.amber { background: rgba(245,158,11,.15); color: var(--amber);  border: 1.5px solid rgba(245,158,11,.2); }
-    .feature-icon.green { background: rgba(34,197,94,.12);  color: var(--green);  border: 1.5px solid rgba(34,197,94,.2);  }
-    .feature-icon.blue  { background: rgba(59,130,246,.12); color: var(--blue);   border: 1.5px solid rgba(59,130,246,.2); }
-    .feature-icon.pink  { background: rgba(244,114,182,.12); color: #f472b6;      border: 1.5px solid rgba(244,114,182,.2); }
+    footer { position:relative;z-index:1;text-align:center;padding:28px 24px;border-top:1px solid var(--border);color:var(--muted);font-size:13px; }
+    footer span { color:var(--amber);font-weight:700; }
 
-    .feature-title { font-size: 17px; font-weight: 700; margin-bottom: 8px; position: relative; z-index: 1; }
-    .feature-desc  { font-size: 14px; color: var(--muted); line-height: 1.65; position: relative; z-index: 1; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
 
-    /* ── Stats strip ── */
-    .stats-strip {
-      position: relative;
-      z-index: 1;
-      background: linear-gradient(135deg, rgba(245,158,11,.06) 0%, rgba(34,197,94,.04) 100%);
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      padding: 48px 24px;
-      margin-bottom: 80px;
-    }
-
-    .stats-inner {
-      max-width: 800px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-around;
-      flex-wrap: wrap;
-      gap: 32px;
-    }
-
-    .stat-item {
-      text-align: center;
-      animation: fadeUp .6s ease-out both;
-    }
-
-    .stat-value {
-      font-size: 2.4rem;
-      font-weight: 900;
-      background: linear-gradient(135deg, var(--amber-l), var(--amber-d));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      line-height: 1;
-      margin-bottom: 6px;
-    }
-
-    .stat-label { font-size: 13px; color: var(--muted); font-weight: 600; }
-
-    /* ── Closed banner ── */
-    #closedBanner {
-      position: fixed;
-      bottom: 24px; left: 50%;
-      transform: translateX(-50%) translateY(100px);
-      z-index: 200;
-      background: linear-gradient(135deg, rgba(239,68,68,.15), rgba(220,38,38,.1));
-      border: 1.5px solid rgba(239,68,68,.3);
-      border-radius: var(--radius-md);
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 16px 24px;
-      backdrop-filter: blur(16px);
-      font-size: 14px;
-      font-weight: 600;
-      color: #fca5a5;
-      box-shadow: 0 16px 48px rgba(0,0,0,.5);
-      max-width: 480px;
-      width: 90%;
-      transition: transform .5s cubic-bezier(.34,1.56,.64,1);
-    }
-
-    #closedBanner.show { transform: translateX(-50%) translateY(0); }
-    #closedBanner i { font-size: 22px; color: var(--red); flex-shrink: 0; }
-
-    /* ── Footer ── */
-    footer {
-      position: relative;
-      z-index: 1;
-      text-align: center;
-      padding: 32px 24px;
-      border-top: 1px solid var(--border);
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    footer span { color: var(--amber); font-weight: 700; }
-
-    /* ── Animations ── */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(28px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    /* ── Responsive ── */
-    @media (max-width: 640px) {
-      nav { padding: 14px 18px; }
-      .nav-wordmark { font-size: 15px; }
-      .hero { padding-top: 100px; }
-      .cta-group { flex-direction: column; align-items: center; }
-      .btn-primary, .btn-secondary { width: 100%; max-width: 300px; justify-content: center; }
+    @media(max-width:640px) {
+      nav { padding:12px 16px; }
+      .hero { padding-top:100px; }
+      .cta-group { flex-direction:column;align-items:center; }
+      .btn-primary,.btn-secondary { width:100%;max-width:300px;justify-content:center; }
     }
   </style>
 </head>
 <body>
 
-<!-- Background -->
 <div class="bg-canvas"></div>
 <div class="orb orb-1"></div>
 <div class="orb orb-2"></div>
-<div class="orb orb-3"></div>
 
-<!-- ── Navigation ── -->
+<!-- ── Nav ── -->
 <nav>
   <a href="index.html" class="nav-brand">
     <div class="nav-logo">🍔</div>
     <span class="nav-wordmark">Food Point</span>
   </a>
-  <div id="shopStatusBadge" class="nav-status loading">
-    <span class="status-dot"></span>
-    <span id="shopStatusText">Checking…</span>
+  <div class="nav-right">
+    <div id="shopStatusBadge" class="nav-status loading">
+      <span class="status-dot"></span>
+      <span id="shopStatusText">Checking…</span>
+    </div>
+    <a href="owner-dashboard.html" class="nav-owner-btn" id="ownerNavBtn">
+      <i class="fas fa-lock"></i> Owner
+    </a>
   </div>
 </nav>
 
 <!-- ── Hero ── -->
 <section class="hero">
-  <div class="hero-badge">
-    <i class="fas fa-bolt"></i>
-    Fast · Fresh · Delivered to you
+  <div class="hero-badge"><i class="fas fa-bolt"></i> Fast · Fresh · Delivered to you</div>
+
+  <h1 class="hero-title">Hungry?<br>Order from <span class="accent">Food Point</span></h1>
+
+  <p class="hero-sub">Browse our full menu, place your order in seconds, and pay the way you want. Your food is just a tap away.</p>
+
+  <!-- Closed notice (shown only when shop is closed) -->
+  <div class="closed-notice" id="closedNotice">
+    <i class="fas fa-store-slash"></i>
+    <div>
+      <strong>Shop is currently closed.</strong><br>
+      <span style="font-weight:400;font-size:13px;">Ordering is disabled. You can still browse the menu.</span>
+    </div>
   </div>
-
-  <h1 class="hero-title">
-    Hungry?<br>
-    Order from <span class="accent">Food Point</span>
-  </h1>
-
-  <p class="hero-sub">
-    Browse our full menu, place your order in seconds, and pay the way you want.
-    Your food is just a tap away.
-  </p>
 
   <div class="cta-group">
-    <a href="login.html" class="btn-primary" id="ctaOrderBtn">
-      <i class="fas fa-utensils"></i>
-      Order Now
+    <!-- Order Now: disabled when closed -->
+    <a href="login.html" class="btn-primary" id="orderNowBtn">
+      <i class="fas fa-utensils"></i> Order Now
     </a>
-    <a href="menu.html" class="btn-secondary">
-      <i class="fas fa-list"></i>
-      View Menu
+    <!-- View Menu: always works -->
+    <a href="menu.html" class="btn-secondary" id="viewMenuBtn">
+      <i class="fas fa-list"></i> View Menu
     </a>
   </div>
 
-  <!-- Floating food preview cards -->
+  <!-- Floating food cards -->
   <div class="hero-visual" aria-hidden="true">
     <div class="food-card food-card-1">
       <span class="food-emoji">🍔</span>
-      <div class="food-info">
-        <span class="food-name">Classic Burger</span>
-        <span class="food-price">₹149.99</span>
-      </div>
+      <div class="food-info"><span class="food-name">Classic Burger</span><span class="food-price">₹149.99</span></div>
       <span class="food-badge">Popular</span>
     </div>
     <div class="food-card food-card-2">
       <span class="food-emoji">🌯</span>
-      <div class="food-info">
-        <span class="food-name">Paneer Wrap</span>
-        <span class="food-price">₹129.99</span>
-      </div>
+      <div class="food-info"><span class="food-name">Paneer Wrap</span><span class="food-price">₹129.99</span></div>
       <span class="food-badge">New</span>
     </div>
     <div class="food-card food-card-3">
       <span class="food-emoji">🥭</span>
-      <div class="food-info">
-        <span class="food-name">Mango Lassi</span>
-        <span class="food-price">₹79.99</span>
-      </div>
+      <div class="food-info"><span class="food-name">Mango Lassi</span><span class="food-price">₹79.99</span></div>
       <span class="food-badge">Fresh</span>
     </div>
   </div>
-
-  <div class="scroll-hint">
-    <span>Discover more</span>
-    <i class="fas fa-chevron-down"></i>
-  </div>
 </section>
-
-<!-- ── Stats ── -->
-<div class="stats-strip">
-  <div class="stats-inner">
-    <div class="stat-item" style="animation-delay:.05s">
-      <div class="stat-value">3+</div>
-      <div class="stat-label">Menu Items</div>
-    </div>
-    <div class="stat-item" style="animation-delay:.15s">
-      <div class="stat-value">⚡</div>
-      <div class="stat-label">Instant Orders</div>
-    </div>
-    <div class="stat-item" style="animation-delay:.25s">
-      <div class="stat-value">2</div>
-      <div class="stat-label">Payment Methods</div>
-    </div>
-    <div class="stat-item" style="animation-delay:.35s">
-      <div class="stat-value">24/7</div>
-      <div class="stat-label">Order History</div>
-    </div>
-  </div>
-</div>
 
 <!-- ── Features ── -->
 <section class="features">
   <p class="section-label">Why Food Point?</p>
-  <h2 class="section-title">Everything you need,<br>nothing you don't</h2>
+  <h2 class="section-title">Everything you need</h2>
   <p class="section-sub">A seamless campus food experience built for speed, simplicity, and freshness.</p>
-
   <div class="features-grid">
-    <div class="feature-card" style="animation-delay:.05s; --card-color: rgba(245,158,11,.08);">
-      <div class="feature-icon amber"><i class="fas fa-bolt"></i></div>
+    <div class="feature-card" style="animation-delay:.05s">
+      <div class="feature-icon fi-amber"><i class="fas fa-bolt"></i></div>
       <h3 class="feature-title">Instant Ordering</h3>
-      <p class="feature-desc">Add items to cart and place your order in under 30 seconds. No waiting, no fuss.</p>
+      <p class="feature-desc">Add items to cart and place your order in under 30 seconds.</p>
     </div>
-
-    <div class="feature-card" style="animation-delay:.12s; --card-color: rgba(34,197,94,.07);">
-      <div class="feature-icon green"><i class="fas fa-credit-card"></i></div>
+    <div class="feature-card" style="animation-delay:.12s">
+      <div class="feature-icon fi-green"><i class="fas fa-credit-card"></i></div>
       <h3 class="feature-title">Flexible Payments</h3>
-      <p class="feature-desc">Pay with cash or UPI — whichever you prefer. Payments are logged and tracked automatically.</p>
+      <p class="feature-desc">Pay with cash or UPI — payments are logged and tracked automatically.</p>
     </div>
-
-    <div class="feature-card" style="animation-delay:.19s; --card-color: rgba(59,130,246,.07);">
-      <div class="feature-icon blue"><i class="fas fa-receipt"></i></div>
+    <div class="feature-card" style="animation-delay:.19s">
+      <div class="feature-icon fi-blue"><i class="fas fa-receipt"></i></div>
       <h3 class="feature-title">Order History</h3>
-      <p class="feature-desc">Access all your past orders from your dashboard. Generate QR receipts anytime.</p>
+      <p class="feature-desc">Access all your past orders from your dashboard with QR receipts.</p>
     </div>
-
-    <div class="feature-card" style="animation-delay:.26s; --card-color: rgba(244,114,182,.07);">
-      <div class="feature-icon pink"><i class="fas fa-bell"></i></div>
+    <div class="feature-card" style="animation-delay:.26s">
+      <div class="feature-icon fi-amber"><i class="fas fa-store"></i></div>
+      <h3 class="feature-title">Live Shop Status</h3>
+      <p class="feature-desc">Always know if Food Point is open before making the trip.</p>
+    </div>
+    <div class="feature-card" style="animation-delay:.33s">
+      <div class="feature-icon fi-green"><i class="fas fa-bell"></i></div>
       <h3 class="feature-title">Live Updates</h3>
-      <p class="feature-desc">Real-time socket notifications keep you posted the moment your order status changes.</p>
+      <p class="feature-desc">Real-time socket notifications when your order status changes.</p>
     </div>
-
-    <div class="feature-card" style="animation-delay:.33s; --card-color: rgba(245,158,11,.08);">
-      <div class="feature-icon amber"><i class="fas fa-store"></i></div>
-      <h3 class="feature-title">Shop Status</h3>
-      <p class="feature-desc">Always know if Food Point is open or closed before making the trip — right on the home page.</p>
-    </div>
-
-    <div class="feature-card" style="animation-delay:.40s; --card-color: rgba(34,197,94,.07);">
-      <div class="feature-icon green"><i class="fas fa-user-shield"></i></div>
+    <div class="feature-card" style="animation-delay:.40s">
+      <div class="feature-icon fi-blue"><i class="fas fa-user-shield"></i></div>
       <h3 class="feature-title">Secure Auth</h3>
-      <p class="feature-desc">Bcrypt-hashed passwords and server-side token sessions mean your account stays safe.</p>
+      <p class="feature-desc">Bcrypt-hashed passwords and server-side sessions keep you safe.</p>
     </div>
   </div>
 </section>
 
 <!-- ── Bottom CTA ── -->
-<div class="section-divider">
+<div class="bottom-cta">
   <div class="divider-line">Ready to eat?</div>
-  <a href="login.html" class="btn-primary" style="font-size:16px; padding:18px 44px;">
-    <i class="fas fa-arrow-right"></i>
-    Get Started
+  <a href="login.html" class="btn-primary" id="bottomOrderBtn" style="font-size:16px;padding:18px 44px;">
+    <i class="fas fa-arrow-right"></i> Get Started
   </a>
+  <p id="bottomClosedNote" style="display:none;margin-top:16px;color:#fca5a5;font-size:13px;font-weight:600;">
+    <i class="fas fa-info-circle"></i> Shop is closed — ordering unavailable right now.
+  </p>
 </div>
 
-<!-- ── Closed Notice Banner ── -->
-<div id="closedBanner" role="alert">
-  <i class="fas fa-store-slash"></i>
-  <div>
-    <strong>Shop is currently closed.</strong><br>
-    <span style="font-weight:400;font-size:13px;">We'll be back soon — check again later!</span>
-  </div>
-</div>
-
-<!-- ── Footer ── -->
-<footer>
-  <p>© 2025 <span>Food Point</span>. Built with ❤️ for campus life.</p>
-</footer>
+<footer><p>© 2025 <span>Food Point</span>. Built with ❤️ for campus life.</p></footer>
 
 <script>
+(async function () {
   const API = (window.FP && window.FP.API_BASE) || '/api';
+  const badge   = document.getElementById('shopStatusBadge');
+  const label   = document.getElementById('shopStatusText');
+  const orderBtn = document.getElementById('orderNowBtn');
+  const closedNotice = document.getElementById('closedNotice');
+  const bottomOrderBtn = document.getElementById('bottomOrderBtn');
+  const bottomClosedNote = document.getElementById('bottomClosedNote');
 
-  // ── Shop Status ──────────────────────────────────────────────────────────────
   async function loadShopStatus() {
-    const badge   = document.getElementById('shopStatusBadge');
-    const label   = document.getElementById('shopStatusText');
-    const banner  = document.getElementById('closedBanner');
-    const orderBtn = document.getElementById('ctaOrderBtn');
-
     try {
       const res  = await fetch(`${API}/shop/status`);
+      if (!res.ok) throw new Error('non-ok');
       const data = await res.json();
-      const isOpen = data.status === 'open';
-
-      badge.className = `nav-status ${isOpen ? 'open' : 'closed'}`;
-      label.textContent = isOpen ? 'Open Now' : 'Closed';
-
-      if (!isOpen) {
-        // Show closed banner with entrance animation
-        setTimeout(() => banner.classList.add('show'), 600);
-
-        // Dim the order button slightly
-        orderBtn.style.opacity = '.55';
-        orderBtn.style.pointerEvents = 'none';
-        orderBtn.title = 'Shop is currently closed';
-      }
+      const isOpen = (data.status || 'open') === 'open';
+      applyStatus(isOpen);
     } catch {
-      badge.className = 'nav-status loading';
-      label.textContent = 'Status unknown';
+      // Fallback: try localStorage written by owner-dashboard
+      const local = localStorage.getItem('fp_shop_status') || localStorage.getItem('shopStatus');
+      const isOpen = !local || local === 'open';
+      applyStatus(isOpen, true);
     }
   }
 
-  loadShopStatus();
+  function applyStatus(isOpen, fallback = false) {
+    badge.className = `nav-status ${isOpen ? 'open' : 'closed'}`;
+    label.textContent = isOpen ? 'Open Now' : 'Closed';
 
-  // ── Intersection Observer for feature cards ──────────────────────────────────
+    if (isOpen) {
+      // Re-enable Order Now
+      orderBtn.classList.remove('disabled');
+      orderBtn.removeAttribute('data-blocked');
+      bottomOrderBtn.classList.remove('disabled');
+      bottomOrderBtn.removeAttribute('data-blocked');
+      closedNotice.classList.remove('show');
+      bottomClosedNote.style.display = 'none';
+    } else {
+      // Block ordering
+      orderBtn.classList.add('disabled');
+      orderBtn.setAttribute('data-blocked', '1');
+      bottomOrderBtn.classList.add('disabled');
+      bottomOrderBtn.setAttribute('data-blocked', '1');
+      closedNotice.classList.add('show');
+      bottomClosedNote.style.display = 'block';
+    }
+  }
+
+  // Intercept Order Now clicks when shop is closed
+  function handleOrderClick(e) {
+    if (this.hasAttribute('data-blocked')) {
+      e.preventDefault();
+      closedNotice.classList.add('show');
+      closedNotice.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+
+  orderBtn.addEventListener('click', handleOrderClick);
+  bottomOrderBtn.addEventListener('click', handleOrderClick);
+
+  // Scroll-reveal for feature cards
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
@@ -814,11 +435,16 @@
     });
   }, { threshold: 0.12 });
 
-  document.querySelectorAll('.feature-card, .stat-item').forEach(el => {
+  document.querySelectorAll('.feature-card').forEach(el => {
     el.style.animationPlayState = 'paused';
     observer.observe(el);
   });
-</script>
 
+  await loadShopStatus();
+
+  // Poll every 30 s so status stays fresh without refresh
+  setInterval(loadShopStatus, 30000);
+})();
+</script>
 </body>
 </html>

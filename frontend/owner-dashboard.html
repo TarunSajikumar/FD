@@ -2636,10 +2636,22 @@
       } catch (e) { console.warn('setupSocket failed', e); }
     }
 
-    function initializeDashboard() {
-      // Initialize shop status
+    async function initializeDashboard() {
+      // Load shop status from backend API first, fall back to localStorage
       let status = localStorage.getItem(SHOP_STATUS_KEY) || "open";
-      localStorage.setItem(SHOP_STATUS_KEY, status);
+      try {
+        const base = (window.FP && window.FP.API_BASE) ? window.FP.API_BASE : '/api';
+        const res = await fetch(base.replace(/\/$/, '') + '/shop/status');
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.status) {
+            status = data.status;
+            localStorage.setItem(SHOP_STATUS_KEY, status);
+          }
+        }
+      } catch (e) {
+        console.warn('Could not fetch shop status from API, using localStorage fallback', e);
+      }
       updateOwnerStatusUI(status);
 
       // Initialize new orders count
@@ -2839,18 +2851,36 @@
       }
     }
 
-    function toggleShopStatus() {
-      let status = localStorage.getItem(SHOP_STATUS_KEY) || "open";
-      const newStatus = status === "open" ? "closed" : "open";
-      
+    async function toggleShopStatus() {
+      const btn = document.getElementById("toggleBtn");
+      btn.disabled = true;
+      btn.textContent = 'Updating…';
+
+      let currentStatus = localStorage.getItem(SHOP_STATUS_KEY) || "open";
+      const newStatus = currentStatus === "open" ? "closed" : "open";
+
+      // Always update localStorage immediately for offline resilience
       localStorage.setItem(SHOP_STATUS_KEY, newStatus);
       updateOwnerStatusUI(newStatus);
-      
-      showNotification(
-        "Shop Status Updated", 
-        `Shop is now ${newStatus.toUpperCase()}. Customers ${newStatus === 'open' ? 'can' : 'cannot'} place orders.`,
-        newStatus === 'open' ? 'success' : 'info'
-      );
+
+      // Persist to backend API
+      try {
+        await apiFetch('/shop/status', { method: 'PUT', body: { status: newStatus } });
+        showNotification(
+          "Shop Status Updated",
+          `Shop is now ${newStatus.toUpperCase()}. Customers ${newStatus === 'open' ? 'can' : 'cannot'} place orders.`,
+          newStatus === 'open' ? 'success' : 'info'
+        );
+      } catch (e) {
+        console.warn('Backend shop status update failed, saved locally only', e);
+        showNotification(
+          "Saved Locally",
+          `Shop marked ${newStatus.toUpperCase()} locally — backend unreachable.`,
+          'info'
+        );
+      } finally {
+        btn.disabled = false;
+      }
     }
 
     function updateOwnerStatusUI(status) {
@@ -2860,21 +2890,30 @@
       const text = document.getElementById("ownerStatusText");
       const btn = document.getElementById("toggleBtn");
 
+      // Sync localStorage so other pages can read it instantly
+      localStorage.setItem(SHOP_STATUS_KEY, status);
+
       // Remove previous status classes
       container.classList.remove("status-open", "status-closed");
       
       if (status === "closed") {
         container.classList.add("status-closed");
         dot.style.background = "var(--accent-red)";
+        dot.style.boxShadow = "0 0 8px var(--accent-red)";
         text.textContent = "Shop is CLOSED";
         btn.textContent = "Open Shop";
+        btn.style.background = "linear-gradient(135deg, #00FF85 0%, #00C96D 100%)";
+        btn.style.color = "#0A0A0F";
         btn.classList.remove("open");
         btn.classList.add("close");
       } else {
         container.classList.add("status-open");
         dot.style.background = "var(--accent-green)";
+        dot.style.boxShadow = "0 0 8px var(--accent-green)";
         text.textContent = "Shop is OPEN";
         btn.textContent = "Close Shop";
+        btn.style.background = "linear-gradient(135deg, #FF4D4D 0%, #cc2020 100%)";
+        btn.style.color = "#fff";
         btn.classList.remove("close");
         btn.classList.add("open");
       }
