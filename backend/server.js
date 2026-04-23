@@ -7,87 +7,64 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const cors = require('cors');
 const path = require('path');
-const fs = require('fs').promises;
 const crypto = require('crypto');
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-const MONGO_URI = process.env.MONGO_URI || "mongodb+srv://foodpoint_db:foodpoint_db@foodpint.otnysi6.mongodb.net/";
-const USE_LOCAL_STORAGE = process.env.USE_LOCAL_STORAGE === 'true';
+const MONGO_URI = process.env.MONGO_URI || "mongodb+srv://foodpoint_db:foodpointby1515@foodpint.otnysi6.mongodb.net/foodpoint?retryWrites=true&w=majority";
 const API_BASE = '/api';
 const OWNER_PASSWORD = process.env.OWNER_PASSWORD || '1515';
 const PORT = process.env.PORT || 3000;
 
 const tokenStore = new Map();
 
-// Local storage paths
-const DATA_DIR = path.join(__dirname, 'data');
-const USERS_FILE = path.join(DATA_DIR, 'users.json');
-const MENU_FILE = path.join(DATA_DIR, 'menu.json');
-const ORDERS_FILE = path.join(DATA_DIR, 'orders.json');
-const SHOP_STATUS_FILE = path.join(DATA_DIR, 'shop-status.json');
+// ─── MongoDB Schemas ──────────────────────────────────────────────────────────
 
-// MongoDB Schemas (only used when not using local storage)
-let User, MenuItem, Order;
+const userSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  email: { type: String, required: true, unique: true, lowercase: true },
+  password: { type: String, required: true },
+  plainPassword: { type: String, default: '' },
+  role: { type: String, default: 'customer', enum: ['customer', 'owner'] },
+  createdAt: { type: Date, default: Date.now }
+});
 
-if (!USE_LOCAL_STORAGE) {
-  const userSchema = new mongoose.Schema({
-    name: { type: String, required: true },
-    email: { type: String, required: true, unique: true, lowercase: true },
-    password: { type: String, required: true },
-    plainPassword: { type: String, default: '' },
-    role: { type: String, default: 'customer', enum: ['customer', 'owner'] },
-    createdAt: { type: Date, default: Date.now }
-  });
+const menuItemSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  price: { type: Number, required: true },
+  description: { type: String, default: '' },
+  available: { type: Boolean, default: true },
+  createdAt: { type: Date, default: Date.now }
+});
 
-  const menuItemSchema = new mongoose.Schema({
+const orderSchema = new mongoose.Schema({
+  customerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  customerName: { type: String, required: true },
+  items: [{
     name: { type: String, required: true },
     price: { type: Number, required: true },
-    description: { type: String, default: '' },
-    available: { type: Boolean, default: true },
-    createdAt: { type: Date, default: Date.now }
-  });
+    qty: { type: Number, default: 1 }
+  }],
+  amount: { type: Number, required: true },
+  method: { type: String, default: 'cash' },
+  provider: { type: String },
+  status: { type: String, default: 'paid', enum: ['paid', 'unpaid', 'cancelled'] },
+  createdAt: { type: Date, default: Date.now }
+});
 
-  const orderSchema = new mongoose.Schema({
-    customerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    customerName: { type: String, required: true },
-    items: [{
-      name: { type: String, required: true },
-      price: { type: Number, required: true },
-      qty: { type: Number, default: 1 }
-    }],
-    amount: { type: Number, required: true },
-    method: { type: String, default: 'cash' },
-    provider: { type: String },
-    status: { type: String, default: 'paid', enum: ['paid', 'unpaid', 'cancelled'] },
-    createdAt: { type: Date, default: Date.now }
-  });
+const shopSettingSchema = new mongoose.Schema({
+  key: { type: String, required: true, unique: true },
+  value: { type: mongoose.Schema.Types.Mixed, required: true }
+});
 
-  User = mongoose.model('User', userSchema);
-  MenuItem = mongoose.model('MenuItem', menuItemSchema);
-  Order = mongoose.model('Order', orderSchema);
-}
+const User = mongoose.model('User', userSchema);
+const MenuItem = mongoose.model('MenuItem', menuItemSchema);
+const Order = mongoose.model('Order', orderSchema);
+const ShopSetting = mongoose.model('ShopSetting', shopSettingSchema);
 
-// Local storage helpers
-async function ensureFile(filePath, defaultValue) {
-  try {
-    await fs.access(filePath);
-  } catch (err) {
-    await fs.mkdir(path.dirname(filePath), { recursive: true });
-    await fs.writeFile(filePath, JSON.stringify(defaultValue, null, 2));
-  }
-}
-
-async function loadJson(filePath) {
-  const raw = await fs.readFile(filePath, 'utf8');
-  return JSON.parse(raw || '[]');
-}
-
-async function saveJson(filePath, value) {
-  await fs.writeFile(filePath, JSON.stringify(value, null, 2));
-}
+// ─── Auth Helpers ─────────────────────────────────────────────────────────────
 
 function generateToken() {
   return crypto.randomBytes(24).toString('hex');
@@ -116,20 +93,18 @@ function requireOwner(req, res, next) {
   next();
 }
 
+// ─── Middleware ───────────────────────────────────────────────────────────────
+
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../frontend')));
 
-// Menu endpoints
+// ─── Menu Endpoints ───────────────────────────────────────────────────────────
+
 app.get(`${API_BASE}/menu`, async (req, res) => {
   try {
-    if (USE_LOCAL_STORAGE) {
-      const menu = await loadJson(MENU_FILE);
-      res.json(menu);
-    } else {
-      const menu = await MenuItem.find({}).sort({ createdAt: -1 });
-      res.json(menu);
-    }
+    const menu = await MenuItem.find({}).sort({ createdAt: -1 });
+    res.json(menu);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch menu' });
   }
@@ -142,29 +117,14 @@ app.post(`${API_BASE}/menu`, requireAuth, requireOwner, async (req, res) => {
       return res.status(400).json({ error: 'name and price are required' });
     }
 
-    if (USE_LOCAL_STORAGE) {
-      const menu = await loadJson(MENU_FILE);
-      const id = Date.now().toString();
-      const item = {
-        id,
-        name: String(name),
-        price: Number(price),
-        description: String(description || ''),
-        available: available !== false
-      };
-      menu.push(item);
-      await saveJson(MENU_FILE, menu);
-      res.status(201).json(item);
-    } else {
-      const item = new MenuItem({
-        name: String(name),
-        price: Number(price),
-        description: String(description || ''),
-        available: available !== false
-      });
-      await item.save();
-      res.status(201).json(item);
-    }
+    const item = new MenuItem({
+      name: String(name),
+      price: Number(price),
+      description: String(description || ''),
+      available: available !== false
+    });
+    await item.save();
+    res.status(201).json(item);
   } catch (error) {
     res.status(500).json({ error: 'Failed to create menu item' });
   }
@@ -179,22 +139,11 @@ app.put(`${API_BASE}/menu/:id`, requireAuth, requireOwner, async (req, res) => {
     if (description != null) updates.description = String(description);
     if (available != null) updates.available = Boolean(available);
 
-    if (USE_LOCAL_STORAGE) {
-      const menu = await loadJson(MENU_FILE);
-      const item = menu.find((entry) => String(entry.id) === req.params.id);
-      if (!item) {
-        return res.status(404).json({ error: 'Menu item not found' });
-      }
-      Object.assign(item, updates);
-      await saveJson(MENU_FILE, menu);
-      res.json(item);
-    } else {
-      const item = await MenuItem.findByIdAndUpdate(req.params.id, updates, { new: true });
-      if (!item) {
-        return res.status(404).json({ error: 'Menu item not found' });
-      }
-      res.json(item);
+    const item = await MenuItem.findByIdAndUpdate(req.params.id, updates, { new: true });
+    if (!item) {
+      return res.status(404).json({ error: 'Menu item not found' });
     }
+    res.json(item);
   } catch (error) {
     res.status(500).json({ error: 'Failed to update menu item' });
   }
@@ -202,52 +151,30 @@ app.put(`${API_BASE}/menu/:id`, requireAuth, requireOwner, async (req, res) => {
 
 app.delete(`${API_BASE}/menu/:id`, requireAuth, requireOwner, async (req, res) => {
   try {
-    if (USE_LOCAL_STORAGE) {
-      let menu = await loadJson(MENU_FILE);
-      const itemIndex = menu.findIndex((entry) => String(entry.id) === req.params.id);
-      if (itemIndex === -1) {
-        return res.status(404).json({ error: 'Menu item not found' });
-      }
-      const [deleted] = menu.splice(itemIndex, 1);
-      await saveJson(MENU_FILE, menu);
-      res.json(deleted);
-    } else {
-      const item = await MenuItem.findByIdAndDelete(req.params.id);
-      if (!item) {
-        return res.status(404).json({ error: 'Menu item not found' });
-      }
-      res.json(item);
+    const item = await MenuItem.findByIdAndDelete(req.params.id);
+    if (!item) {
+      return res.status(404).json({ error: 'Menu item not found' });
     }
+    res.json(item);
   } catch (error) {
     res.status(500).json({ error: 'Failed to delete menu item' });
   }
 });
 
-// Order endpoints
+// ─── Order Endpoints ──────────────────────────────────────────────────────────
+
 app.get(`${API_BASE}/orders`, requireAuth, async (req, res) => {
   try {
-    if (USE_LOCAL_STORAGE) {
-      const orders = await loadJson(ORDERS_FILE);
-      // Filter orders based on user role
-      let filteredOrders = orders;
-      if (req.user.role !== 'owner') {
-        // For local storage, we don't have customerId, so return all for now
-        // In a real implementation, you'd need to track user orders differently
-        filteredOrders = orders;
-      }
-      res.json(filteredOrders);
-    } else {
-      let query = {};
-      if (req.user.role !== 'owner') {
-        query.customerId = req.user.id;
-      }
-
-      const orders = await Order.find(query)
-        .populate('customerId', 'name email')
-        .sort({ createdAt: -1 });
-
-      res.json(orders);
+    let query = {};
+    if (req.user.role !== 'owner') {
+      query.customerId = req.user.id;
     }
+
+    const orders = await Order.find(query)
+      .populate('customerId', 'name email')
+      .sort({ createdAt: -1 });
+
+    res.json(orders);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch orders' });
   }
@@ -260,7 +187,7 @@ app.post(`${API_BASE}/orders`, async (req, res) => {
       return res.status(400).json({ error: 'customerName, items, and amount are required' });
     }
 
-    // Check if user is authenticated
+    // Resolve customerId from auth header if present
     let customerId = null;
     const authHeader = req.headers.authorization || req.headers.Authorization;
     if (authHeader && authHeader.startsWith('Bearer ')) {
@@ -271,47 +198,24 @@ app.post(`${API_BASE}/orders`, async (req, res) => {
       }
     }
 
-    if (USE_LOCAL_STORAGE) {
-      const orders = await loadJson(ORDERS_FILE);
-      const order = {
-        id: Date.now().toString(),
-        customerId,
-        customerName: String(customerName),
-        items: items.map(item => ({
-          name: String(item.name || item.title || ''),
-          price: Number(item.price || 0),
-          qty: Number(item.qty || item.quantity || 1)
-        })),
-        amount: Number(amount),
-        method: String(method || 'cash'),
-        provider: provider || null,
-        status: String(status || 'paid'),
-        createdAt: new Date().toISOString()
-      };
-      orders.push(order);
-      await saveJson(ORDERS_FILE, orders);
-      res.status(201).json(order);
-      io.emit('orderCreated', order);
-    } else {
-      const order = new Order({
-        customerId,
-        customerName: String(customerName),
-        items: items.map(item => ({
-          name: String(item.name || item.title || ''),
-          price: Number(item.price || 0),
-          qty: Number(item.qty || item.quantity || 1)
-        })),
-        amount: Number(amount),
-        method: String(method || 'cash'),
-        provider: provider || null,
-        status: String(status || 'paid')
-      });
+    const order = new Order({
+      customerId,
+      customerName: String(customerName),
+      items: items.map(item => ({
+        name: String(item.name || item.title || ''),
+        price: Number(item.price || 0),
+        qty: Number(item.qty || item.quantity || 1)
+      })),
+      amount: Number(amount),
+      method: String(method || 'cash'),
+      provider: provider || null,
+      status: String(status || 'paid')
+    });
 
-      await order.save();
-      const populatedOrder = await Order.findById(order._id).populate('customerId', 'name email');
-      res.status(201).json(populatedOrder);
-      io.emit('orderCreated', populatedOrder);
-    }
+    await order.save();
+    const populatedOrder = await Order.findById(order._id).populate('customerId', 'name email');
+    res.status(201).json(populatedOrder);
+    io.emit('orderCreated', populatedOrder);
   } catch (error) {
     res.status(500).json({ error: 'Failed to create order' });
   }
@@ -324,34 +228,24 @@ app.put(`${API_BASE}/orders/:id/status`, requireAuth, requireOwner, async (req, 
       return res.status(400).json({ error: 'Invalid status. Must be paid, unpaid, or cancelled' });
     }
 
-    if (USE_LOCAL_STORAGE) {
-      const orders = await loadJson(ORDERS_FILE);
-      const order = orders.find((entry) => String(entry.id) === req.params.id);
-      if (!order) {
-        return res.status(404).json({ error: 'Order not found' });
-      }
-      order.status = status;
-      await saveJson(ORDERS_FILE, orders);
-      res.json(order);
-      io.emit('orderUpdated', order);
-    } else {
-      const order = await Order.findByIdAndUpdate(
-        req.params.id,
-        { status },
-        { new: true }
-      ).populate('customerId', 'name email');
+    const order = await Order.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true }
+    ).populate('customerId', 'name email');
 
-      if (!order) {
-        return res.status(404).json({ error: 'Order not found' });
-      }
-
-      res.json(order);
-      io.emit('orderUpdated', order);
+    if (!order) {
+      return res.status(404).json({ error: 'Order not found' });
     }
+
+    res.json(order);
+    io.emit('orderUpdated', order);
   } catch (error) {
     res.status(500).json({ error: 'Failed to update order status' });
   }
 });
+
+// ─── User Profile ─────────────────────────────────────────────────────────────
 
 app.get(`${API_BASE}/user/profile`, requireAuth, async (req, res) => {
   try {
@@ -382,6 +276,9 @@ app.get(`${API_BASE}/user/profile`, requireAuth, async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch profile' });
   }
 });
+
+// ─── Auth Endpoints ───────────────────────────────────────────────────────────
+
 app.post(`${API_BASE}/auth/login`, async (req, res) => {
   try {
     const { identifier, password } = req.body;
@@ -402,62 +299,32 @@ app.post(`${API_BASE}/auth/login`, async (req, res) => {
       return res.json({ token, user: { id: 'owner', name: 'Owner', role: 'owner' } });
     }
 
-    if (USE_LOCAL_STORAGE) {
-      const users = await loadJson(USERS_FILE);
-      const user = users.find(u =>
-        u.email === key || u.name.toLowerCase() === key
-      );
+    // Regular user login via MongoDB
+    const user = await User.findOne({
+      $or: [{ email: key }, { name: key }]
+    });
 
-      if (!user || !(await bcrypt.compare(password, user.password))) {
-        return res.status(401).json({ error: 'Invalid credentials' });
-      }
-
-      const token = generateToken();
-      tokenStore.set(token, {
-        id: user.id,
-        role: user.role,
-        name: user.name,
-        email: user.email
-      });
-
-      const safeUser = {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role
-      };
-
-      res.json({ token, user: safeUser });
-    } else {
-      // Regular user login
-      const user = await User.findOne({
-        $or: [
-          { email: key },
-          { name: key }
-        ]
-      });
-
-      if (!user || !(await bcrypt.compare(password, user.password))) {
-        return res.status(401).json({ error: 'Invalid credentials' });
-      }
-
-      const token = generateToken();
-      tokenStore.set(token, {
-        id: user._id.toString(),
-        role: user.role,
-        name: user.name,
-        email: user.email
-      });
-
-      const safeUser = {
-        id: user._id.toString(),
-        name: user.name,
-        email: user.email,
-        role: user.role
-      };
-
-      res.json({ token, user: safeUser });
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+      return res.status(401).json({ error: 'Invalid credentials' });
     }
+
+    const token = generateToken();
+    tokenStore.set(token, {
+      id: user._id.toString(),
+      role: user.role,
+      name: user.name,
+      email: user.email
+    });
+
+    res.json({
+      token,
+      user: {
+        id: user._id.toString(),
+        name: user.name,
+        email: user.email,
+        role: user.role
+      }
+    });
   } catch (error) {
     res.status(500).json({ error: 'Login failed' });
   }
@@ -472,95 +339,51 @@ app.post(`${API_BASE}/auth/signup`, async (req, res) => {
 
     const normalizedEmail = String(email).trim().toLowerCase();
 
-    if (USE_LOCAL_STORAGE) {
-      const users = await loadJson(USERS_FILE);
-      const existingUser = users.find(u => u.email === normalizedEmail);
-      if (existingUser) {
-        return res.status(409).json({ error: 'Email already registered' });
-      }
-
-      const hashedPassword = await bcrypt.hash(password, 12);
-      const user = {
-        id: Date.now().toString(),
-        name: String(name),
-        email: normalizedEmail,
-        password: hashedPassword,
-        plainPassword: String(password),
-        role: 'customer',
-        createdAt: new Date().toISOString()
-      };
-      users.push(user);
-      await saveJson(USERS_FILE, users);
-
-      const token = generateToken();
-      tokenStore.set(token, {
-        id: user.id,
-        role: user.role,
-        name: user.name,
-        email: user.email
-      });
-
-      const safeUser = {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role
-      };
-
-      res.status(201).json({ token, user: safeUser });
-    } else {
-      // Check if user already exists
-      const existingUser = await User.findOne({ email: normalizedEmail });
-      if (existingUser) {
-        return res.status(409).json({ error: 'Email already registered' });
-      }
-
-      // Hash password
-      const hashedPassword = await bcrypt.hash(password, 12);
-
-      const user = new User({
-        name: String(name),
-        email: normalizedEmail,
-        password: hashedPassword,
-        plainPassword: String(password),
-        role: 'customer'
-      });
-
-      await user.save();
-
-      const token = generateToken();
-      tokenStore.set(token, {
-        id: user._id.toString(),
-        role: user.role,
-        name: user.name,
-        email: user.email
-      });
-
-      const safeUser = {
-        id: user._id.toString(),
-        name: user.name,
-        email: user.email,
-        role: user.role
-      };
-
-      res.status(201).json({ token, user: safeUser });
+    const existingUser = await User.findOne({ email: normalizedEmail });
+    if (existingUser) {
+      return res.status(409).json({ error: 'Email already registered' });
     }
+
+    const hashedPassword = await bcrypt.hash(password, 12);
+
+    const user = new User({
+      name: String(name),
+      email: normalizedEmail,
+      password: hashedPassword,
+      plainPassword: String(password),
+      role: 'customer'
+    });
+
+    await user.save();
+
+    const token = generateToken();
+    tokenStore.set(token, {
+      id: user._id.toString(),
+      role: user.role,
+      name: user.name,
+      email: user.email
+    });
+
+    res.status(201).json({
+      token,
+      user: {
+        id: user._id.toString(),
+        name: user.name,
+        email: user.email,
+        role: user.role
+      }
+    });
   } catch (error) {
     res.status(500).json({ error: 'Signup failed' });
   }
 });
 
-// Shop status endpoints
+// ─── Shop Status Endpoints ────────────────────────────────────────────────────
+
 app.get(`${API_BASE}/shop/status`, async (req, res) => {
   try {
-    if (USE_LOCAL_STORAGE) {
-      const statusData = await loadJson(SHOP_STATUS_FILE);
-      res.json(statusData);
-    } else {
-      // For MongoDB, you could store this in a settings collection
-      // For now, return a default value
-      res.json({ status: 'open' });
-    }
+    const setting = await ShopSetting.findOne({ key: 'shopStatus' });
+    res.json({ status: setting ? setting.value : 'open' });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch shop status' });
   }
@@ -573,22 +396,21 @@ app.put(`${API_BASE}/shop/status`, requireAuth, requireOwner, async (req, res) =
       return res.status(400).json({ error: 'Invalid status. Must be open or closed' });
     }
 
-    if (USE_LOCAL_STORAGE) {
-      const statusData = { status };
-      await saveJson(SHOP_STATUS_FILE, statusData);
-      res.json(statusData);
-      io.emit('shopStatusChanged', statusData);
-    } else {
-      // For MongoDB, you could store this in a settings collection
-      res.json({ status });
-      io.emit('shopStatusChanged', { status });
-    }
+    await ShopSetting.findOneAndUpdate(
+      { key: 'shopStatus' },
+      { key: 'shopStatus', value: status },
+      { upsert: true, new: true }
+    );
+
+    res.json({ status });
+    io.emit('shopStatusChanged', { status });
   } catch (error) {
     res.status(500).json({ error: 'Failed to update shop status' });
   }
 });
 
-// Socket.IO setup
+// ─── Socket.IO ────────────────────────────────────────────────────────────────
+
 io.use((socket, next) => {
   const token = socket.handshake.auth?.token;
   if (token && tokenStore.has(token)) {
@@ -601,99 +423,44 @@ io.on('connection', (socket) => {
   console.log('Socket connected:', socket.id, socket.user ? socket.user.name : 'anonymous');
 });
 
-// Initialize database and start server
+// ─── Start Server ─────────────────────────────────────────────────────────────
+
 async function start() {
   try {
-    if (!USE_LOCAL_STORAGE) {
-      await mongoose.connect(MONGO_URI);
-      console.log('Connected to MongoDB');
+    await mongoose.connect(MONGO_URI);
+    console.log('✅ Connected to MongoDB Atlas');
 
-      // Ensure owner user exists (for backward compatibility)
-      const ownerExists = await User.findOne({ email: 'owner@foodpoint.local' });
-      if (!ownerExists) {
-        const hashedOwnerPassword = await bcrypt.hash(OWNER_PASSWORD, 12);
-        const owner = new User({
-          name: 'Owner',
-          email: 'owner@foodpoint.local',
-          password: hashedOwnerPassword,
-          role: 'owner'
-        });
-        await owner.save();
-        console.log('Owner user created');
-      }
+    // Ensure owner user exists
+    const ownerExists = await User.findOne({ email: 'owner@foodpoint.local' });
+    if (!ownerExists) {
+      const hashedOwnerPassword = await bcrypt.hash(OWNER_PASSWORD, 12);
+      await new User({
+        name: 'Owner',
+        email: 'owner@foodpoint.local',
+        password: hashedOwnerPassword,
+        role: 'owner'
+      }).save();
+      console.log('Owner user created');
+    }
 
-      // Seed initial menu items if empty
-      const menuCount = await MenuItem.countDocuments();
-      if (menuCount === 0) {
-        const initialMenu = [
-          {
-            name: 'Classic Burger',
-            price: 149.99,
-            description: 'Juicy beef burger with lettuce, tomato and house sauce.',
-            available: true
-          },
-          {
-            name: 'Paneer Wrap',
-            price: 129.99,
-            description: 'Spiced paneer wrap with fresh greens and mint chutney.',
-            available: true
-          },
-          {
-            name: 'Mango Lassi',
-            price: 79.99,
-            description: 'Creamy mango lassi with cardamom and honey.',
-            available: true
-          }
-        ];
-
-        await MenuItem.insertMany(initialMenu);
-        console.log('Initial menu items seeded');
-      }
-    } else {
-      console.log('Using local storage mode');
-
-      // Initialize local storage files
-      await ensureFile(USERS_FILE, []);
-      await ensureFile(MENU_FILE, [
-        {
-          id: '1',
-          name: 'Classic Burger',
-          price: 149.99,
-          description: 'Juicy beef burger with lettuce, tomato and house sauce.',
-          available: true
-        },
-        {
-          id: '2',
-          name: 'Paneer Wrap',
-          price: 129.99,
-          description: 'Spiced paneer wrap with fresh greens and mint chutney.',
-          available: true
-        },
-        {
-          id: '3',
-          name: 'Mango Lassi',
-          price: 79.99,
-          description: 'Creamy mango lassi with cardamom and honey.',
-          available: true
-        }
+    // Seed initial menu if empty
+    const menuCount = await MenuItem.countDocuments();
+    if (menuCount === 0) {
+      await MenuItem.insertMany([
+        { name: 'Classic Burger', price: 149.99, description: 'Juicy beef burger with lettuce, tomato and house sauce.', available: true },
+        { name: 'Paneer Wrap', price: 129.99, description: 'Spiced paneer wrap with fresh greens and mint chutney.', available: true },
+        { name: 'Mango Lassi', price: 79.99, description: 'Creamy mango lassi with cardamom and honey.', available: true }
       ]);
-      await ensureFile(ORDERS_FILE, []);
-      await ensureFile(SHOP_STATUS_FILE, { status: 'open' });
-      console.log('Local storage files initialized');
+      console.log('Initial menu items seeded');
     }
 
     server.listen(PORT, () => {
-      console.log(`Food Point backend listening on http://localhost:${PORT}`);
-      console.log(`Storage mode: ${USE_LOCAL_STORAGE ? 'Local Files' : 'MongoDB'}`);
-      console.log(`API base: ${API_BASE}`);
+      console.log(`🚀 Food Point backend listening on http://localhost:${PORT}`);
+      console.log(`📦 Storage: MongoDB Atlas`);
+      console.log(`🔗 API base: ${API_BASE}`);
     });
   } catch (error) {
-    console.error('Startup error:', error);
-    if (error.message.includes('ECONNREFUSED') || error.message.includes('authentication failed')) {
-      console.log('\n💡 MongoDB connection failed. To use local storage instead:');
-      console.log('   Set USE_LOCAL_STORAGE=true in your .env file');
-      console.log('   Then restart the server');
-    }
+    console.error('❌ Startup error:', error.message);
     process.exit(1);
   }
 }
