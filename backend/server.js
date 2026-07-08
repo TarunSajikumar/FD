@@ -8,6 +8,7 @@ const bcrypt = require('bcryptjs');
 const cors = require('cors');
 const path = require('path');
 const crypto = require('crypto');
+const { sendWelcomeEmail } = require('./mailer');
 
 const app = express();
 const server = http.createServer(app);
@@ -369,6 +370,11 @@ app.post(`${API_BASE}/auth/signup`, async (req, res) => {
     });
 
     await user.save();
+
+    // Trigger welcome email asynchronously
+    sendWelcomeEmail(user.email, user.name).catch(err => {
+      console.error('Welcome email sending failed asynchronously:', err.message);
+    });
 
     const token = generateToken();
     tokenStore.set(token, {
