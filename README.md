@@ -24,38 +24,9 @@ Edit `.env` with your MongoDB connection string:
 MONGO_URI=mongodb+srv://foodpoint_db:foodpoint_db@foodpint.otnysi6.mongodb.net/
 OWNER_PASSWORD=1515
 PORT=3000
-USE_LOCAL_STORAGE=false
 ```
 
 **Note:** Ensure your MongoDB Atlas cluster allows connections from your IP address and the database user has appropriate permissions.
-
-## Storage Modes
-
-The backend supports two storage modes:
-
-### MongoDB Mode (Default)
-- Uses MongoDB Atlas for persistent data storage
-- Requires internet connection and valid MongoDB URI
-- Supports multiple users and concurrent access
-
-### Local Storage Mode (Fallback)
-- Uses JSON files for data storage
-- No internet connection required
-- Perfect for development and testing
-- Data persists between server restarts
-
-To enable local storage mode, set `USE_LOCAL_STORAGE=true` in your `.env` file.
-
-## Test Database Connection
-
-```bash
-cd backend
-npm run test-db
-```
-
-If the connection fails, you can:
-1. Fix MongoDB connectivity issues, or
-2. Switch to local storage mode by setting `USE_LOCAL_STORAGE=true`
 
 ## Run the backend
 
@@ -63,8 +34,6 @@ If the connection fails, you can:
 cd backend
 npm start
 ```
-
-The server will automatically detect the storage mode and display which one is active.
 
 ## Run the frontend
 

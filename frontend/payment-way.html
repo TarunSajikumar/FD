@@ -825,7 +825,6 @@
 <script src="fp-config.js"></script>
 <script src="fp-fetch-proxy.js"></script>
 <script src="api.js"></script>
-<script src="dev-check.js"></script>
 
 <div class="user-bar">
   <div class="user-info">
@@ -842,20 +841,14 @@
   <h3>💳 PAYMENT</h3>
   <p class="pay-sub">Choose your preferred method</p>
 
+  <div class="amount-box">
+    <div class="amount-label">TOTAL AMOUNT</div>
+    <div id="amountValue" class="amount-value">₹0.00</div>
+  </div>
+
   <!-- Payment Methods -->
   <div class="pay-methods" id="payMethods">
-    <div class="pay-option" onclick="selectPaymentMethod('cash')">
-      <div class="pay-option-left">
-        <i class="fas fa-money-bill-wave"></i>
-        <div>
-          <div class="pay-option-title">Cash on Delivery</div>
-          <div class="pay-option-desc">Pay when your order arrives</div>
-        </div>
-      </div>
-      <i class="fas fa-chevron-right pay-option-arrow"></i>
-    </div>
-
-    <div class="pay-option" onclick="selectPaymentMethod('upi')">
+    <div class="pay-option" onclick="selectPaymentMethod('upi', true)">
       <div class="pay-option-left">
         <i class="fas fa-qrcode"></i>
         <div>
@@ -866,24 +859,17 @@
       <i class="fas fa-chevron-right pay-option-arrow"></i>
     </div>
 
-    <div class="pay-option" onclick="selectPaymentMethod('card')">
+    <div class="pay-option" onclick="selectPaymentMethod('cash', true)">
       <div class="pay-option-left">
-        <i class="fas fa-credit-card"></i>
+        <i class="fas fa-money-bill-wave"></i>
         <div>
-          <div class="pay-option-title">Credit/Debit Card</div>
-          <div class="pay-option-desc">Visa, Mastercard, RuPay</div>
+          <div class="pay-option-title">Cash on Delivery</div>
+          <div class="pay-option-desc">Pay when your order arrives</div>
         </div>
       </div>
       <i class="fas fa-chevron-right pay-option-arrow"></i>
     </div>
   </div>
-
-  <div class="amount-box">
-    <div class="amount-label">TOTAL AMOUNT</div>
-    <div id="amountValue" class="amount-value">₹0.00</div>
-  </div>
-
-  <button class="proceed-btn" onclick="proceedToPayment()">Proceed to Payment</button>
 
   <div class="note">
     <i class="fas fa-lock"></i> 100% secure transaction · Instant confirmation
@@ -968,7 +954,7 @@
   // ----- Payment method selection -----
   let selectedPaymentMethod = 'cash'; // default
   
-  function selectPaymentMethod(method) {
+  function selectPaymentMethod(method, autoRedirect = false) {
     selectedPaymentMethod = method;
     
     // Update UI - highlight selected option
@@ -978,7 +964,7 @@
     // Find and highlight the clicked option
     const payMethods = document.getElementById('payMethods');
     if (payMethods) {
-      const methodIndex = method === 'cash' ? 0 : (method === 'upi' ? 1 : 2);
+      const methodIndex = method === 'upi' ? 0 : 1;
       if (payMethods.children[methodIndex]) {
         payMethods.children[methodIndex].classList.add('selected');
       }
@@ -986,17 +972,17 @@
     
     // Store selection
     safeSet('paymentMethod', method);
-  }
 
-  // ----- Payment method handler (single button to payment.html) -----
-  function proceedToPayment() {
-    // get latest amount and store
-    const amountDisplay = document.getElementById('amountValue').innerText;
-    const amountNum = parseFloat(amountDisplay.replace('₹', '').replace(/,/g, ''));
-    safeSet('amountPaid', amountDisplay);
-    if (!isNaN(amountNum)) safeSet('amountPaidNumeric', amountNum);
-    // redirect to payment.html
-    window.location.href = 'payment.html';
+    if (autoRedirect) {
+      syncAmountToStorage();
+      setTimeout(() => {
+        if (method === 'upi') {
+          window.location.href = 'payment-upi.html';
+        } else if (method === 'cash') {
+          window.location.href = 'payment-cash.html';
+        }
+      }, 150);
+    }
   }
 
   // ----- UI initialization & event binding -----
@@ -1022,17 +1008,13 @@
     }
 
     // Initialize payment methods
-    const storedMethod = safeGet('paymentMethod') || 'cash';
+    let storedMethod = safeGet('paymentMethod') || 'cash';
+    if (storedMethod === 'card') {
+      storedMethod = 'cash';
+    }
     selectPaymentMethod(storedMethod);
 
-    // bind click events for payment button
-    const proceedBtn = document.querySelector('.proceed-btn');
-    if (proceedBtn) {
-      proceedBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        proceedToPayment();
-      });
-    }
+
 
     // listen for storage changes (if cart updates from another tab)
     window.addEventListener('storage', (event) => {

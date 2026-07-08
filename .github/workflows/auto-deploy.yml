@@ -24,10 +24,6 @@ jobs:
         working-directory: backend
         run: npm install
 
-      - name: Run backend tests
-        working-directory: backend
-        run: npm test
-
       - name: Build frontend (optional)
         run: echo "No frontend build configured. Add build commands if needed."
 

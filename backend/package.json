@@ -4,8 +4,7 @@
   "description": "Express backend for the Food Point storefront with MongoDB",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "test-db": "node test-db.js"
+    "start": "node server.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

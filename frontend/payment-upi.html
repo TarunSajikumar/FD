@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes" />
-  <title>Food Point | Payment <i class="fa fa-money" aria-hidden="true"></i> </title>
+  <title>Food Point | UPI Payment</title>
 
   <!-- fontawesome (for icons) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -14,7 +14,6 @@
   <script src="fp-config.js"></script>
   <script src="fp-fetch-proxy.js"></script>
   <script src="api.js"></script>
-  <script src="dev-check.js"></script>
   <style>
     * {
       margin: 0;
@@ -244,9 +243,9 @@
       right: 0;
       bottom: 0;
       background: 
-        radial-gradient(circle at 20% 50%, rgba(0, 255, 133, 0.15) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(255, 157, 77, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 50% 0%, rgba(255, 100, 50, 0.12) 0%, transparent 60%);
+      radial-gradient(circle at 20% 50%, rgba(0, 255, 133, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(255, 157, 77, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 50% 0%, rgba(255, 100, 50, 0.12) 0%, transparent 60%);
       pointer-events: none;
       z-index: 0;
       animation: gradientShift 15s ease-in-out infinite;
@@ -260,8 +259,8 @@
       right: 0;
       bottom: 0;
       background-image: 
-        linear-gradient(90deg, transparent 1px, rgba(0, 255, 133, 0.03) 1px),
-        linear-gradient(transparent 1px, rgba(0, 255, 133, 0.03) 1px);
+      linear-gradient(90deg, transparent 1px, rgba(0, 255, 133, 0.03) 1px),
+      linear-gradient(transparent 1px, rgba(0, 255, 133, 0.03) 1px);
       background-size: 50px 50px;
       pointer-events: none;
       z-index: 0;
@@ -323,75 +322,6 @@
       }
     }
 
-    /* Steps */
-    .steps {
-      display: flex;
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-
-    .step {
-      flex: 1;
-      background: var(--bg-card);
-      border: 1px solid var(--border-card);
-      border-radius: var(--radius-lg);
-      padding: 16px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-      animation: cardEnter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .steps .step:nth-child(1) {
-      animation: cardEnter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s backwards;
-    }
-
-    .steps .step:nth-child(2) {
-      animation: cardEnter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s backwards;
-    }
-
-    .step::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(0, 255, 133, 0.1), transparent);
-      transition: left 0.6s ease;
-      pointer-events: none;
-    }
-
-    .step:hover::before {
-      left: 100%;
-    }
-
-    .step:hover {
-      transform: translateY(-3px) scale(1.02);
-      border-color: rgba(0, 255, 133, 0.3);
-      box-shadow: 0 6px 16px rgba(0, 255, 133, 0.2);
-    }
-
-    .step.active {
-      border-color: var(--accent-green);
-      background: linear-gradient(180deg, #1A1C23 0%, #111116 100%);
-      box-shadow: 0 0 20px rgba(0, 255, 133, 0.15), inset 0 0 15px rgba(0, 255, 133, 0.08);
-    }
-
-    .step h3 {
-      font-size: 1rem;
-      font-weight: 600;
-      margin-bottom: 6px;
-      color: var(--text-primary);
-    }
-
-    .step p {
-      font-size: 0.7rem;
-      color: var(--text-muted);
-    }
-
     /* Payment Card */
     .payment-card {
       background: var(--bg-card);
@@ -431,10 +361,6 @@
     .payment-card:hover {
       box-shadow: 0 30px 60px -15px rgba(0, 255, 133, 0.25), 0 0 0 1px rgba(0, 255, 133, 0.15), inset 0 0 20px rgba(0, 255, 133, 0.08);
       transform: translateY(-3px) scale(1.01);
-    }
-
-    .steps .step {
-      animation: cardEnter 0.8s ease-out backwards;
     }
 
     .btn {
@@ -573,7 +499,7 @@
 
     /* Online UI */
     .online-ui {
-      margin-top: 24px;
+      margin-top: 10px;
       animation: fadeInUp 0.6s ease-out 0.2s backwards;
     }
 
@@ -740,15 +666,15 @@
     @keyframes gradientShift {
       0%, 100% {
         background: 
-          radial-gradient(circle at 20% 50%, rgba(0, 255, 133, 0.15) 0%, transparent 50%),
-          radial-gradient(circle at 80% 80%, rgba(255, 157, 77, 0.1) 0%, transparent 50%),
-          radial-gradient(circle at 50% 0%, rgba(255, 100, 50, 0.12) 0%, transparent 60%);
+        radial-gradient(circle at 20% 50%, rgba(0, 255, 133, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(255, 157, 77, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 50% 0%, rgba(255, 100, 50, 0.12) 0%, transparent 60%);
       }
       50% {
         background: 
-          radial-gradient(circle at 80% 20%, rgba(0, 255, 133, 0.15) 0%, transparent 50%),
-          radial-gradient(circle at 20% 80%, rgba(255, 157, 77, 0.1) 0%, transparent 50%),
-          radial-gradient(circle at 50% 100%, rgba(255, 100, 50, 0.12) 0%, transparent 60%);
+        radial-gradient(circle at 80% 20%, rgba(0, 255, 133, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 20% 80%, rgba(255, 157, 77, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 50% 100%, rgba(255, 100, 50, 0.12) 0%, transparent 60%);
       }
     }
 
@@ -819,10 +745,6 @@
       }
     }
 
-    #actionArea {
-      animation: fadeInUp 0.6s ease-out 0.35s backwards !important;
-    }
-
     /* Responsive */
     @media (max-width: 560px) {
       body {
@@ -847,8 +769,144 @@
         gap: 8px;
         text-align: center;
       }
-      .steps {
-        flex-direction: column;
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(10, 10, 15, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .modal-content {
+      background: var(--bg-card);
+      border: 1px solid rgba(0, 255, 133, 0.2);
+      border-radius: var(--radius-xl);
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 20px 50px rgba(0, 255, 133, 0.15);
+      animation: modalEnter 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      overflow: hidden;
+    }
+
+    .modal-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .modal-close-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 1.8rem;
+      cursor: pointer;
+      line-height: 1;
+      transition: color 0.2s;
+    }
+
+    .modal-close-btn:hover {
+      color: var(--accent-red);
+    }
+
+    .modal-body {
+      padding: 20px;
+    }
+
+    .upi-app-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .upi-app-option {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      text-decoration: none;
+      color: var(--text-primary);
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .upi-app-option:hover {
+      transform: translateX(4px) scale(1.02);
+      border-color: var(--accent-green);
+      background: linear-gradient(135deg, rgba(0, 255, 133, 0.08), rgba(0, 255, 133, 0.03));
+      box-shadow: 0 8px 20px rgba(0, 255, 133, 0.15);
+    }
+
+    .app-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .gpay-icon {
+      background: rgba(59, 130, 246, 0.15);
+      color: #3B82F6;
+    }
+
+    .phonepe-icon {
+      background: rgba(168, 85, 247, 0.15);
+      color: #A855F7;
+    }
+
+    .paytm-icon {
+      background: rgba(249, 115, 22, 0.15);
+      color: #F97316;
+    }
+
+    .bhim-icon {
+      background: rgba(0, 255, 133, 0.15);
+      color: #00FF85;
+    }
+
+    .generic-icon {
+      background: rgba(90, 95, 115, 0.15);
+      color: var(--text-secondary);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes modalEnter {
+      from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
       }
     }
   </style>
@@ -868,26 +926,14 @@
       <div class="user-email">secure checkout</div>
     </div>
   </div>
-  <button class="logout-btn" onclick="history.back()"><i class="fas fa-arrow-left"></i> Back</button>
+  <button class="logout-btn" onclick="location.href='payment-way.html'"><i class="fas fa-arrow-left"></i> Back</button>
 </div>
 
 <div class="container">
   <header>
-    <h1>✨ FOOD POINT PAYMENT</h1>
-    <p>Choose comfort - COD / UPI 😌</p>
+    <h1>✨ FOOD POINT UPI PAYMENT</h1>
+    <p>Scan QR or click to pay via any UPI app 📱</p>
   </header>
-
-  <!-- Step selector -->
-  <div class="steps" id="paymentSteps">
-    <div class="step" id="stepCash" data-step="cash" tabindex="0">
-      <h3>💵 Cash</h3>
-      <p>Pay on delivery — trusted & easy</p>
-    </div>
-    <div class="step" id="stepOnline" data-step="online" tabindex="0">
-      <h3>📱 UPI / Online</h3>
-      <p>Scan QR or click to pay via any UPI app</p>
-    </div>
-  </div>
 
   <div class="payment-card">
     <div class="amount-row">
@@ -895,12 +941,8 @@
       <div class="value" id="amountValue">₹0.00</div>
     </div>
 
-    <div id="actionArea" style="display: flex; gap: 14px; flex-wrap: wrap;">
-      <button class="btn" id="payCashBtn"><i class="fa-solid fa-money-bill-wave"></i> Pay with Cash</button>
-    </div>
-
-    <!-- Online Interface (hidden by default) -->
-    <div class="online-ui" id="onlineUI" aria-hidden="true">
+    <!-- Online Interface -->
+    <div class="online-ui" id="onlineUI">
       <div class="upi-box">
         <div class="upi-qr" id="qrPlaceholder">
           <i class="fa-solid fa-qrcode" style="font-size: 42px; color: var(--accent-orange);"></i>
@@ -914,7 +956,7 @@
           </div>
           <div style="margin-top: 16px; display: flex; gap: 14px; flex-wrap: wrap;">
             <button class="btn" id="iPaidBtn"><i class="fa-regular fa-circle-check"></i> I have paid</button>
-            <button class="btn btn-ghost" id="chooseCashBackBtn"><i class="fa-solid fa-arrow-left"></i> Back</button>
+            <button class="btn btn-ghost" onclick="location.href='payment-way.html'"><i class="fa-solid fa-arrow-left"></i> Back</button>
           </div>
         </div>
       </div>
@@ -934,6 +976,40 @@
       <div><i class="fa-regular fa-shield-haltered"></i> Provider: <strong>UPI Secure</strong></div>
       <div><i class="fa-regular fa-clock"></i> Instant confirmation</div>
     </footer>
+  </div>
+</div>
+
+<!-- UPI App Selector Modal -->
+<div id="upiModal" class="modal-overlay" style="display: none;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Select UPI App</h3>
+      <button class="modal-close-btn" onclick="closeUpiModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="upi-app-list">
+        <a class="upi-app-option" href="#" onclick="launchUpiApp('gpay')">
+          <div class="app-icon gpay-icon"><i class="fa-brands fa-google-pay"></i></div>
+          <span>Google Pay</span>
+        </a>
+        <a class="upi-app-option" href="#" onclick="launchUpiApp('phonepe')">
+          <div class="app-icon phonepe-icon"><i class="fa-solid fa-mobile-screen"></i></div>
+          <span>PhonePe</span>
+        </a>
+        <a class="upi-app-option" href="#" onclick="launchUpiApp('paytm')">
+          <div class="app-icon paytm-icon"><i class="fa-solid fa-wallet"></i></div>
+          <span>Paytm</span>
+        </a>
+        <a class="upi-app-option" href="#" onclick="launchUpiApp('bhim')">
+          <div class="app-icon bhim-icon"><i class="fa-solid fa-building-columns"></i></div>
+          <span>BHIM UPI</span>
+        </a>
+        <a class="upi-app-option" href="#" onclick="launchUpiApp('generic')">
+          <div class="app-icon generic-icon"><i class="fa-solid fa-qrcode"></i></div>
+          <span>Other UPI App</span>
+        </a>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1054,18 +1130,54 @@
     intentBtn.setAttribute('data-upi-link', upiLink);
   }
 
+  function openUpiModal() {
+    const modal = document.getElementById('upiModal');
+    if (modal) {
+      modal.style.display = 'flex';
+      modal.setAttribute('aria-hidden', 'false');
+    }
+  }
+
+  function closeUpiModal() {
+    const modal = document.getElementById('upiModal');
+    if (modal) {
+      modal.style.display = 'none';
+      modal.setAttribute('aria-hidden', 'true');
+    }
+  }
+
+  function launchUpiApp(app) {
+    if (currentAmount <= 0) {
+      alert("⚠️ Amount is zero. Please check your cart items.");
+      return;
+    }
+    
+    // Base standard URL
+    const standardUpiUrl = `upi://pay?pa=${encodeURIComponent(currentUpiId)}&pn=${encodeURIComponent(restaurantName)}&am=${currentAmount.toFixed(2)}&cu=INR`;
+    
+    let targetUrl = standardUpiUrl;
+    
+    // Construct specific schemes if applicable
+    if (app === 'phonepe') {
+      targetUrl = `phonepe://pay?pa=${encodeURIComponent(currentUpiId)}&pn=${encodeURIComponent(restaurantName)}&am=${currentAmount.toFixed(2)}&cu=INR`;
+    } else if (app === 'paytm') {
+      targetUrl = `paytmmp://pay?pa=${encodeURIComponent(currentUpiId)}&pn=${encodeURIComponent(restaurantName)}&am=${currentAmount.toFixed(2)}&cu=INR`;
+    } else if (app === 'bhim') {
+      targetUrl = `bhim://pay?pa=${encodeURIComponent(currentUpiId)}&pn=${encodeURIComponent(restaurantName)}&am=${currentAmount.toFixed(2)}&cu=INR`;
+    }
+    
+    // Redirect / open app
+    window.location.href = targetUrl;
+    closeUpiModal();
+  }
+
   // setup intent click
   function setupPaymentIntent() {
     const intentBtn = document.getElementById('payIntentBtn');
     if (!intentBtn) return;
     intentBtn.addEventListener('click', (e) => {
       e.preventDefault();
-      if (currentAmount <= 0) {
-        alert("⚠️ Amount is zero. Please check your cart items.");
-        return;
-      }
-      const upiLink = `upi://pay?pa=${encodeURIComponent(currentUpiId)}&pn=${encodeURIComponent(restaurantName)}&am=${currentAmount.toFixed(2)}&cu=INR`;
-      window.location.href = upiLink;
+      openUpiModal();
     });
   }
 
@@ -1097,65 +1209,66 @@
     updateIntentButtonLink();
   }
 
-  /* ----- UI State management (Cash / Online) ----- */
-  const stepCash = document.getElementById('stepCash');
-  const stepOnline = document.getElementById('stepOnline');
-  const onlineUI = document.getElementById('onlineUI');
-  const payCashBtn = document.getElementById('payCashBtn');
-  const chooseCashBackBtn = document.getElementById('chooseCashBackBtn');
   const iPaidBtn = document.getElementById('iPaidBtn');
   const copyUpiBtn = document.getElementById('copyUpiBtn');
   const upiInputField = document.getElementById('upiInput');
 
-  function setActiveStep(step) {
-    stepCash.classList.remove('active');
-    stepOnline.classList.remove('active');
-    if (step === 'cash') stepCash.classList.add('active');
-    if (step === 'online') stepOnline.classList.add('active');
-  }
-
-  function showOnlineUI() {
-    setActiveStep('online');
-    onlineUI.style.display = 'block';
-    onlineUI.setAttribute('aria-hidden', 'false');
-    payCashBtn.style.display = 'none';
-    fetchUpiSettings();
-    updateUpiDisplay();
-    refreshAmountAndQR();
-    onlineUI.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }
-
-  function hideOnlineUI() {
-    setActiveStep('cash');
-    onlineUI.style.display = 'none';
-    onlineUI.setAttribute('aria-hidden', 'true');
-    payCashBtn.style.display = 'inline-flex';
-  }
-
-  stepOnline.addEventListener('click', showOnlineUI);
-  stepCash.addEventListener('click', hideOnlineUI);
-  chooseCashBackBtn.addEventListener('click', hideOnlineUI);
-
-  // Cash payment
-  payCashBtn.addEventListener('click', () => {
-    const amtText = document.getElementById('amountValue')?.innerText || '₹0.00';
-    safeSet('paymentMethod', 'cash');
-    safeSet('amountPaid', amtText);
-    safeSet('amountPaidNumeric', currentAmount);
-    safeSet('justPaid', '1');
-    window.location.href = 'thank-you.html';
-  });
-
   // I have paid (online)
-  iPaidBtn.addEventListener('click', () => {
-    const amtText = document.getElementById('amountValue')?.innerText || '₹0.00';
-    safeSet('paymentMethod', 'online');
-    safeSet('paymentProvider', 'UPI');
-    safeSet('amountPaid', amtText);
-    safeSet('amountPaidNumeric', currentAmount);
-    safeSet('justPaid', '1');
-    safeSet('lastPaidAt', new Date().toISOString());
-    window.location.href = 'thank-you.html';
+  iPaidBtn.addEventListener('click', async () => {
+    iPaidBtn.disabled = true;
+    iPaidBtn.textContent = 'Processing...';
+
+    let customerName = 'Guest';
+    try {
+      const userRaw = localStorage.getItem('fp_current_user');
+      if (userRaw) {
+        const user = JSON.parse(userRaw);
+        if (user && user.name) customerName = user.name;
+      }
+    } catch (e) {}
+
+    let items = [];
+    try {
+      const cartJson = safeGet('cartItems') || safeGet('selectedFoods_v1') || safeGet('selectedFoods');
+      if (cartJson) {
+        const parsed = JSON.parse(cartJson);
+        if (Array.isArray(parsed)) {
+          items = parsed.map(it => {
+            const name = it.name || it.title || it.itemName || String(it);
+            const price = parseFloat(String(it.price || it.numericPrice || 0).replace(/[₹, ]+/g, '')) || 0;
+            const qty = parseInt(it.qty || it.quantity || 1) || 1;
+            return { name, price, qty };
+          });
+        }
+      }
+    } catch(e) {}
+
+    const parcelSelected = safeGet('parcelSelected') === 'true';
+
+    const orderBody = {
+      customerName,
+      items,
+      amount: currentAmount,
+      method: 'online',
+      provider: 'UPI',
+      parcelSelected
+    };
+
+    try {
+      const response = await FPAPI.post('/orders', orderBody);
+      if (response && response._id) {
+        localStorage.setItem('fp_last_order', JSON.stringify(response));
+        safeSet('justPaid', '1');
+        window.location.href = 'thank-you.html';
+      } else {
+        throw new Error('Invalid order response');
+      }
+    } catch (err) {
+      console.error('Order placement failed:', err);
+      alert('Failed to place order. Please try again.');
+      iPaidBtn.disabled = false;
+      iPaidBtn.textContent = 'Retry Payment Confirmation';
+    }
   });
 
   // copy UPI ID
@@ -1223,18 +1336,9 @@
     initAmount();
     updateUpiDisplay();
     setupPaymentIntent();
-    const prevMethod = safeGet('paymentMethod');
-    if (prevMethod === 'online') showOnlineUI();
-    else hideOnlineUI();
     setInterval(periodicCartSync, 1200);
     setInterval(periodicUpiSync, 2000); // check UPI settings every 2 seconds
   })();
-
-  window.refreshPaymentQR = function() {
-    fetchUpiSettings();
-    updateUpiDisplay();
-    refreshAmountAndQR();
-  };
 </script>
 </body>
 </html>

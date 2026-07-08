@@ -825,7 +825,6 @@
 
   <script>
     // ---------- USER LOGIN / SIGNUP (same logic) ----------
-    const USERS_KEY = "fp_users";
     const CURRENT_USER_KEY = "fp_current_user";
     const SHOP_STATUS_KEY = "shopStatus";
 
@@ -848,18 +847,6 @@
     const successMsg    = document.getElementById("successMsg");
 
     let mode = "login"; // or "signup"
-
-    function loadUsers() {
-      try {
-        return JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
-      } catch {
-        return [];
-      }
-    }
-
-    function saveUsers(users) {
-      localStorage.setItem(USERS_KEY, JSON.stringify(users));
-    }
 
     function getCurrentUser() {
       try {
@@ -941,10 +928,6 @@
         message.textContent = "Shop is currently closed. Customer login/signup is disabled until the owner reopens it.";
         return;
       }
-      message.textContent = "";
-      successMsg.textContent = "";
-
-      const users = loadUsers();
 
       if (mode === "login") {
           const identifier = loginIdInput.value.trim().toLowerCase();
@@ -955,34 +938,27 @@
             return;
           }
 
-          // Try backend login first; fallback to local users
           try {
             const data = await FPAPI.post('/auth/login', { identifier, password });
             if (data && data.token) localStorage.setItem('fp_token', data.token);
             if (data && data.user) setCurrentUser(data.user);
             successMsg.textContent = 'Logged in successfully. Redirecting…';
             setTimeout(() => window.location.href = 'menu.html', 700);
-            return;
           } catch (e) {
-            // network error or non-2xx — fall through to local fallback
+            let errorMsg = 'Invalid credentials or connection error.';
+            if (e.message && e.message.includes('API error')) {
+              try {
+                const parts = e.message.split(' ');
+                const status = parts[2];
+                if (status === '401') {
+                  errorMsg = 'Invalid username or password.';
+                } else if (status === '400') {
+                  errorMsg = 'Please fill in login and password.';
+                }
+              } catch (err) {}
+            }
+            message.textContent = errorMsg;
           }
-
-          // Fallback: local users
-          const user = users.find(u =>
-            (u.email && u.email.toLowerCase() === identifier) ||
-            (u.name && u.name.toLowerCase() === identifier)
-          );
-
-          if (!user || user.password !== password) {
-            message.textContent = "Invalid details. Try again.";
-            return;
-          }
-
-          setCurrentUser(user);
-          successMsg.textContent = "Logged in successfully. Redirecting…";
-          setTimeout(() => {
-            window.location.href = "menu.html";
-          }, 700);
       } else {
         const name = nameInput.value.trim();
         const email = emailInput.value.trim().toLowerCase();
@@ -1005,36 +981,28 @@
           message.textContent = "Passwords do not match.";
           return;
         }
-        if (users.some(u => u.email === email)) {
-          message.textContent = "This email is already registered.";
-          return;
-        }
 
-        // Try to create user on backend first; fallback to local storage
         try {
           const data = await FPAPI.post('/auth/signup', { name, email, password });
           if (data && data.token) localStorage.setItem('fp_token', data.token);
           if (data && data.user) setCurrentUser(data.user);
           successMsg.textContent = 'Account created! Redirecting…';
           setTimeout(() => window.location.href = 'menu.html', 800);
-          return;
         } catch (e) {
-          // network error -> fallback to local storage
+          let errorMsg = 'Signup failed. Please try again.';
+          if (e.message && e.message.includes('API error')) {
+            try {
+              const parts = e.message.split(' ');
+              const status = parts[2];
+              if (status === '409') {
+                errorMsg = 'This email is already registered.';
+              } else if (status === '400') {
+                errorMsg = 'Please fill all fields.';
+              }
+            } catch (err) {}
+          }
+          message.textContent = errorMsg;
         }
-
-        const newUser = {
-          id: Date.now(),
-          name,
-          email,
-          password
-        };
-        users.push(newUser);
-        saveUsers(users);
-        setCurrentUser(newUser);
-        successMsg.textContent = "Account created! Redirecting…";
-        setTimeout(() => {
-          window.location.href = "menu.html";
-        }, 800);
       }
     }
 
@@ -1105,9 +1073,7 @@
       const input = document.getElementById("ownerPasswordInput");
       const error = document.getElementById("ownerErrorMsg");
       const entered = (input.value || '').toString().trim();
-      const correct = (getOwnerPassword() || '1515').toString().trim();
 
-      // Try backend owner login first (graceful fallback to local password)
       (async () => {
         try {
           const data = await FPAPI.post('/auth/login', { identifier: 'Owner', password: entered });
@@ -1117,17 +1083,7 @@
           localStorage.removeItem(ATTEMPTS_KEY);
           localStorage.removeItem(LOCKOUT_KEY);
           window.location.href = 'owner-dashboard.html';
-          return;
         } catch (e) {
-          // network error — ignore and fallback
-        }
-
-        // Fallback: local password check
-        if (entered === correct) {
-          localStorage.removeItem(ATTEMPTS_KEY);
-          localStorage.removeItem(LOCKOUT_KEY);
-          window.location.href = "owner.html";
-        } else {
           input.classList.add("error");
           error.classList.add("show");
           ownerFailedAttempt();

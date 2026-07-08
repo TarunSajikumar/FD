@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes" />
+  <title>Food Point | Cash Payment</title>
+
+  <!-- fontawesome (for icons) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+  <!-- external scripts for compatibility -->
+  <script src="fp-config.js"></script>
+  <script src="fp-fetch-proxy.js"></script>
+  <script src="api.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      /* Backgrounds - Crypto Dark Theme */
+      --bg-primary: #0A0A0F;
+      --bg-secondary: #111116;
+      --bg-card: #15171E;
+      --bg-elevated: #1A1C23;
+      --bg-userbar: #0D0D12;
+      
+      /* Text Colors */
+      --text-primary: #FFFFFF;
+      --text-secondary: #8A8F9E;
+      --text-muted: #5A5F73;
+      
+      /* Accent Colors */
+      --accent-green: #00FF85;
+      --accent-blue: #3B82F6;
+      --accent-red: #FF4D4D;
+      --accent-orange: #F97316;
+      --accent-purple: #A855F7;
+      
+      /* Borders */
+      --border-subtle: #1E1E2E;
+      --border-card: rgba(255, 255, 255, 0.05);
+      
+      /* Spacing */
+      --spacing-xs: 0.5rem;
+      --spacing-sm: 1rem;
+      --spacing-md: 1.5rem;
+      --spacing-lg: 2rem;
+      --spacing-xl: 3rem;
+      
+      /* Border Radius */
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      
+      /* Gradients */
+      --gradient-primary: linear-gradient(135deg, #00FF85 0%, #00C96D 100%);
+      --gradient-card-hover: linear-gradient(180deg, #1A1C23 0%, #111116 100%);
+      --gradient-glow: radial-gradient(circle at 50% 0%, rgba(0, 255, 133, 0.08), transparent);
+      --gradient-amount: linear-gradient(135deg, #00FF85 0%, #3B82F6 100%);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    /* User Bar */
+    .user-bar {
+      background: linear-gradient(135deg, rgba(13, 13, 18, 0.95) 0%, rgba(21, 23, 30, 0.9) 100%);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(0, 255, 133, 0.1);
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      border-radius: 50px;
+      z-index: 100;
+      max-width: 600px;
+      width: calc(100% - 40px);
+      box-shadow: 0 8px 32px rgba(0, 255, 133, 0.08), 0 0 20px rgba(0, 255, 133, 0.04);
+      animation: floatingBar 3s ease-in-out infinite, userBarEnter 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .user-bar:hover {
+      box-shadow: 0 12px 40px rgba(0, 255, 133, 0.15), 0 0 30px rgba(0, 255, 133, 0.08);
+      border-color: rgba(0, 255, 133, 0.2);
+    }
+
+    @keyframes userBarEnter {
+      from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+    }
+
+    @keyframes floatingBar {
+      0%, 100% {
+        transform: translateX(-50%) translateY(0);
+      }
+      50% {
+        transform: translateX(-50%) translateY(-8px);
+      }
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .user-avatar {
+      width: 44px;
+      height: 44px;
+      background: var(--gradient-primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 20px;
+      color: #0A0A0F;
+      animation: avatarPulse 2s ease-in-out infinite;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .user-avatar:hover {
+      transform: scale(1.1) rotate(5deg);
+      box-shadow: 0 0 20px rgba(0, 255, 133, 0.4);
+    }
+
+    @keyframes avatarPulse {
+      0%, 100% {
+        box-shadow: 0 0 0 0 rgba(0, 255, 133, 0.4);
+      }
+      50% {
+        box-shadow: 0 0 0 8px rgba(0, 255, 133, 0);
+      }
+    }
+
+    .user-text .user-name {
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+    }
+
+    .user-text .user-email {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .logout-btn {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      padding: 8px 20px;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      animation: buttonEnter 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s backwards;
+    }
+
+    .logout-btn:hover {
+      border-color: var(--accent-blue);
+      color: var(--accent-blue);
+      background: rgba(59, 130, 246, 0.05);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(59, 130, 246, 0.25);
+    }
+
+    /* Floating circles */
+    .bg-circle-1,
+    .bg-circle-2,
+    .bg-circle-3 {
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+      filter: blur(40px);
+    }
+
+    .bg-circle-1 {
+      width: 300px;
+      height: 300px;
+      top: 10%;
+      right: 5%;
+      background: radial-gradient(circle, rgba(0, 255, 133, 0.3) 0%, rgba(0, 255, 133, 0.1) 40%, transparent 70%);
+      animation: floatComplex1 25s ease-in-out infinite;
+    }
+
+    .bg-circle-2 {
+      width: 250px;
+      height: 250px;
+      bottom: 15%;
+      left: 8%;
+      background: radial-gradient(circle, rgba(255, 157, 77, 0.25) 0%, rgba(255, 157, 77, 0.08) 40%, transparent 70%);
+      animation: floatComplex2 30s ease-in-out infinite;
+    }
+
+    .bg-circle-3 {
+      width: 280px;
+      height: 280px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(circle, rgba(255, 100, 50, 0.2) 0%, rgba(255, 100, 50, 0.05) 40%, transparent 70%);
+      animation: floatComplex3 35s ease-in-out infinite;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+      radial-gradient(circle at 20% 50%, rgba(0, 255, 133, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(255, 157, 77, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 50% 0%, rgba(255, 100, 50, 0.12) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+      animation: gradientShift 15s ease-in-out infinite;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: 
+      linear-gradient(90deg, transparent 1px, rgba(0, 255, 133, 0.03) 1px),
+      linear-gradient(transparent 1px, rgba(0, 255, 133, 0.03) 1px);
+      background-size: 50px 50px;
+      pointer-events: none;
+      z-index: 0;
+      animation: gridShift 20s linear infinite;
+    }
+
+    .container {
+      max-width: 550px;
+      width: 100%;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+      animation: fadeInUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+      padding-top: 80px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 32px;
+      animation: fadeInUp 0.6s ease-out backwards;
+    }
+
+    header h1 {
+      font-size: 1.6rem;
+      font-weight: 800;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+      filter: drop-shadow(0 0 20px rgba(0, 255, 133, 0.3));
+      animation: titleShimmer 3s ease-in-out infinite;
+    }
+
+    @keyframes titleShimmer {
+      0%, 100% {
+        filter: drop-shadow(0 0 20px rgba(0, 255, 133, 0.3));
+      }
+      50% {
+        filter: drop-shadow(0 0 30px rgba(0, 255, 133, 0.5));
+      }
+    }
+
+    header p {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      animation: subtitleEnter 0.8s ease-out 0.15s backwards;
+    }
+
+    @keyframes subtitleEnter {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Payment Card */
+    .payment-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 255, 133, 0.05);
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      animation: cardEnter 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s backwards;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .payment-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, rgba(0, 255, 133, 0.15), transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 0.2;
+      animation: shimmerPulse 4s ease-in-out infinite;
+    }
+
+    @keyframes shimmerPulse {
+      0%, 100% {
+        opacity: 0.2;
+      }
+      50% {
+        opacity: 0.4;
+      }
+    }
+
+    .payment-card:hover {
+      box-shadow: 0 30px 60px -15px rgba(0, 255, 133, 0.25), 0 0 0 1px rgba(0, 255, 133, 0.15), inset 0 0 20px rgba(0, 255, 133, 0.08);
+      transform: translateY(-3px) scale(1.01);
+    }
+
+    .btn {
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transform: rotate(45deg);
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      pointer-events: none;
+    }
+
+    .btn:hover::before {
+      opacity: 1;
+    }
+
+    .btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top left, rgba(0, 255, 133, 0.12), transparent 45%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+
+    .btn:hover::after {
+      opacity: 1;
+    }
+
+    /* Amount Row */
+    .amount-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding-bottom: 20px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border-subtle);
+      animation: fadeInUp 0.6s ease-out 0.2s backwards;
+    }
+
+    .amount-row .label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      animation: fadeInUp 0.6s ease-out 0.15s backwards;
+    }
+
+    .amount-row .value {
+      font-size: 2rem;
+      font-weight: 800;
+      background: var(--gradient-amount);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: fadeInUp 0.6s ease-out 0.25s backwards;
+      filter: drop-shadow(0 0 15px rgba(0, 255, 133, 0.2));
+    }
+
+    /* Buttons */
+    .btn {
+      background: var(--gradient-primary);
+      border: none;
+      padding: 12px 24px;
+      border-radius: 100px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #0A0A0F;
+      animation: buttonEnter 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s backwards;
+    }
+
+    .btn:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 10px 30px rgba(0, 255, 133, 0.4), inset 0 0 10px rgba(255, 255, 255, 0.1);
+    }
+
+    .btn:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+    @keyframes buttonEnter {
+      from {
+        opacity: 0;
+        transform: scale(0.9) translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      animation: buttonEnter 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.5s backwards;
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--accent-green);
+      color: var(--accent-green);
+      background: rgba(0, 255, 133, 0.05);
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 6px 16px rgba(0, 255, 133, 0.2);
+    }
+
+    /* Info card */
+    .info-card {
+      text-align: center;
+      margin-bottom: 24px;
+      padding: 24px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      animation: cardEnter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s backwards;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .info-card:hover {
+      border-color: rgba(0, 255, 133, 0.2);
+      box-shadow: 0 8px 20px rgba(0, 255, 133, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .info-card i {
+      font-size: 48px;
+      color: var(--accent-green);
+      margin-bottom: 16px;
+      filter: drop-shadow(0 0 10px rgba(0, 255, 133, 0.3));
+    }
+
+    .info-card h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .info-card p {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* Footer */
+    footer {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border-subtle);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      animation: fadeInUp 0.6s ease-out 0.7s backwards;
+    }
+
+    footer i {
+      margin-right: 6px;
+      color: var(--accent-green);
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes gradientShift {
+      0%, 100% {
+        background: 
+        radial-gradient(circle at 20% 50%, rgba(0, 255, 133, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(255, 157, 77, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 50% 0%, rgba(255, 100, 50, 0.12) 0%, transparent 60%);
+      }
+      50% {
+        background: 
+        radial-gradient(circle at 80% 20%, rgba(0, 255, 133, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 20% 80%, rgba(255, 157, 77, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 50% 100%, rgba(255, 100, 50, 0.12) 0%, transparent 60%);
+      }
+    }
+
+    @keyframes gridShift {
+      0% {
+        background-position: 0 0, 0 0;
+      }
+      100% {
+        background-position: 50px 50px, 50px 50px;
+      }
+    }
+
+    @keyframes floatComplex1 {
+      0%, 100% {
+        transform: translate(0, 0) scale(1) rotate(0deg);
+      }
+      25% {
+        transform: translate(30px, -40px) scale(1.1) rotate(90deg);
+      }
+      50% {
+        transform: translate(-20px, 30px) scale(0.95) rotate(180deg);
+      }
+      75% {
+        transform: translate(40px, 20px) scale(1.05) rotate(270deg);
+      }
+    }
+
+    @keyframes floatComplex2 {
+      0%, 100% {
+        transform: translate(0, 0) scale(1) rotate(0deg);
+      }
+      25% {
+        transform: translate(-35px, 25px) scale(0.9) rotate(-90deg);
+      }
+      50% {
+        transform: translate(25px, -35px) scale(1.08) rotate(-180deg);
+      }
+      75% {
+        transform: translate(-20px, -15px) scale(0.98) rotate(-270deg);
+      }
+    }
+
+    @keyframes floatComplex3 {
+      0%, 100% {
+        transform: translate(-50%, -50%) scale(1) rotate(0deg);
+      }
+      25% {
+        transform: translate(-50%, -40%) scale(1.08) rotate(45deg);
+      }
+      50% {
+        transform: translate(-60%, -50%) scale(0.95) rotate(90deg);
+      }
+      75% {
+        transform: translate(-40%, -60%) scale(1.05) rotate(135deg);
+      }
+    }
+
+    @keyframes cardEnter {
+      from {
+        opacity: 0;
+        transform: translateY(24px) scale(0.98);
+        filter: blur(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 560px) {
+      body {
+        padding: 16px;
+      }
+      .payment-card {
+        padding: 20px;
+      }
+      .amount-row .value {
+        font-size: 1.5rem;
+      }
+      footer {
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Floating circle decorations -->
+<div class="bg-circle-1"></div>
+<div class="bg-circle-2"></div>
+<div class="bg-circle-3"></div>
+
+<div class="user-bar">
+  <div class="user-info">
+    <div class="user-avatar">🍔</div>
+    <div class="user-text">
+      <div class="user-name">FOOD POINT</div>
+      <div class="user-email">secure checkout</div>
+    </div>
+  </div>
+  <button class="logout-btn" onclick="location.href='payment-way.html'"><i class="fas fa-arrow-left"></i> Back</button>
+</div>
+
+<div class="container">
+  <header>
+    <h1>✨ FOOD POINT CASH PAYMENT</h1>
+    <p>Pay on delivery — trusted & easy 💵</p>
+  </header>
+
+  <div class="payment-card">
+    <div class="amount-row">
+      <div class="label">💰 TOTAL AMOUNT</div>
+      <div class="value" id="amountValue">₹0.00</div>
+    </div>
+
+    <!-- Cash Delivery Info -->
+    <div class="info-card">
+      <i class="fa-solid fa-money-bill-wave"></i>
+      <h3>Cash on Delivery</h3>
+      <p>Please keep the exact change ready when the delivery agent arrives at your doorstep. You will receive an instant confirmation of your order once you click the button below.</p>
+    </div>
+
+    <div id="actionArea" style="display: flex; flex-direction: column; gap: 14px;">
+      <button class="btn" id="payCashBtn" style="width: 100%; justify-content: center;"><i class="fa-solid fa-money-bill-wave"></i> Confirm Cash Order</button>
+      <button class="btn btn-ghost" onclick="location.href='payment-way.html'" style="width: 100%; justify-content: center;"><i class="fa-solid fa-arrow-left"></i> Back to Payment Options</button>
+    </div>
+
+    <footer>
+      <div><i class="fa-regular fa-shield-haltered"></i> Provider: <strong>COD Verified</strong></div>
+      <div><i class="fa-regular fa-clock"></i> Instant confirmation</div>
+    </footer>
+  </div>
+</div>
+
+<script>
+  /* ---------- secure storage helpers ---------- */
+  function getCurrentUser() {
+    try {
+      const raw = localStorage.getItem("fp_current_user");
+      return raw ? JSON.parse(raw) : null;
+    } catch(e) { return null; }
+  }
+
+  function getUserSpecificKey(baseKey) {
+    const user = getCurrentUser();
+    return user && user.id ? baseKey + "_" + user.id : baseKey;
+  }
+
+  function safeGet(key) { try { return localStorage.getItem(getUserSpecificKey(key)); } catch(e) { return null; } }
+  function safeSet(key, val) { try { localStorage.setItem(getUserSpecificKey(key), String(val)); } catch(e) {} }
+
+  function parseAmountRaw(raw) {
+    if (!raw) return null;
+    const cleaned = String(raw).replace(/[₹, ]+/g, '').trim();
+    const n = parseFloat(cleaned);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  function computeAmountFromCart() {
+    try {
+      const cartJson = safeGet('cartItems') || safeGet('selectedFoods_v1') || safeGet('selectedFoods');
+      if (cartJson) {
+        const parsed = JSON.parse(cartJson);
+        if (Array.isArray(parsed) && parsed.length) {
+          let total = 0;
+          parsed.forEach(it => {
+            const price = (it && (it.price || it.priceNumeric || it.amount)) || 0;
+            const qty = (it && (it.qty || it.quantity || it.qtyOrdered)) || 1;
+            const pnum = parseFloat(String(price).replace(/[₹, ]+/g, '')) || 0;
+            const qnum = parseFloat(qty) || 1;
+            total += pnum * qnum;
+          });
+          if (total > 0) return total;
+        }
+      }
+    } catch(e) {}
+    try {
+      const legacy = safeGet('selectedFoods') || safeGet('selectedFoods_v1');
+      if (legacy) {
+        const arr = JSON.parse(legacy);
+        if (Array.isArray(arr)) {
+          const DEFAULT_PRICE = 129;
+          return arr.length * DEFAULT_PRICE;
+        }
+      }
+    } catch(e) {}
+    return null;
+  }
+
+  let currentAmount = 0;
+
+  /* amount & cart sync */
+  function initAmount() {
+    let numeric = parseAmountRaw(safeGet('amountPaid') || safeGet('amountValue') || safeGet('cartAmount'));
+    if (numeric === null) numeric = computeAmountFromCart();
+    if (numeric === null || isNaN(numeric)) numeric = 0;
+    currentAmount = Math.round(numeric * 100) / 100;
+    const amountEl = document.getElementById('amountValue');
+    if (amountEl) amountEl.textContent = '₹' + currentAmount.toFixed(2);
+    safeSet('amountPaidNumeric', currentAmount);
+    return currentAmount;
+  }
+
+  function refreshAmount() {
+    let newAmt = currentAmount;
+    const amountSpan = document.getElementById('amountValue');
+    if (amountSpan) {
+      const rawText = amountSpan.innerText.replace('₹', '');
+      const parsed = parseFloat(rawText);
+      if (!isNaN(parsed) && parsed !== newAmt) newAmt = parsed;
+    }
+    if (newAmt !== currentAmount) {
+      currentAmount = newAmt;
+      safeSet('amountPaidNumeric', currentAmount);
+    }
+  }
+
+  const payCashBtn = document.getElementById('payCashBtn');
+
+  // Cash payment
+  payCashBtn.addEventListener('click', async () => {
+    payCashBtn.disabled = true;
+    payCashBtn.textContent = 'Processing...';
+
+    let customerName = 'Guest';
+    try {
+      const userRaw = localStorage.getItem('fp_current_user');
+      if (userRaw) {
+        const user = JSON.parse(userRaw);
+        if (user && user.name) customerName = user.name;
+      }
+    } catch (e) {}
+
+    let items = [];
+    try {
+      const cartJson = safeGet('cartItems') || safeGet('selectedFoods_v1') || safeGet('selectedFoods');
+      if (cartJson) {
+        const parsed = JSON.parse(cartJson);
+        if (Array.isArray(parsed)) {
+          items = parsed.map(it => {
+            const name = it.name || it.title || it.itemName || String(it);
+            const price = parseFloat(String(it.price || it.numericPrice || 0).replace(/[₹, ]+/g, '')) || 0;
+            const qty = parseInt(it.qty || it.quantity || 1) || 1;
+            return { name, price, qty };
+          });
+        }
+      }
+    } catch(e) {}
+
+    const parcelSelected = safeGet('parcelSelected') === 'true';
+
+    const orderBody = {
+      customerName,
+      items,
+      amount: currentAmount,
+      method: 'cash',
+      parcelSelected
+    };
+
+    try {
+      const response = await FPAPI.post('/orders', orderBody);
+      if (response && response._id) {
+        localStorage.setItem('fp_last_order', JSON.stringify(response));
+        safeSet('justPaid', '1');
+        window.location.href = 'thank-you.html';
+      } else {
+        throw new Error('Invalid order response');
+      }
+    } catch (err) {
+      console.error('Order placement failed:', err);
+      alert('Failed to place order. Please try again.');
+      payCashBtn.disabled = false;
+      payCashBtn.textContent = 'Retry Cash Payment';
+    }
+  });
+
+  /* storage event listener for owner dashboard changes */
+  window.addEventListener('storage', (event) => {
+    console.log('Storage event:', event.key, event.newValue);
+    if (event.key === 'amountPaidNumeric' || event.key === 'cartAmount' || event.key === 'cartItems') {
+      let val = parseAmountRaw(event.newValue);
+      if (val !== null && !isNaN(val) && val !== currentAmount) {
+        currentAmount = val;
+        document.getElementById('amountValue').innerText = '₹' + currentAmount.toFixed(2);
+        refreshAmount();
+      }
+    }
+  });
+
+  /* also manual fallback: watch amount from cart periodically */
+  function periodicCartSync() {
+    const cartTotal = computeAmountFromCart();
+    if (cartTotal !== null && cartTotal !== currentAmount && cartTotal > 0) {
+      currentAmount = cartTotal;
+      document.getElementById('amountValue').innerText = '₹' + currentAmount.toFixed(2);
+      safeSet('amountPaidNumeric', currentAmount);
+      refreshAmount();
+    }
+  }
+
+  /* INIT */
+  (function init() {
+    initAmount();
+    setInterval(periodicCartSync, 1200);
+  })();
+</script>
+</body>
+</html>

@@ -55,5 +55,48 @@ window.FPAPI = window.FPAPI || {
   get(path) { return this.fetch(path, { method: 'GET' }); },
   post(path, body) { return this.fetch(path, { method: 'POST', body }); },
   put(path, body) { return this.fetch(path, { method: 'PUT', body }); },
-  delete(path, body) { return this.fetch(path, { method: 'DELETE', body }); }
+  delete(path, body) { return this.fetch(path, { method: 'DELETE', body }); },
+
+  setupSocket(callbacks = {}) {
+    try {
+      const script = document.createElement('script');
+      const scriptSrc = (window.FP && window.FP.SOCKET_IO_SCRIPT) ? window.FP.SOCKET_IO_SCRIPT : '/socket.io/socket.io.js';
+      script.src = scriptSrc;
+      script.onload = () => {
+        try {
+          const socketOpts = {};
+          const token = localStorage.getItem('fp_owner_token') || localStorage.getItem('fp_token');
+          if (token) socketOpts.auth = { token };
+          const socketUrl = (window.FP && window.FP.SOCKET_IO_URL) ? window.FP.SOCKET_IO_URL : undefined;
+          const socket = socketUrl ? io(socketUrl, socketOpts) : io(socketOpts);
+          
+          socket.on('connect', () => {
+            console.log('Socket.IO connected');
+            if (callbacks.onConnect) callbacks.onConnect(socket);
+          });
+          
+          socket.on('orderCreated', (o) => {
+            if (callbacks.onOrderCreated) callbacks.onOrderCreated(o);
+          });
+          
+          socket.on('orderUpdated', (o) => {
+            if (callbacks.onOrderUpdated) callbacks.onOrderUpdated(o);
+          });
+          
+          socket.on('shopStatusChanged', (s) => {
+            if (callbacks.onShopStatusChanged) callbacks.onShopStatusChanged(s);
+          });
+          
+          socket.on('paymentReceived', (o) => {
+            if (callbacks.onPaymentReceived) callbacks.onPaymentReceived(o);
+          });
+        } catch (e) {
+          console.warn('Socket.IO init failed', e);
+        }
+      };
+      document.head.appendChild(script);
+    } catch (e) {
+      console.warn('setupSocket failed', e);
+    }
+  }
 };

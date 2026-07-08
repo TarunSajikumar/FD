@@ -26,7 +26,6 @@ const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true, lowercase: true },
   password: { type: String, required: true },
-  plainPassword: { type: String, default: '' },
   role: { type: String, default: 'customer', enum: ['customer', 'owner'] },
   createdAt: { type: Date, default: Date.now }
 });
@@ -34,6 +33,7 @@ const userSchema = new mongoose.Schema({
 const menuItemSchema = new mongoose.Schema({
   name: { type: String, required: true },
   price: { type: Number, required: true },
+  category: { type: String, default: 'Uncategorized' },
   description: { type: String, default: '' },
   available: { type: Boolean, default: true },
   createdAt: { type: Date, default: Date.now }
@@ -50,7 +50,8 @@ const orderSchema = new mongoose.Schema({
   amount: { type: Number, required: true },
   method: { type: String, default: 'cash' },
   provider: { type: String },
-  status: { type: String, default: 'paid', enum: ['paid', 'unpaid', 'cancelled'] },
+  status: { type: String, default: 'new', enum: ['paid', 'unpaid', 'cancelled', 'completed', 'pending', 'new'] },
+  parcelSelected: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now }
 });
 
@@ -112,7 +113,7 @@ app.get(`${API_BASE}/menu`, async (req, res) => {
 
 app.post(`${API_BASE}/menu`, requireAuth, requireOwner, async (req, res) => {
   try {
-    const { name, price, description, available } = req.body;
+    const { name, price, category, description, available } = req.body;
     if (!name || price == null) {
       return res.status(400).json({ error: 'name and price are required' });
     }
@@ -120,6 +121,7 @@ app.post(`${API_BASE}/menu`, requireAuth, requireOwner, async (req, res) => {
     const item = new MenuItem({
       name: String(name),
       price: Number(price),
+      category: String(category || 'Uncategorized'),
       description: String(description || ''),
       available: available !== false
     });
@@ -132,10 +134,11 @@ app.post(`${API_BASE}/menu`, requireAuth, requireOwner, async (req, res) => {
 
 app.put(`${API_BASE}/menu/:id`, requireAuth, requireOwner, async (req, res) => {
   try {
-    const { name, price, description, available } = req.body;
+    const { name, price, category, description, available } = req.body;
     const updates = {};
     if (name != null) updates.name = String(name);
     if (price != null) updates.price = Number(price);
+    if (category != null) updates.category = String(category);
     if (description != null) updates.description = String(description);
     if (available != null) updates.available = Boolean(available);
 
@@ -182,6 +185,11 @@ app.get(`${API_BASE}/orders`, requireAuth, async (req, res) => {
 
 app.post(`${API_BASE}/orders`, async (req, res) => {
   try {
+    const shopSetting = await ShopSetting.findOne({ key: 'shopStatus' });
+    if (shopSetting && shopSetting.value === 'closed') {
+      return res.status(400).json({ error: 'Shop is currently closed' });
+    }
+
     const { customerName, items, amount, method, provider, status } = req.body;
     if (!customerName || !Array.isArray(items) || items.length === 0 || amount == null) {
       return res.status(400).json({ error: 'customerName, items, and amount are required' });
@@ -209,13 +217,17 @@ app.post(`${API_BASE}/orders`, async (req, res) => {
       amount: Number(amount),
       method: String(method || 'cash'),
       provider: provider || null,
-      status: String(status || 'paid')
+      status: String(status || 'paid'),
+      parcelSelected: Boolean(req.body.parcelSelected)
     });
 
     await order.save();
     const populatedOrder = await Order.findById(order._id).populate('customerId', 'name email');
     res.status(201).json(populatedOrder);
     io.emit('orderCreated', populatedOrder);
+    if (populatedOrder.status === 'paid') {
+      io.emit('paymentReceived', populatedOrder);
+    }
   } catch (error) {
     res.status(500).json({ error: 'Failed to create order' });
   }
@@ -224,8 +236,8 @@ app.post(`${API_BASE}/orders`, async (req, res) => {
 app.put(`${API_BASE}/orders/:id/status`, requireAuth, requireOwner, async (req, res) => {
   try {
     const { status } = req.body;
-    if (!['paid', 'unpaid', 'cancelled'].includes(status)) {
-      return res.status(400).json({ error: 'Invalid status. Must be paid, unpaid, or cancelled' });
+    if (!['paid', 'unpaid', 'cancelled', 'completed', 'pending', 'new'].includes(status)) {
+      return res.status(400).json({ error: 'Invalid status. Must be paid, unpaid, cancelled, completed, pending, or new' });
     }
 
     const order = await Order.findByIdAndUpdate(
@@ -240,6 +252,9 @@ app.put(`${API_BASE}/orders/:id/status`, requireAuth, requireOwner, async (req, 
 
     res.json(order);
     io.emit('orderUpdated', order);
+    if (status === 'paid') {
+      io.emit('paymentReceived', order);
+    }
   } catch (error) {
     res.status(500).json({ error: 'Failed to update order status' });
   }
@@ -350,7 +365,6 @@ app.post(`${API_BASE}/auth/signup`, async (req, res) => {
       name: String(name),
       email: normalizedEmail,
       password: hashedPassword,
-      plainPassword: String(password),
       role: 'customer'
     });
 
@@ -409,6 +423,61 @@ app.put(`${API_BASE}/shop/status`, requireAuth, requireOwner, async (req, res) =
   }
 });
 
+// ─── Analytics / Dashboard Endpoint ──────────────────────────────────────────
+
+app.get(`${API_BASE}/dashboard`, requireAuth, requireOwner, async (req, res) => {
+  try {
+    const orders = await Order.find({});
+    
+    const todayStr = new Date().toLocaleDateString("en-IN");
+    const yesterdayStr = new Date(Date.now() - 86400000).toLocaleDateString("en-IN");
+    
+    let totalOrders = 0;
+    let totalRevenue = 0;
+    let todayOrders = 0;
+    let todayRevenue = 0;
+    let yesterdayOrders = 0;
+    let yesterdayRevenue = 0;
+    let cashCount = 0;
+    let onlineCount = 0;
+
+    orders.forEach(order => {
+      totalOrders++;
+      
+      const amount = Number(order.amount) || 0;
+      totalRevenue += amount;
+
+      const orderDate = new Date(order.createdAt).toLocaleDateString("en-IN");
+      if (orderDate === todayStr) {
+        todayOrders++;
+        todayRevenue += amount;
+      } else if (orderDate === yesterdayStr) {
+        yesterdayOrders++;
+        yesterdayRevenue += amount;
+      }
+
+      if (order.method === 'cash') {
+        cashCount++;
+      } else if (order.method === 'online') {
+        onlineCount++;
+      }
+    });
+
+    res.json({
+      totalOrders,
+      totalRevenue,
+      todayOrders,
+      todayRevenue,
+      yesterdayOrders,
+      yesterdayRevenue,
+      cashCount,
+      onlineCount
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch dashboard metrics' });
+  }
+});
+
 // ─── Socket.IO ────────────────────────────────────────────────────────────────
 
 io.use((socket, next) => {
@@ -447,9 +516,18 @@ async function start() {
     const menuCount = await MenuItem.countDocuments();
     if (menuCount === 0) {
       await MenuItem.insertMany([
-        { name: 'Classic Burger', price: 149.99, description: 'Juicy beef burger with lettuce, tomato and house sauce.', available: true },
-        { name: 'Paneer Wrap', price: 129.99, description: 'Spiced paneer wrap with fresh greens and mint chutney.', available: true },
-        { name: 'Mango Lassi', price: 79.99, description: 'Creamy mango lassi with cardamom and honey.', available: true }
+        { name: 'Chicken Dum Biryani', price: 100, category: '🍛 BIRYANI', description: 'Aromatic basmati rice with tender chicken', available: true },
+        { name: 'Chicken Fry Biryani', price: 90, category: '🍛 BIRYANI', description: 'Fried chicken pieces with flavorful rice', available: true },
+        { name: 'Egg Biryani', price: 90, category: '🍛 BIRYANI', description: 'Boiled eggs with spiced rice', available: true },
+        { name: 'Veg Momo (Steam)', price: 60, category: '🥟 MOMO', description: 'Steamed vegetable dumplings', available: true },
+        { name: 'Chicken Momo (Steam)', price: 70, category: '🥟 MOMO', description: 'Steamed chicken dumplings', available: true },
+        { name: 'Chilli Chicken', price: 120, category: '🍗 CHINESE NON-VEG DRY ITEMS', description: 'Spicy indo-chinese chicken', available: true },
+        { name: 'Veg Noodles', price: 50, category: '🍜 NOODLES', description: 'Mixed vegetable noodles', available: true },
+        { name: 'Chicken Noodles', price: 90, category: '🍜 NOODLES', description: 'Chicken flavored noodles', available: true },
+        { name: 'Paneer Butter Masala', price: 140, category: '🍲 CURRY ITEMS – VEG', description: 'Paneer in creamy tomato gravy', available: true },
+        { name: 'Butter Chicken', price: 180, category: '🍛 CURRY ITEMS – NON-VEG', description: 'Creamy butter chicken', available: true },
+        { name: 'Veg Fried Rice', price: 50, category: '🍚 RICE ITEMS – VEG', description: 'Mixed vegetable fried rice', available: true },
+        { name: 'Chicken Fried Rice', price: 90, category: '🍗 RICE ITEMS – NON-VEG', description: 'Chicken fried rice', available: true }
       ]);
       console.log('Initial menu items seeded');
     }

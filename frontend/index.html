@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <script src="fp-config.js"></script>
+  <script src="fp-fetch-proxy.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -442,8 +443,14 @@
 
   await loadShopStatus();
 
-  // Poll every 30 s so status stays fresh without refresh
-  setInterval(loadShopStatus, 30000);
+  // Setup Socket.IO real-time shop status listener
+  FPAPI.setupSocket({
+    onShopStatusChanged: (s) => {
+      const status = s.status || s;
+      localStorage.setItem('shopStatus', status);
+      applyStatus(status === 'open');
+    }
+  });
 })();
 </script>
 </body>

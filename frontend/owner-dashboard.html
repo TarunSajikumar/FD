@@ -9,7 +9,6 @@
   <script src="fp-config.js"></script>
   <script src="fp-fetch-proxy.js"></script>
   <script src="api.js"></script>
-  <script src="dev-check.js"></script>
   <style>
     * {
       margin: 0;
@@ -2604,36 +2603,30 @@
       try { localStorage.setItem('fp_migrated', '1'); } catch (e) {}
     }
 
-    // Setup Socket.IO client (if available)
+    // Setup Socket.IO client
     function setupSocket(token) {
-      try {
-        const script = document.createElement('script');
-        const scriptSrc = (window.FP && window.FP.SOCKET_IO_SCRIPT) ? window.FP.SOCKET_IO_SCRIPT : '/socket.io/socket.io.js';
-        script.src = scriptSrc;
-        script.onload = () => {
-          try {
-            const socketOpts = {};
-            if (token) socketOpts.auth = { token };
-            const socketUrl = (window.FP && window.FP.SOCKET_IO_URL) ? window.FP.SOCKET_IO_URL : undefined;
-            const socket = socketUrl ? io(socketUrl, socketOpts) : io(socketOpts);
-            socket.on('connect', () => console.log('socket connected'));
-            socket.on('newOrder', (o) => {
-              showNotification('New Order', `New order ${o.id || ''}`, 'success');
-              // refresh orders list if modal open
-              try { loadOrdersForOwner(); } catch(e){}
-            });
-            socket.on('orderUpdated', (o) => {
-              showNotification('Order Updated', `Order ${o.id || ''} updated`, 'info');
-              try { loadOrdersForOwner(); } catch(e){}
-            });
-            socket.on('shopStatus', (s) => {
-              updateOwnerStatusUI(s.status || s);
-            });
-            socket.on('paymentUpdate', (p) => { showNotification('Payment', 'Payment update received', 'info'); });
-          } catch (e) { console.warn('socket init failed', e); }
-        };
-        document.head.appendChild(script);
-      } catch (e) { console.warn('setupSocket failed', e); }
+      FPAPI.setupSocket({
+        onConnect: () => console.log('socket connected'),
+        onOrderCreated: (o) => {
+          const shortId = o._id ? o._id.slice(-6).toUpperCase() : '';
+          showNotification('New Order', `New order #${shortId} received`, 'success');
+          try { loadOrdersForOwner(); } catch(e){}
+        },
+        onOrderUpdated: (o) => {
+          const shortId = o._id ? o._id.slice(-6).toUpperCase() : '';
+          showNotification('Order Updated', `Order #${shortId} updated to ${o.status}`, 'info');
+          try { loadOrdersForOwner(); } catch(e){}
+        },
+        onShopStatusChanged: (s) => {
+          const status = s.status || s;
+          updateOwnerStatusUI(status);
+        },
+        onPaymentReceived: (o) => {
+          const shortId = o._id ? o._id.slice(-6).toUpperCase() : '';
+          showNotification('💰 Payment Received', `Received ₹${(o.amount || 0).toFixed(2)} from ${o.customerName || 'Customer'} (Order #${shortId})`, 'success');
+          try { loadOrdersForOwner(); } catch(e){}
+        }
+      });
     }
 
     async function initializeDashboard() {
@@ -2919,43 +2912,60 @@
       }
     }
 
-    function getAllOrders() {
-      let allOrders = [];
+    let cachedOrders = [];
+
+    function mapBackendOrder(o) {
+      if (!o) return null;
       
-      // Load from main ordersHistory (legacy)
-      const legacyOrders = JSON.parse(localStorage.getItem(ORDERS_KEY) || "[]");
-      allOrders.push(...legacyOrders);
+      let items = [];
+      if (Array.isArray(o.items)) {
+        items = o.items.map(it => {
+          if (typeof it === 'string') return it;
+          if (it && typeof it === 'object') {
+            const name = it.name || it.title || 'Item';
+            const qty = it.qty || it.quantity || 1;
+            return qty > 1 ? `${name} x${qty}` : name;
+          }
+          return String(it);
+        });
+      }
+
+      const amountNumeric = Number(o.amount) || 0;
       
-      // Load from all user-specific order histories
-      const users = JSON.parse(localStorage.getItem("fp_users") || "[]");
-      users.forEach(user => {
-        if (user && user.id) {
-          const userOrdersKey = ORDERS_KEY + "_" + user.id;
-          try {
-            const userOrders = JSON.parse(localStorage.getItem(userOrdersKey) || "[]");
-            // Add customerName if not present
-            userOrders.forEach(order => {
-              if (!order.customerName && user.name) {
-                order.customerName = user.name;
-              }
-            });
-            allOrders.push(...userOrders);
-          } catch (e) { /* ignore */ }
-        }
-      });
-      
-      // Remove duplicates based on order id
-      const seen = new Set();
-      allOrders = allOrders.filter(order => {
-        if (!order.id || seen.has(order.id)) return false;
-        seen.add(order.id);
-        return true;
-      });
-      
-      return allOrders;
+      return {
+        id: o._id ? o._id.slice(-6).toUpperCase() : (o.id || '###'),
+        _id: o._id,
+        customerName: o.customerName || 'Walk-in',
+        items: items,
+        amount: '₹' + amountNumeric.toFixed(2),
+        amountNumeric: amountNumeric,
+        method: o.method || 'cash',
+        status: o.status || 'new',
+        createdAt: o.createdAt || new Date().toISOString(),
+        date: o.createdAt ? new Date(o.createdAt).toLocaleDateString("en-IN") : new Date().toLocaleDateString("en-IN"),
+        parcelSelected: o.parcelSelected === true
+      };
     }
 
-    function loadOrdersForOwner() {
+    async function fetchOrdersFromBackend() {
+      try {
+        const remoteOrders = await apiFetch('/orders');
+        if (Array.isArray(remoteOrders)) {
+          cachedOrders = remoteOrders.map(mapBackendOrder);
+        } else {
+          cachedOrders = [];
+        }
+      } catch (e) {
+        console.error('Failed to fetch orders from backend:', e);
+        cachedOrders = [];
+      }
+    }
+
+    function getAllOrders() {
+      return cachedOrders;
+    }
+
+    async function loadOrdersForOwner() {
       const list = document.getElementById("ordersList");
       const empty = document.getElementById("emptyNote");
       
@@ -2963,23 +2973,23 @@
       list.innerHTML = '<div class="spinner"></div>';
       empty.style.display = "none";
 
-      setTimeout(() => {
-        try {
-          currentOrders = getAllOrders();
-        } catch (e) {
-          currentOrders = [];
-        }
+      try {
+        await fetchOrdersFromBackend();
+        currentOrders = getAllOrders();
+      } catch (e) {
+        console.error('Failed to load orders:', e);
+        currentOrders = [];
+      }
 
-        if (!currentOrders.length) {
-          list.innerHTML = "";
-          empty.style.display = "block";
-          return;
-        }
+      if (!currentOrders.length) {
+        list.innerHTML = "";
+        empty.style.display = "block";
+        return;
+      }
 
-        empty.style.display = "none";
-        renderOrders(currentOrders.slice().reverse()); // latest first
-        updateNewOrdersBadge();
-      }, 500);
+      empty.style.display = "none";
+      renderOrders(currentOrders.slice().reverse()); // latest first
+      updateNewOrdersBadge();
     }
 
     function renderOrders(orders) {
@@ -3206,25 +3216,25 @@
       };
     }
 
-    function completeOrder(orderId) {
-      let orders = JSON.parse(localStorage.getItem(ORDERS_KEY) || "[]");
-      const orderIndex = orders.findIndex(order => order.id === orderId);
-      
-      if (orderIndex !== -1) {
-        orders[orderIndex].status = 'completed';
-        orders[orderIndex].completedAt = new Date().toISOString();
-        localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
-        
+    async function completeOrder(orderId) {
+      const cached = cachedOrders.find(o => o.id === orderId);
+      const dbId = cached ? cached._id : orderId;
+
+      try {
+        await apiFetch(`/orders/${dbId}/status`, {
+          method: 'PUT',
+          body: { status: 'completed' }
+        });
         showNotification("Order Completed", `Order #${orderId} marked as completed.`, "success");
-        
-        // Refresh orders display
-        const activeFilter = document.querySelector(".filter-btn.active").dataset.filter;
-        loadOrdersForOwner();
-        if (activeFilter !== 'all') filterOrders(activeFilter);
-        
-        // Update analytics
-        updateAnalytics();
+      } catch (e) {
+        console.error('Failed to complete order on backend:', e);
+        showNotification("Error", "Failed to update order status on server.", "error");
       }
+
+      await loadOrdersForOwner();
+      const activeFilter = document.querySelector(".filter-btn.active").dataset.filter;
+      if (activeFilter !== 'all') filterOrders(activeFilter);
+      updateAnalytics();
     }
 
     let pendingConfirmationAction = null;
@@ -3263,36 +3273,25 @@
         '⚠️ Cancel Order?',
         `Are you sure you want to cancel order #${orderId}? This action cannot be undone.`,
         '⚠️',
-        () => {
-          let orders = JSON.parse(localStorage.getItem(ORDERS_KEY) || "[]");
-          const orderIndex = orders.findIndex(order => order.id === orderId);
-        
-        if (orderIndex !== -1) {
-          // Move to cancelled orders
-          const cancelledOrder = orders[orderIndex];
-          cancelledOrder.status = 'cancelled';
-          cancelledOrder.cancelledAt = new Date().toISOString();
-          
-          // Remove from active orders
-          orders.splice(orderIndex, 1);
-          
-          // Save cancelled orders separately
-          let cancelledOrders = JSON.parse(localStorage.getItem('cancelledOrders') || "[]");
-          cancelledOrders.push(cancelledOrder);
-          localStorage.setItem('cancelledOrders', JSON.stringify(cancelledOrders));
-          
-          localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
-          
-          showNotification("Order Cancelled", `Order #${orderId} has been cancelled.`, "info");
-          
-          // Refresh orders display
+        async () => {
+          const cached = cachedOrders.find(o => o.id === orderId);
+          const dbId = cached ? cached._id : orderId;
+
+          try {
+            await apiFetch(`/orders/${dbId}/status`, {
+              method: 'PUT',
+              body: { status: 'cancelled' }
+            });
+            showNotification("Order Cancelled", `Order #${orderId} has been cancelled.`, "info");
+          } catch (e) {
+            console.error('Failed to cancel order on backend:', e);
+            showNotification("Error", "Failed to cancel order on server.", "error");
+          }
+
+          await loadOrdersForOwner();
           const activeFilter = document.querySelector(".filter-btn.active").dataset.filter;
-          loadOrdersForOwner();
           if (activeFilter !== 'all') filterOrders(activeFilter);
-          
-          // Update analytics
           updateAnalytics();
-        }
         }
       );
     }
@@ -3374,33 +3373,37 @@
       alert(`Order Details:\n\n${details.replace(/<[^>]*>/g, '')}`);
     }
 
-    function reorderItem(orderId) {
-      let orders = JSON.parse(localStorage.getItem(ORDERS_KEY) || "[]");
-      const order = orders.find(o => o.id === orderId);
-      
-      if (!order) {
+    async function reorderItem(orderId) {
+      const cached = cachedOrders.find(o => o.id === orderId);
+      if (!cached) {
         showNotification("Error", "Order not found!", "error");
         return;
       }
       
       if (confirm("Create a new order with the same items?")) {
-        const newOrder = {
-          ...order,
-          id: 'ORD' + Date.now(),
-          date: new Date().toLocaleDateString("en-IN"),
-          time: new Date().toLocaleTimeString("en-IN", { hour: '2-digit', minute: '2-digit' }),
-          status: 'new',
-          createdAt: new Date().toISOString()
+        const items = (cached.items || []).map(it => {
+          const parts = it.split(' x');
+          const name = parts[0];
+          const qty = parts[1] ? parseInt(parts[1]) : 1;
+          return { name, price: 0, qty };
+        });
+
+        const body = {
+          customerName: cached.customerName || 'Walk-in',
+          items: items,
+          amount: cached.amountNumeric || 0,
+          method: cached.method || 'cash',
+          parcelSelected: cached.parcelSelected === true
         };
-        
-        delete newOrder.completedAt;
-        delete newOrder.cancelledAt;
-        
-        orders.push(newOrder);
-        localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
-        
-        showNotification("Order Recreated", "New order created with the same items.", "success");
-        loadOrdersForOwner();
+
+        try {
+          await apiFetch('/orders', { method: 'POST', body });
+          showNotification("Order Recreated", "New order created with the same items.", "success");
+          await loadOrdersForOwner();
+        } catch (e) {
+          console.error(e);
+          showNotification("Error", "Failed to recreate order on server.", "error");
+        }
       }
     }
 
@@ -3523,7 +3526,7 @@
       
       let history = [];
       try {
-        history = JSON.parse(localStorage.getItem(ORDERS_KEY) || "[]");
+        history = getAllOrders();
       } catch (e) {
         history = [];
       }
@@ -3974,127 +3977,26 @@
     async function loadMenuItems() {
       const container = document.getElementById('menuList');
       let menuItems = [];
-      const token = localStorage.getItem('fp_owner_token');
-      // If authenticated, prefer backend menu
-      if (token) {
-        try {
-          const remote = await apiFetch('/menu');
-          if (Array.isArray(remote)) {
-            // normalize backend items to local shape and persist locally for compatibility
-            const mapped = remote.map(i => ({
-              id: i._id || i.id || String(Date.now()) + Math.random(),
-              name: i.name,
-              price: i.price,
-              description: i.description || '',
-              available: (i.available !== false),
-              category: i.category || ''
-            }));
-            try { localStorage.setItem(MENU_ITEMS_KEY, JSON.stringify(mapped)); } catch(e) {}
-            menuItems = mapped;
-          }
-        } catch (e) {
-          console.warn('Failed to load remote menu, falling back to local', e);
-        }
-      }
-
       try {
-        const raw = localStorage.getItem(MENU_ITEMS_KEY);
-
-        // If the key is missing altogether, seed with a small default menu so
-        // the owner UI and storefront have something to work with on first run.
-        if (raw === null) {
-          // Use the same built-in foodData as the storefront so owner sees full menu
-          const builtinFoodData = [
-            { category: "🍛 BIRYANI", items: [
-              { name: "Chicken Dum Biryani", price: 100, description: "Aromatic basmati rice with tender chicken" },
-              { name: "Chicken Fry Biryani", price: 90, description: "Fried chicken pieces with flavorful rice" },
-              { name: "Egg Biryani", price: 90, description: "Boiled eggs with spiced rice" },
-              { name: "Veg Biryani", price: 80, description: "Mixed vegetables with aromatic rice" },
-              { name: "Biryani Rice (Kushkha)", price: 60, description: "Plain biryani rice" }
-            ]},
-            { category: "🥟 MOMO", items: [
-              { name: "Veg Momo (Steam)", price: 60, description: "Steamed vegetable dumplings" },
-              { name: "Veg Momo (Fried)", price: 70, description: "Crispy fried vegetable dumplings" },
-              { name: "Veg Momo (Chilli)", price: 90, description: "Spicy chilli vegetable momos" },
-              { name: "Paneer Momo (Steam)", price: 70, description: "Steamed paneer-filled dumplings" },
-              { name: "Paneer Momo (Fried)", price: 80, description: "Fried paneer dumplings" },
-              { name: "Paneer Momo (Chilli)", price: 100, description: "Spicy chilli paneer momos" },
-              { name: "Chicken Momo (Steam)", price: 70, description: "Steamed chicken dumplings" },
-              { name: "Chicken Momo (Fried)", price: 80, description: "Fried chicken dumplings" },
-              { name: "Chicken Momo (Chilli)", price: 100, description: "Spicy chilli chicken momos" }
-            ]},
-            { category: "🍗 CHINESE NON-VEG DRY ITEMS", items: [
-              { name: "Chilli Chicken", price: 120, description: "Spicy indo-chinese chicken" },
-              { name: "Chicken 65", price: 120, description: "Crispy deep-fried chicken" },
-              { name: "Chicken Lollipop", price: 100, description: "Chicken wings in lollipop style" },
-              { name: "Chicken Pepper Dry", price: 120, description: "Pepper flavored dry chicken" },
-              { name: "Lemon Chicken", price: 140, description: "Tangy lemon flavored chicken" },
-              { name: "Chicken Kabab", price: 100, description: "Traditional chicken kababs" },
-              { name: "Chicken Kabab (Boneless)", price: 120, description: "Boneless chicken kababs" }
-            ]},
-            { category: "🍜 NOODLES", items: [
-              { name: "Veg Noodles", price: "30 / 50", description: "Mixed vegetable noodles" },
-              { name: "Egg Noodles", price: "40 / 60", description: "Noodles with scrambled eggs" },
-              { name: "Chicken Noodles", price: "50 / 90", description: "Chicken flavored noodles" },
-              { name: "Mushroom Noodles", price: "50 / 80", description: "Mushroom flavored noodles" },
-              { name: "Gobi Noodles", price: "40 / 70", description: "Cauliflower noodles" },
-              { name: "Paneer Noodles", price: "50 / 90", description: "Paneer cubes with noodles" },
-              { name: "Hakka Noodles", price: "45 / 80", description: "Traditional hakka style noodles" }
-            ]},
-            { category: "🍲 CURRY ITEMS – VEG", items: [
-              { name: "Matar Paneer", price: 120, description: "Peas and cottage cheese curry" },
-              { name: "Palak Paneer", price: 120, description: "Spinach and paneer curry" },
-              { name: "Paneer Masala", price: 120, description: "Paneer in rich masala gravy" },
-              { name: "Paneer Butter Masala", price: 140, description: "Paneer in creamy tomato gravy" },
-              { name: "Mushroom Curry", price: 100, description: "Mushroom in spicy gravy" },
-              { name: "Mix Veg Curry", price: 80, description: "Mixed vegetables in curry" }
-            ]},
-            { category: "🍛 CURRY ITEMS – NON-VEG", items: [
-              { name: "Chicken Curry", price: 100, description: "Traditional chicken curry" },
-              { name: "Chicken Masala", price: 120, description: "Spicy chicken masala" },
-              { name: "Butter Chicken", price: 180, description: "Creamy butter chicken" },
-              { name: "Chicken Kolapuri", price: 150, description: "Spicy Kolhapuri style chicken" },
-              { name: "Kadai Chicken", price: 140, description: "Kadai style chicken curry" }
-            ]},
-            { category: "🍚 RICE ITEMS – VEG", items: [
-              { name: "Veg Fried Rice", price: 50, description: "Mixed vegetable fried rice" },
-              { name: "Ghee Rice", price: 60, description: "Aromatic ghee rice" },
-              { name: "Paneer Rice", price: 80, description: "Paneer fried rice" },
-              { name: "Mushroom Rice", price: 80, description: "Mushroom fried rice" },
-              { name: "Manchurian Rice", price: 70, description: "Rice with veg manchurian" },
-              { name: "Gobi Rice", price: 70, description: "Cauliflower fried rice" },
-              { name: "Jeera Rice", price: 50, description: "Cumin flavored rice" }
-            ]},
-            { category: "🍗 RICE ITEMS – NON-VEG", items: [
-              { name: "Chicken Fried Rice", price: "50 / 90", description: "Chicken fried rice" },
-              { name: "Egg Fried Rice", price: "40 / 60", description: "Egg fried rice" },
-              { name: "Singapore Chicken Rice", price: 120, description: "Singapore style chicken rice" }
-            ]},
-            { category: "🍽️ MEALS", items: [
-              { name: "Veg Meals (2 roti, ½ rice, dal, sabji)", price: 60, description: "" },
-              { name: "Chicken Meals (2 roti, ½ rice, dal, ½ chicken curry)", price: 90, description: "" },
-              { name: "Fish Meals (2 roti, ½ rice, dal, ½ fish curry)", price: 90, description: "" },
-              { name: "Chole Bhature (12:00 – 4:00 PM)", price: 80, description: "" }
-            ]}
-          ];
-
-          const seed = builtinFoodData.flatMap(cat => (cat.items || []).map((it, idx) => ({
-            id: `${cat.category}-${idx}`,
-            name: it.name,
-            price: it.price,
-            description: it.description || '',
-            available: true,
-            category: cat.category
-          })));
-
-          try { localStorage.setItem(MENU_ITEMS_KEY, JSON.stringify(seed)); } catch(e) { /* ignore */ }
-          menuItems = seed;
-        } else {
-          // parse previously set local menu (or fallback to seed)
-          menuItems = JSON.parse(raw || '[]');
+        const remote = await apiFetch('/menu');
+        if (Array.isArray(remote)) {
+          menuItems = remote.map(i => ({
+            id: i._id || i.id,
+            name: i.name,
+            price: i.price,
+            description: i.description || '',
+            available: (i.available !== false),
+            category: i.category || 'Uncategorized'
+          }));
+          try { localStorage.setItem(MENU_ITEMS_KEY, JSON.stringify(menuItems)); } catch(e) {}
         }
-      } catch(e) {
-        menuItems = [];
+      } catch (e) {
+        console.warn('Failed to load remote menu, falling back to local', e);
+        try {
+          menuItems = JSON.parse(localStorage.getItem(MENU_ITEMS_KEY) || '[]');
+        } catch (err) {
+          menuItems = [];
+        }
       }
 
       if (!menuItems.length) {
@@ -4548,62 +4450,6 @@
           );
         }
       );
-    }
-
-    function generateDemoOrders() {
-      const demoOrders = [
-        {
-          id: "ORD" + Date.now(),
-          date: new Date().toLocaleDateString("en-IN"),
-          time: new Date().toLocaleTimeString("en-IN", { hour: '2-digit', minute: '2-digit' }),
-          amount: "₹450",
-          method: "Cash",
-          items: ["Butter Chicken", "Garlic Naan", "Coke"],
-          customerName: "Rahul Sharma",
-          status: "new",
-          parcelSelected: false,
-          createdAt: new Date().toISOString()
-        },
-        {
-          id: "ORD" + (Date.now() + 1),
-          date: new Date().toLocaleDateString("en-IN"),
-          time: new Date().toLocaleTimeString("en-IN", { hour: '2-digit', minute: '2-digit' }),
-          amount: "₹320",
-          method: "Online",
-          items: ["Paneer Tikka", "Roti", "Salad"],
-          customerName: "Priya Patel",
-          status: "new",
-          parcelSelected: true,
-          createdAt: new Date().toISOString()
-        },
-        {
-          id: "ORD" + (Date.now() + 2),
-          date: new Date().toLocaleDateString("en-IN"),
-          time: new Date().toLocaleTimeString("en-IN", { hour: '2-digit', minute: '2-digit' }),
-          amount: "₹580",
-          method: "Cash",
-          items: ["Biryani", "Raita", "Chicken Curry"],
-          customerName: "Amit Kumar",
-          status: "pending",
-          parcelSelected: false,
-          createdAt: new Date(Date.now() - 3600000).toISOString()
-        }
-      ];
-      
-      // Get existing orders
-      let existingOrders = [];
-      try {
-        existingOrders = JSON.parse(localStorage.getItem(ORDERS_KEY) || "[]");
-      } catch (e) {
-        existingOrders = [];
-      }
-      
-      // Add demo orders
-      const allOrders = [...existingOrders, ...demoOrders];
-      localStorage.setItem(ORDERS_KEY, JSON.stringify(allOrders));
-      
-      showNotification("Demo Data Added", "Sample orders added for testing.", "success");
-      refreshDashboard();
     }
 
     function exportDashboardPDF() {

@@ -6,6 +6,8 @@
   <title>Food Point • Your Orders • Crypto Style</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="fp-config.js"></script>
+  <script src="fp-fetch-proxy.js"></script>
   <style>
     * {
       margin: 0;
@@ -822,7 +824,7 @@
       }
     }
 
-    function renderOrders() {
+    async function renderOrders() {
       const container = document.getElementById("ordersContainer");
       const emptyState = document.getElementById("emptyState");
 
@@ -836,9 +838,12 @@
 
       let orders = [];
       try {
-        const raw = localStorage.getItem(getOrdersStorageKey());
-        orders = raw ? JSON.parse(raw) : [];
+        orders = await FPAPI.get('/orders');
+        if (!orders || !Array.isArray(orders)) {
+          orders = [];
+        }
       } catch (e) {
+        console.error("Failed to fetch orders:", e);
         orders = [];
       }
 
@@ -858,8 +863,8 @@
           const block = document.createElement("div");
           block.className = "order-block";
           
-          const orderId = order.id || "###";
-          const dateText = order.date || new Date().toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+          const orderId = order._id ? order._id.slice(-6).toUpperCase() : (order.id || "###");
+          const dateText = order.createdAt ? new Date(order.createdAt).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) : (order.date || 'Today');
           const method = order.method || "online";   // 'cash' or 'online' (UPI)
           const parcelSelected = order.parcelSelected === true;
           const items = Array.isArray(order.items) ? order.items : [];
@@ -999,40 +1004,7 @@
       } catch(e) { /* ignore */ }
     }
     
-    // populate sample orders for demo if empty, so UI is not blank
-    function populateSampleOrdersIfEmpty() {
-      const storageKey = getOrdersStorageKey();
-      const existing = localStorage.getItem(storageKey);
-      if (!existing || JSON.parse(existing).length === 0) {
-        const demoOrders = [
-          {
-            id: "001",
-            date: "16 April 2026",
-            method: "cash",
-            parcelSelected: false,
-            items: ["Grilled Chicken Burger", "French Fries", "Coca-Cola"]
-          },
-          {
-            id: "002",
-            date: "15 April 2026",
-            method: "online",
-            parcelSelected: true,
-            items: ["Margherita Pizza", "Garlic Bread", "Lemon Iced Tea"]
-          },
-          {
-            id: "003",
-            date: "14 April 2026",
-            method: "online",
-            parcelSelected: false,
-            items: ["Vegan Bowl", "Avocado Smoothie"]
-          }
-        ];
-        localStorage.setItem(storageKey, JSON.stringify(demoOrders));
-      }
-    }
-
     document.addEventListener("DOMContentLoaded", () => {
-      populateSampleOrdersIfEmpty();
       updateUserDisplay();
       renderOrders();
     });

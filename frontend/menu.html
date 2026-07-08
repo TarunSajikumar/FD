@@ -1463,23 +1463,36 @@
       ]}
     ];
 
-    // If owner has managed menu items in localStorage under key "menuItems",
-    // prefer that data (grouped by category) and filter out unavailable items.
-    function getMenuData() {
+    let cachedMenu = [];
+
+    async function loadMenuFromBackend() {
       try {
-        const local = JSON.parse(localStorage.getItem('menuItems') || '[]');
+        const local = await FPAPI.get('/menu');
         if (Array.isArray(local) && local.length) {
           const filtered = local.filter(i => i.available !== false);
           const map = new Map();
           filtered.forEach(it => {
             const cat = it.category || 'Uncategorized';
             if (!map.has(cat)) map.set(cat, []);
-            map.get(cat).push({ name: it.name, price: it.price, description: it.description || '' });
+            map.get(cat).push({ id: it._id, name: it.name, price: it.price, description: it.description || '' });
           });
-          return Array.from(map.entries()).map(([category, items]) => ({ category, items }));
+          cachedMenu = Array.from(map.entries()).map(([category, items]) => ({ category, items }));
+        } else {
+          cachedMenu = [];
         }
-      } catch (e) { console.warn('getMenuData parse error', e); }
-      return foodData;
+      } catch (e) {
+        console.warn('loadMenuFromBackend parse error', e);
+        // Fallback to hardcoded list
+        const map = new Map();
+        foodData.forEach(cat => {
+          map.set(cat.category, cat.items);
+        });
+        cachedMenu = Array.from(map.entries()).map(([category, items]) => ({ category, items }));
+      }
+    }
+
+    function getMenuData() {
+      return cachedMenu;
     }
 
     /* ================
@@ -1904,7 +1917,8 @@
       }
     });
 
-    function init(){
+    async function init(){
+      await loadMenuFromBackend();
       loadSelected();
       renderCategories();
       renderFoodItems();
@@ -1922,6 +1936,21 @@
       window.addEventListener('resize', setVH);
       window.addEventListener('orientationchange', setVH);
       setVH();
+
+      // Setup Socket.IO listener for real-time shop status updates
+      FPAPI.setupSocket({
+        onShopStatusChanged: (s) => {
+          const status = s.status || s;
+          localStorage.setItem('shopStatus', status);
+          if (status === 'closed') {
+            alert('The shop has closed. Ordering is now disabled.');
+            window.location.reload();
+          } else {
+            alert('The shop is now open! You can place orders.');
+            window.location.reload();
+          }
+        }
+      });
     }
 
     document.addEventListener('DOMContentLoaded', init);

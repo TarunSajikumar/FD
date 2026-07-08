@@ -6,6 +6,8 @@
   <title>FOOD POINT · Payment Confirmed • Crypto Style</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="fp-config.js"></script>
+  <script src="fp-fetch-proxy.js"></script>
   <style>
     * {
       margin: 0;
@@ -943,147 +945,55 @@
     }
 
     function applyOrderToUI(order) {
-      if (order.id) document.getElementById("orderId").innerText = order.id;
-      if (order.date) document.getElementById("orderDate").innerText = order.date;
-      if (order.amount) document.getElementById("amountPaid").innerHTML = formatINR(order.amount);
-      if (order.method) document.getElementById("paymentMethod").innerText = order.method;
-    }
+      if (!order) return;
+      const orderId = order._id ? '#FP' + order._id.slice(-6).toUpperCase() : (order.id || '###');
+      document.getElementById("orderId").innerText = orderId;
 
-    // ------ create fresh order from justPaid flag or retrieve latest ------
-    function buildNewOrderFromStorage() {
-      const now = new Date();
-      const dateOptions = { year: "numeric", month: "long", day: "numeric" };
-      const dateText = now.toLocaleDateString("en-IN", dateOptions);
-      const timeText = now.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
+      const dateText = order.createdAt ? new Date(order.createdAt).toLocaleDateString('en-IN', { year: "numeric", month: "long", day: "numeric" }) : (order.date || 'Today');
+      document.getElementById("orderDate").innerText = dateText;
 
-      // get amount from payment page (set by payment-flow)
-      let storedAmount = localStorage.getItem(getUserSpecificKey("amountPaid")) || localStorage.getItem(getUserSpecificKey("amountPaidNumeric")) || "₹0.00";
-      let numericAmount = 0;
-      if (typeof storedAmount === 'string') {
-        const parsed = parseFloat(storedAmount.replace(/[₹, ]+/g, ''));
-        numericAmount = isNaN(parsed) ? 0 : parsed;
-      } else if (typeof storedAmount === 'number') numericAmount = storedAmount;
-      
-      const method = localStorage.getItem(getUserSpecificKey("paymentMethod")) || "Online UPI";
-      const displayAmount = (numericAmount > 0) ? '₹' + numericAmount.toFixed(2) : storedAmount;
-
-      // generate order ID sequential (daily)
-      const todayKey = now.toISOString().slice(0, 10);
-      let counterData = { date: todayKey, last: 0 };
-      try {
-        const storedCounter = localStorage.getItem(COUNTER_KEY);
-        if (storedCounter) {
-          const parsed = JSON.parse(storedCounter);
-          if (parsed.date === todayKey) counterData = parsed;
-        }
-      } catch(e) {}
-      counterData.last = (counterData.last || 0) + 1;
-      localStorage.setItem(COUNTER_KEY, JSON.stringify(counterData));
-      const orderNumber = counterData.last;
-      const orderId = "#FP" + String(orderNumber).padStart(4, "0") + "-" + String(Date.now()).slice(-4);
-
-      // build items list (for future orders page, we preserve)
-      let items = [];
-      try {
-        const cartRaw = localStorage.getItem(getUserSpecificKey('cartItems'));
-        if (cartRaw) {
-          const parsed = JSON.parse(cartRaw);
-          if (Array.isArray(parsed) && parsed.length) {
-            items = parsed.map(it => (typeof it === 'object' ? (it.name || it.title || 'Item') : String(it)));
-          }
-        }
-      } catch(e) {}
-      if (!items.length) {
-        try {
-          const v1 = JSON.parse(localStorage.getItem(getUserSpecificKey('selectedFoods_v1')) || '[]');
-          if (Array.isArray(v1) && v1.length) items = v1.map(it => typeof it === 'object' ? (it.name || 'Item') : it);
-        } catch(e) {}
+      if (order.amount != null) document.getElementById("amountPaid").innerHTML = formatINR(order.amount);
+      if (order.method) {
+        let methodText = order.method === 'online' ? 'Online UPI' : (order.method === 'cash' ? 'Cash Payment' : order.method);
+        document.getElementById("paymentMethod").innerText = methodText;
       }
-      if (!items.length) {
-        try {
-          const legacy = JSON.parse(localStorage.getItem(getUserSpecificKey('selectedFoods')) || '[]');
-          if (Array.isArray(legacy) && legacy.length) items = legacy;
-        } catch(e) {}
-      }
-      
-      let customerName = 'Guest';
-      try {
-        const userRaw = localStorage.getItem("fp_current_user");
-        if (userRaw) {
-          const user = JSON.parse(userRaw);
-          if (user && user.name) customerName = user.name;
-        }
-      } catch(e) {}
-
-      const newOrder = {
-        id: orderId,
-        date: dateText,
-        time: timeText,
-        amount: displayAmount,
-        amountNumeric: numericAmount,
-        method: method,
-        items: items,
-        customerName: customerName,
-        status: 'new',
-        createdAt: now.toISOString()
-      };
-      return newOrder;
     }
 
     // ----- main execution -----
-    const justPaidFlag = localStorage.getItem(getUserSpecificKey("justPaid")) === "1";
     if (enforceOpenStore()) return;
-    const storageKey = getOrdersStorageKey();
-    let history = [];
 
+    let lastOrder = null;
     try {
-      const rawHistory = localStorage.getItem(storageKey);
-      history = rawHistory ? JSON.parse(rawHistory) : [];
-    } catch(e) { history = []; }
+      const rawLastOrder = localStorage.getItem('fp_last_order');
+      if (rawLastOrder) {
+        lastOrder = JSON.parse(rawLastOrder);
+      }
+    } catch(e) {}
 
+    const justPaidFlag = localStorage.getItem(getUserSpecificKey("justPaid")) === "1";
     if (justPaidFlag) {
-      // fresh order created after successful payment
-      const freshOrder = buildNewOrderFromStorage();
-      // add to user-specific history
-      history.push(freshOrder);
-      localStorage.setItem(storageKey, JSON.stringify(history));
-      
-      // also sync to global ordersHistory (for admin/fallback)
-      try {
-        const globalHistory = JSON.parse(localStorage.getItem(ORDERS_KEY) || "[]");
-        globalHistory.push(freshOrder);
-        localStorage.setItem(ORDERS_KEY, JSON.stringify(globalHistory));
-      } catch(e) {}
-
-      // display fresh order
-      applyOrderToUI(freshOrder);
-
-      // clear cart & payment flags after creating order (preserve justPaid reset)
+      // clear cart & payment flags after creating order
       localStorage.removeItem("selectedFoods");
       localStorage.removeItem("selectedFoods_v1");
       localStorage.removeItem(getUserSpecificKey("cartItems"));
       localStorage.removeItem(getUserSpecificKey("parcelSelected"));
       localStorage.setItem(getUserSpecificKey("justPaid"), "0");
-    } 
-    else {
-      // No fresh payment — show the most recent order from history (if any)
-      if (history.length > 0) {
-        const lastOrder = history[history.length - 1];
-        applyOrderToUI(lastOrder);
-      } 
-      else {
-        // fallback: attempt to pull from localStorage fields set by payment page
-        let fallbackAmount = localStorage.getItem("amountPaid") || "₹149.00";
-        let fallbackMethod = localStorage.getItem("paymentMethod") || "Cash / UPI";
-        let fallbackDate = new Date().toLocaleDateString("en-IN", { year: "numeric", month: "long", day: "numeric" });
-        let fallbackId = "#FP" + Math.floor(Math.random() * 1000);
-        applyOrderToUI({
-          id: fallbackId,
-          date: fallbackDate,
-          amount: fallbackAmount,
-          method: fallbackMethod
-        });
-      }
+    }
+
+    if (lastOrder) {
+      applyOrderToUI(lastOrder);
+    } else {
+      // fallback: attempt to pull from localStorage fields set by payment page
+      let fallbackAmount = localStorage.getItem("amountPaid") || "₹149.00";
+      let fallbackMethod = localStorage.getItem("paymentMethod") || "Cash / UPI";
+      let fallbackDate = new Date().toLocaleDateString("en-IN", { year: "numeric", month: "long", day: "numeric" });
+      let fallbackId = "#FP" + Math.floor(Math.random() * 1000);
+      applyOrderToUI({
+        id: fallbackId,
+        date: fallbackDate,
+        amount: fallbackAmount,
+        method: fallbackMethod
+      });
     }
 
     // Additional polish: if amount displays as ₹0.00 due to missing numeric, try to recover from amountPaidNumeric
